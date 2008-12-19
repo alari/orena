@@ -148,6 +148,17 @@ class Dao_FieldInfo {
 	}
 
 	/**
+	 * Returns value of param stored in field config query
+	 *
+	 * @param string $paramName
+	 * @return string
+	 */
+	public function getParam( $paramName )
+	{
+		return isset( $this->params[ $paramName ] ) ? $this->params[ $paramName ] : null;
+	}
+
+	/**
 	 * Adds field to CREATE query
 	 *
 	 * @param Db_Query $query
@@ -161,6 +172,18 @@ class Dao_FieldInfo {
 			$query->field( $this->name, $this->type );
 		else
 			$query->field( $this->name, "int" )->index( $this->name );
+	}
+
+	/**
+	 * Alters table to add unexistent field
+	 *
+	 * @return PDOStatement
+	 */
+	private function addFieldToTable()
+	{
+		$q = new Dao_Query( $this->class );
+		$this->addFieldTypeToQuery( $q );
+		return $q->alter( "ADD" );
 	}
 
 	/**
@@ -255,10 +278,12 @@ class Dao_FieldInfo {
 	 * @param mixed $fieldValue
 	 * @return mixed
 	 */
-	public function getValue( Dao_Object $object, $fieldValue = null )
+	public function getValue( Dao_Object $object, $fieldValue, $fieldExists )
 	{
 		// Value as is
 		if ($this->isAtomic) {
+			if (!$fieldExists)
+				$this->addFieldToTable();
 			return $fieldValue;
 		}
 		// Alias -- cached query
@@ -278,6 +303,8 @@ class Dao_FieldInfo {
 			return $this->getRelation( $object->id );
 		}
 		// Base-to-one
+		if (!$fieldExists)
+			$this->addFieldToTable();
 		return Dao_Object::getById( $fieldValue, $this->relationTarget );
 	}
 

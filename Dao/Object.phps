@@ -1,10 +1,10 @@
 <?php
 abstract class Dao_Object {
 	private static $objs = array();
-	
+
 	private $fields = array();
 	private $changed = array();
-	
+
 	/**
 	 * Creates a new object in database
 	 *
@@ -29,7 +29,7 @@ abstract class Dao_Object {
 		$this->reload();
 		self::$objs[ get_class( $this ) ][ $this->fields[ "id" ] ] = $this;
 	}
-	
+
 	/**
 	 * Magic functionality
 	 *
@@ -44,10 +44,10 @@ abstract class Dao_Object {
 			list($name, $subreq) = explode( ".", $name, 2 );
 			return $this->getFieldInfo( $name )->getMappedQuery( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
-		
-		return $this->getFieldInfo( $name )->getValue( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
+
+		return $this->getFieldInfo( $name )->getValue( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, isset( $this->fields[ $name ] ) );
 	}
-	
+
 	/**
 	 * Works only with atomic fields
 	 *
@@ -58,7 +58,7 @@ abstract class Dao_Object {
 	{
 		if ($name == "id")
 			return;
-		
+
 		if ($this->getFieldInfo( $name )->isAtomic()) {
 			if ($this->fields[ $name ] != $value)
 				$this->changed[ $name ] = $value;
@@ -66,7 +66,7 @@ abstract class Dao_Object {
 			$this->getFieldInfo( $name )->setValue( $this, $value );
 		}
 	}
-	
+
 	/**
 	 * Sets the field without any test
 	 *
@@ -78,7 +78,7 @@ abstract class Dao_Object {
 	{
 		$this->changed[ $name ] = $value;
 	}
-	
+
 	/**
 	 * Sets the field value as is
 	 *
@@ -95,7 +95,7 @@ abstract class Dao_Object {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Returns field info object
 	 *
@@ -107,10 +107,10 @@ abstract class Dao_Object {
 		$fieldInfo = Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new Exception( "Unknown field: $name." );
-		
+
 		return $fieldInfo;
 	}
-	
+
 	/**
 	 * Saves the changes
 	 *
@@ -120,14 +120,14 @@ abstract class Dao_Object {
 	{
 		if (!count( $this->changed ))
 			return true;
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
-		
+
 		foreach ($this->changed as $name => $value) {
 			$query->field( $name, $value );
 		}
-		
+
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
 				if (isset( $this->fields[ $name ] ))
@@ -135,10 +135,10 @@ abstract class Dao_Object {
 			$this->changed = array();
 			return true;
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Updates object fields from database
 	 *
@@ -154,7 +154,7 @@ abstract class Dao_Object {
 				$fieldInfo->reload( $this->id );
 		return true;
 	}
-	
+
 	/**
 	 * Returns an object by its ID
 	 *
@@ -167,7 +167,7 @@ abstract class Dao_Object {
 	{
 		if (isset( self::$objs[ $class ][ $id ] ))
 			return self::$objs[ $class ][ $id ];
-		
+
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new Dao_Query( $class );
@@ -179,7 +179,7 @@ abstract class Dao_Object {
 		}
 		return self::$objs[ $class ][ $id ] = null;
 	}
-	
+
 	/**
 	 * Delete the object
 	 *
@@ -189,7 +189,7 @@ abstract class Dao_Object {
 		$fields = Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
 			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
 	}
