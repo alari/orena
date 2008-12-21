@@ -23,6 +23,8 @@ class Test_Suite extends PHPUnit_Framework_TestSuite {
 		$this->addTestSuite( 'Test_Cases_DbManager' );
 		
 		$this->addTestSuite( 'Test_Cases_DaoTableInfo' );
+		
+		$this->addTestSuite( 'Test_Cases_DaoSignals' );
 	
 	}
 

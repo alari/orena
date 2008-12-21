@@ -189,31 +189,31 @@ class Dao_FieldInfo {
 	/**
 	 * Create relation with other object(s).
 	 *
-	 * @param int $object_id
+	 * @param int $obj_id
 	 * @return Dao_Relation_BaseToMany
 	 */
-	private function getRelation( $object_id )
+	private function getRelation( $obj_id )
 	{
-		if (!isset( $this->relation[ $object_id ] ) || !$this->relation[ $object_id ] instanceof Dao_Relation_BaseToMany) {
+		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->relationMany) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $object_id ] = new Dao_Relation_ManyToMany( $this->relationTarget, $this->relationInverse, $object_id, $this->class, $this->name );
+				$this->relation[ $obj_id ] = new Dao_Relation_ManyToMany( $this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name );
 			} else {
 				// Has many with inverse
-				$this->relation[ $object_id ] = new Dao_Relation_OneToMany( $this->relationTarget, $this->relationInverse, $object_id, $this->class, $this->name );
+				$this->relation[ $obj_id ] = new Dao_Relation_OneToMany( $this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name );
 			}
 		}
-		return $this->relation[ $object_id ];
+		return $this->relation[ $obj_id ];
 	}
 
 	/**
 	 * Refreshes relation object
 	 *
-	 * @param int $object_id
+	 * @param int $obj_id
 	 */
-	public function reload( $object_id )
+	public function reload( $obj_id )
 	{
-		$this->relation[ $object_id ] = null;
+		$this->relation[ $obj_id ] = null;
 	}
 
 	/**
@@ -248,7 +248,13 @@ class Dao_FieldInfo {
 	 */
 	public function setValue( Dao_Object $obj, $fieldValue )
 	{
-		// TODO: add signal support
+		if (isset( $this->params[ "signal" ] )) {
+			// Old value removed
+			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, $obj, $obj->{$this->name} );
+			// New value is set
+			Dao_Signals::fire( Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, $obj, $fieldValue );
+			// TODO: maybe signal should be fired when field is saved to database, not just set?
+		}
 		// Value as is
 		if ($this->isAtomic) {
 			return $obj->setField( $this->name, $fieldValue );
@@ -274,11 +280,11 @@ class Dao_FieldInfo {
 	/**
 	 * Returns the field value, even if it's a relation
 	 *
-	 * @param Dao_Object $object
+	 * @param Dao_Object $obj
 	 * @param mixed $fieldValue
 	 * @return mixed
 	 */
-	public function getValue( Dao_Object $object, $fieldValue, $fieldExists )
+	public function getValue( Dao_Object $obj, $fieldValue, $fieldExists )
 	{
 		// Value as is
 		if ($this->isAtomic) {
@@ -296,11 +302,11 @@ class Dao_FieldInfo {
 				throw new Exception( "Wrong mapped query produced by $name.$subreq map." );
 			}
 			$q = clone $this->aliasQuery;
-			return $q->test( $this->aliasTestField, $fieldValue ? $fieldValue : $object->id );
+			return $q->test( $this->aliasTestField, $fieldValue ? $fieldValue : $obj->id );
 		}
 		// Many objects
 		if ($this->relationMany) {
-			return $this->getRelation( $object->id );
+			return $this->getRelation( $obj->id );
 		}
 		// Base-to-one
 		if (!$fieldExists)
@@ -311,19 +317,19 @@ class Dao_FieldInfo {
 	/**
 	 * Returns query by object relations mapping
 	 *
-	 * @param Dao_Object $object
+	 * @param Dao_Object $obj
 	 * @param int $fieldValue
 	 * @param string $subreq
 	 * @return Dao_Query
 	 */
-	public function getMappedQuery( Dao_Object $object, $fieldValue = null, $subreq = "" )
+	public function getMappedQuery( Dao_Object $obj, $fieldValue = null, $subreq = "" )
 	{
 		if ($this->isAtomic())
 			throw new Exception( "Cannot create mapped query field by atomic field basis." );
 		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
-		$query->test( $joinOnField, $fieldValue ? $fieldValue : $object->id );
+		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id );
 		return $query;
 	}
 
@@ -401,19 +407,23 @@ class Dao_FieldInfo {
 	/**
 	 * Handles deletion of object -- or just of relation
 	 *
-	 * @param Dao_Object $object
+	 * @param Dao_Object $obj
 	 * @param mixed $fieldValue
 	 */
-	public function deleteThis( Dao_Object $object, $fieldValue = null )
+	public function deleteThis( Dao_Object $obj, $fieldValue = null )
 	{
+		if (isset( $this->params[ "signal" ] )) {
+			// Old value removed
+			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, $obj, $obj->{$this->name} );
+		}
 		if ($this->isAtomic || $this->alias) {
 			// TODO: add signal support for atomic fields
 			return;
 		}
-		unset( $this->relation[ $object->id ] );
+		unset( $this->relation[ $obj->id ] );
 		if ($this->relationMany) {
 			// Action is always needed
-			$this->getRelation( $object->id )->removeAll( $this->relationOwns );
+			$this->getRelation( $obj->id )->removeAll( $this->relationOwns );
 		} else {
 			// Action needed if target is set and must be deleted, or if inverse field must be cleaned
 			$relative = Dao_Object::getById( $fieldValue, $this->relationTarget );

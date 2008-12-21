@@ -49,7 +49,7 @@ abstract class Dao_Object {
 	}
 
 	/**
-	 * Works only with atomic fields
+	 * Works only with atomic and base-to-one
 	 *
 	 * @param string $name
 	 * @param mixed $value
@@ -59,12 +59,7 @@ abstract class Dao_Object {
 		if ($name == "id")
 			return;
 		
-		if ($this->getFieldInfo( $name )->isAtomic()) {
-			if ($this->fields[ $name ] != $value)
-				$this->changed[ $name ] = $value;
-		} else {
-			$this->getFieldInfo( $name )->setValue( $this, $value );
-		}
+		$this->getFieldInfo( $name )->setValue( $this, $value );
 	}
 
 	/**
