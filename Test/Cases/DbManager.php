@@ -8,7 +8,7 @@ require_once 'PHPUnit/Framework/TestCase.php';
  * Db_Manager test case.
  */
 class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
-
+	
 	/**
 	 * @var Db_Manager
 	 */
@@ -20,7 +20,7 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	protected function setUp()
 	{
 		parent::setUp();
-
+	
 	}
 
 	/**
@@ -30,7 +30,6 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	{
 		parent::tearDown();
 	}
-
 
 	/**
 	 * Tests Db_Manager::getConnection()

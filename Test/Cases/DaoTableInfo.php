@@ -8,7 +8,7 @@ require_once 'PHPUnit/Framework/TestCase.php';
  * Dao_TableInfo test case.
  */
 class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
-
+	
 	/**
 	 * Object to work with
 	 *
@@ -22,11 +22,11 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	protected function setUp()
 	{
 		parent::setUp();
-
+		
 		Db_Manager::getConnection()->query( "DROP TABLE IF EXISTS create_table" );
-
+		
 		$this->Dao_TableInfo = Dao_TableInfo::get( "Test_Models_Tbl" );
-
+	
 	}
 
 	/**
@@ -34,9 +34,9 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	 */
 	protected function tearDown()
 	{
-
+		
 		$this->Dao_TableInfo = null;
-
+		
 		parent::tearDown();
 	}
 
@@ -46,15 +46,15 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	public function testGet()
 	{
 		$this->assertEquals( "Dao_TableInfo", get_class( $this->Dao_TableInfo ) );
-
+	
 	}
 
 	public function testCreateTable()
 	{
 		$this->assertFalse( $this->Dao_TableInfo->tableExists(), "Table should not exist" );
-
+		
 		$this->assertEquals( "PDOStatement", get_class( $this->Dao_TableInfo->createTable() ), "Creating table" );
-
+		
 		$this->assertTrue( $this->Dao_TableInfo->tableExists(), "Table should exist now" );
 	}
 
@@ -77,7 +77,7 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	public function testGetFields()
 	{
 		$this->assertEquals( 2, count( $this->Dao_TableInfo->getFields(/* parameters */) ) );
-
+	
 	}
 
 	/**
@@ -85,22 +85,23 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetPrefix()
 	{
-
+		
 		$this->assertEquals( "", Dao_TableInfo::getPrefix(), "Prefix is clear" );
-
+		
 		Dao_TableInfo::setPrefix( "test" );
-
+		
 		$this->assertEquals( "test_", Dao_TableInfo::getPrefix(), "Setting test prefix" );
-
+		
 		Dao_TableInfo::setPrefix( "" );
-
+	
 	}
 
-	public function testGetParam() {
-		$fieldInfo = $this->Dao_TableInfo->getFieldInfo("intfield");
-
-		$this->assertEquals(1, $fieldInfo->getParam("test"));
-		$this->assertNull($fieldInfo->getParam("asdasas"));
+	public function testGetParam()
+	{
+		$fieldInfo = $this->Dao_TableInfo->getFieldInfo( "intfield" );
+		
+		$this->assertEquals( 1, $fieldInfo->getParam( "test" ) );
+		$this->assertNull( $fieldInfo->getParam( "asdasas" ) );
 	}
 
 }

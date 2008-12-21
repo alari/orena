@@ -2,8 +2,8 @@
 class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	
 	protected $class;
-	protected $objects = Array();
-	
+	protected $objects = Array ();
+
 	/**
 	 * Creates query instance for a class
 	 *
@@ -17,7 +17,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->class = $class;
 		parent::__construct( Dao_TableInfo::get( $class )->getTableName(), $alias );
 	}
-	
+
 	/**
 	 * Sets the class and table to select objects
 	 *
@@ -32,7 +32,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->class = $class;
 		return parent::from( Dao_TableInfo::get( $class )->getTableName(), $alias );
 	}
-	
+
 	/**
 	 * Returns first Dao_Object from query
 	 *
@@ -46,7 +46,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Returns (cached) array of query results as Dao_Objects
 	 *
@@ -58,12 +58,12 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		if (!$forse && count( $this->objects ))
 			return $this->objects;
 		$r = $this->select()->fetchAll();
-		$this->objects = Array();
+		$this->objects = Array ();
 		foreach ($r as $o)
 			$this->objects[ $o[ "id" ] ] = Dao_Object::getById( $o[ "id" ], $this->class, $o );
 		return $this->objects;
 	}
-	
+
 	/**
 	 * For Iterator
 	 *
@@ -75,7 +75,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return reset( $this->objects );
 	}
-	
+
 	/**
 	 * For Iterator
 	 *
@@ -87,7 +87,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return current( $this->objects );
 	}
-	
+
 	/**
 	 * For Iterator
 	 *
@@ -99,7 +99,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return key( $this->objects );
 	}
-	
+
 	/**
 	 * For Iterator
 	 *
@@ -111,7 +111,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return next( $this->objects );
 	}
-	
+
 	/**
 	 * For Iterator
 	 *
@@ -123,7 +123,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return $this->current() !== false;
 	}
-	
+
 	/**
 	 * Checks if object exists
 	 *
@@ -136,7 +136,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return isset( $this->objects[ $offset ] );
 	}
-	
+
 	/**
 	 * Returns object
 	 *
@@ -151,7 +151,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 			return false;
 		return $this->objects[ $offset ];
 	}
-	
+
 	/**
 	 * Does nothing
 	 *
@@ -164,7 +164,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	{
 		throw new Exception( "Cannot set an offset to virtual query results array." );
 	}
-	
+
 	/**
 	 * Just removes object from an array
 	 *

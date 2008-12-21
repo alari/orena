@@ -1,7 +1,7 @@
 <?php
 class Db_Manager {
-	private static $connections = Array();
-	
+	private static $connections = Array ();
+
 	/**
 	 * Creates a new connection to database server
 	 *
@@ -13,7 +13,7 @@ class Db_Manager {
 	{
 		return self::$connections[ $conn_id ] = new PDO( $conf[ "engine" ] . ":host=" . $conf[ "host" ] . ";port=" . $conf[ "port" ] . ";dbname=" . $conf[ "dbname" ], $conf[ "user" ], $conf[ "password" ] );
 	}
-	
+
 	/**
 	 * Returns the specified connection with database
 	 *

@@ -10,7 +10,7 @@ require_once 'Test/Cases/DbManager.php';
  * Static test suite.
  */
 class Test_Suite extends PHPUnit_Framework_TestSuite {
-	
+
 	/**
 	 * Constructs the test suite handler.
 	 */
@@ -25,7 +25,7 @@ class Test_Suite extends PHPUnit_Framework_TestSuite {
 		$this->addTestSuite( 'Test_Cases_DaoTableInfo' );
 	
 	}
-	
+
 	/**
 	 * Creates the suite.
 	 */

@@ -10,8 +10,8 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	
 	private $relationTbl;
 	
-	private static $relationTblLoaded = Array();
-	
+	private static $relationTblLoaded = Array ();
+
 	/**
 	 * Relation instance for concrete object
 	 *
@@ -36,7 +36,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		$this->join( $this->relationTbl, $this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $baseId, "CROSS" );
 		//$this->addFrom($this->relationTbl)->where($this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $baseId);
 	}
-	
+
 	/**
 	 * Makes the relation table name from classes and fields, and creates it if needed and possible
 	 *
@@ -68,7 +68,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		
 		return $r;
 	}
-	
+
 	/**
 	 * Reloads the relation query
 	 *
@@ -77,7 +77,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	{
 		Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
 	}
-	
+
 	/**
 	 * Returns clear query with related objects
 	 *
@@ -88,7 +88,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		$q = new Dao_Query( $this->targetClass );
 		return $q->join( $this->relationTbl, $this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
 	}
-	
+
 	/**
 	 * Removes an object from relation (current query state influes)
 	 *
@@ -115,7 +115,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		
 		return true;
 	}
-	
+
 	/**
 	 * Removes all objects from current relation state
 	 *
@@ -126,7 +126,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		foreach ($this->getAll() as $o)
 			$this->remove( $o, $delete );
 	}
-	
+
 	/**
 	 * Adds support for [] operator
 	 *

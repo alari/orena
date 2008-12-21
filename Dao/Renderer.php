@@ -1,5 +1,6 @@
 <?php
 class Dao_Renderer {
+
 	/**
 	 * Echoes an object in HTML
 	 *
@@ -29,19 +30,19 @@ class Dao_Renderer {
 		}
 		if (!$echoEditForm)
 			throw new Exception( "Cannot render edit form for object of class class " . get_class( $obj ) . "." );
-
+		
 		?>
 
-<form method="POST" enctype="application/x-www-form-urlencoded" action="<?=$action?>">
+<form method="POST" enctype="application/x-www-form-urlencoded"
+	action="<?=$action?>">
 
 <?
 		foreach (array_keys( Dao_TableInfo::get( get_class( $obj ) )->getFields() ) as $fieldName) {
 			self::editField( $obj, $fieldName, isset( $errorsArray[ $fieldName ] ) ? $errorsArray[ $fieldName ] : null, $isAjax );
 		}
 		?>
-<input type="hidden" name="id" value="<?=$obj->id?>" />
-<input type="submit" />
-</form>
+<input type="hidden" name="id" value="<?=$obj->id?>" /> <input
+	type="submit" /></form>
 
 <?
 	}
@@ -62,11 +63,11 @@ class Dao_Renderer {
 			$param = $fieldInfo->getParam( "render" );
 		if (!$param)
 			return;
-
+		
 		$title = $fieldInfo->getParam( "title" );
 		if (!$title)
 			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-
+		
 		if ($param === 1) {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic())
@@ -75,21 +76,21 @@ class Dao_Renderer {
 			// TODO: add logic to autogenerate callback for atomic fields
 			return;
 		} else {
-
+			
 			$subparams = "";
 			if (strpos( $param, " " )) {
-				list($callback, $subparams) = explode( " ", $param, 2 );
+				list ($callback, $subparams) = explode( " ", $param, 2 );
 			} else {
 				$callback = $param;
 			}
-
+		
 		}
-
+		
 		if (!strpos( $callback, "::" )) {
 			$callback = __CLASS__ . "::editor" . ucfirst( $callback );
 		}
-
-		call_user_func_array( $callback, array($obj, $fieldName, $title, $subparams, $errorMessage, $isAjax) );
+		
+		call_user_func_array( $callback, array ($obj, $fieldName, $title, $subparams, $errorMessage, $isAjax) );
 	}
 
 	static public function editorWysiwyg( Dao_Object $obj, $fieldName, $title, $subparams, $errorMessage, $isAjax )
@@ -99,5 +100,4 @@ class Dao_Renderer {
 <?=$title?>:
 <br />
 <textarea cols="100" rows="40"><?=$obj->$fieldName?></textarea><?=$subparams . $errorMessage?>
-<?}
-}
+<?}}

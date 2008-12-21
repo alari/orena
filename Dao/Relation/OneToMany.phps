@@ -5,7 +5,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	private $baseId;
 	private $baseClass;
 	private $baseField;
-	
+
 	/**
 	 * Relation instance for concrete object
 	 *
@@ -25,7 +25,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		$tbl = Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->test( $tbl . "." . $targetField, $baseId );
 	}
-	
+
 	/**
 	 * Returns clear query with related objects
 	 *
@@ -36,7 +36,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		$q = new Dao_Query( $this->targetClass );
 		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, $this->baseId );
 	}
-	
+
 	/**
 	 * Reloads the relation query
 	 *
@@ -45,7 +45,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	{
 		Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
 	}
-	
+
 	/**
 	 * Removes an object from relation (current query state influes)
 	 *
@@ -73,7 +73,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		
 		return true;
 	}
-	
+
 	/**
 	 * Removes all objects from current relation state
 	 *
@@ -84,7 +84,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		foreach ($this->getAll() as $o)
 			$this->remove( $o, $delete );
 	}
-	
+
 	/**
 	 * Adds support for [] operator
 	 *

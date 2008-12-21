@@ -12,7 +12,7 @@ class Dao_FieldInfo {
 	 * @var Array
 	 */
 	private $params;
-
+	
 	/**
 	 * Database type of field, e.g. int, tinytext, or null if it's not represented in db
 	 *
@@ -25,7 +25,7 @@ class Dao_FieldInfo {
 	 * @var bool
 	 */
 	private $isAtomic = null;
-
+	
 	/**
 	 * Relation to one or to many objects
 	 *
@@ -73,7 +73,7 @@ class Dao_FieldInfo {
 	 *
 	 * @var Dao_Relation_BaseToMany[]
 	 */
-	private $relation = Array();
+	private $relation = Array ();
 	/**
 	 * String map for alias field
 	 * e.g. fieldA.fieldB means relation field A which targets object whith relation field B
@@ -101,7 +101,7 @@ class Dao_FieldInfo {
 		$this->name = $name;
 		$this->params = $params;
 		$this->type = $type;
-
+		
 		// check if it's relation
 		if (isset( $params[ "has" ] )) {
 			$relation = "has";
@@ -110,14 +110,14 @@ class Dao_FieldInfo {
 			$relation = "owns";
 			$this->relationOwns = 1;
 		}
-
+		
 		// save info about relation to be ready to sey it to other side
 		if (isset( $relation )) {
 			$this->isAtomic = false;
-
-			list($quantity, $this->relationTarget) = explode( " ", $params[ $relation ], 2 );
+			
+			list ($quantity, $this->relationTarget) = explode( " ", $params[ $relation ], 2 );
 			$this->relationInverse = isset( $params[ "inverse" ] ) ? $params[ "inverse" ] : null;
-
+			
 			if ($quantity == "many") {
 				$this->relationMany = 1;
 				if (!$this->relationInverse)
@@ -289,7 +289,7 @@ class Dao_FieldInfo {
 		// Alias -- cached query
 		if ($this->alias) {
 			if (!$this->aliasQuery) {
-				list($name, $subreq) = explode( ".", $this->alias, 2 );
+				list ($name, $subreq) = explode( ".", $this->alias, 2 );
 				$this->aliasTestField = Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery( $this->aliasQuery, $subreq );
 			}
 			if (!$this->aliasQuery instanceof Dao_Query) {
@@ -320,7 +320,7 @@ class Dao_FieldInfo {
 	{
 		if ($this->isAtomic())
 			throw new Exception( "Cannot create mapped query field by atomic field basis." );
-
+		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
 		$query->test( $joinOnField, $fieldValue ? $fieldValue : $object->id );
@@ -336,7 +336,7 @@ class Dao_FieldInfo {
 	 */
 	protected function prepareMappedQuery( Dao_Query &$query = null, $subreq = "" )
 	{
-		$fieldInfos = Array();
+		$fieldInfos = Array ();
 		$subreq = explode( ".", $subreq );
 		$info = $this;
 		foreach ($subreq as $fieldName) {
@@ -345,7 +345,7 @@ class Dao_FieldInfo {
 				throw new Exception( "Cannot use atomic field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
 		}
-
+		
 		$joinOnField = null;
 		while ($fieldInfo = current( $fieldInfos )) {
 			$nextInfo = next( $fieldInfos );
@@ -370,27 +370,27 @@ class Dao_FieldInfo {
 			$query = new Dao_Query( $this->relationTarget );
 			$joinOnField = Dao_TableInfo::get( $this->relationTarget )->getTableName() . ".id";
 		}
-
+		
 		$isOneToMany = $nextInfo->relationMany && !$nextInfo->getInverse()->relationMany;
-
+		
 		$currTable = Dao_TableInfo::get( $this->class )->getTableName();
-
+		
 		//many-to-many: relation is a special table
 		if ($this->relationMany && $this->getInverse()->relationMany) {
 			$tbl = $this->getRelation( 0 )->getRelationTableName();
-
+			
 			$query->join( $tbl, $tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
 				$query->join( $currTable, $currTable . ".id=" . $tbl . "." . $currTable, "CROSS" );
 				return $currTable . "." . $nextInfo->getInverse()->name;
 			}
-
+			
 			return $tbl . "." . $currTable;
 			//relation is current table itself
 		} else {
 			$query->join( $currTable, $currTable . "." . $this->name . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
 				return $currTable . "." . $nextInfo->getInverse()->name;
 			}

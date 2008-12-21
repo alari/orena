@@ -1,17 +1,17 @@
 <?php
 class Dao_TableInfo {
 	
-	private static $conf = Array();
+	private static $conf = Array ();
 	private static $prefix = "";
 	private static $default_tail = "";
 	
 	private $table;
-	private $fields = Array();
+	private $fields = Array ();
 	private $class;
-	private $indexes = Array();
+	private $indexes = Array ();
 	
 	private $tail = "";
-	
+
 	/**
 	 * Uses recursion to get table config
 	 *
@@ -40,7 +40,7 @@ class Dao_TableInfo {
 		
 		// Override
 		foreach (explode( "\n", $reflection->getDocComment() ) as $line) {
-			$matches = Array();
+			$matches = Array ();
 			preg_match( "/@(table|field|index|tail) (.*)/", $line, $matches );
 			if ($matches) {
 				if ($matches[ 1 ] == "tail") {
@@ -49,7 +49,7 @@ class Dao_TableInfo {
 				}
 				$_subkeys = explode( " -", trim( $matches[ 2 ] ) );
 				$value = array_shift( $_subkeys );
-				$subkeys = array();
+				$subkeys = array ();
 				if (count( $_subkeys )) {
 					foreach ($_subkeys as $v) {
 						$v = explode( " ", $v, 2 );
@@ -64,7 +64,7 @@ class Dao_TableInfo {
 						$name = $value;
 						$type = null;
 						if (strpos( $name, " " ))
-							list($name, $type) = explode( " ", $value, 2 );
+							list ($name, $type) = explode( " ", $value, 2 );
 						$this->fields[ $name ] = new Dao_FieldInfo( $this->class, $name, $type, $subkeys );
 					break;
 					case "index" :
@@ -74,7 +74,7 @@ class Dao_TableInfo {
 			}
 		}
 	}
-	
+
 	/**
 	 * Checks if table exists in database
 	 *
@@ -90,7 +90,7 @@ class Dao_TableInfo {
 		$stmt->execute();
 		return (bool)count( $stmt->fetchAll() );
 	}
-	
+
 	/**
 	 * Tries to create table
 	 *
@@ -120,7 +120,7 @@ class Dao_TableInfo {
 		
 		return $query->create( $this->tail ? $this->tail : self::$default_tail );
 	}
-	
+
 	/**
 	 * Returns field info object
 	 *
@@ -131,7 +131,7 @@ class Dao_TableInfo {
 	{
 		return isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null;
 	}
-	
+
 	/**
 	 * Returns table name
 	 *
@@ -141,7 +141,7 @@ class Dao_TableInfo {
 	{
 		return $this->table;
 	}
-	
+
 	/**
 	 * Returns array of field info
 	 *
@@ -151,7 +151,7 @@ class Dao_TableInfo {
 	{
 		return $this->fields;
 	}
-	
+
 	/**
 	 * Returns instance of table info object
 	 *
@@ -166,7 +166,7 @@ class Dao_TableInfo {
 			self::$conf[ $class ] = new self( $class );
 		return self::$conf[ $class ];
 	}
-	
+
 	/**
 	 * Sets the prefix for all table names
 	 *
@@ -182,7 +182,7 @@ class Dao_TableInfo {
 			$prefix .= "_";
 		self::$prefix = $prefix;
 	}
-	
+
 	/**
 	 * Returns the prefix for all table names
 	 *
@@ -192,7 +192,7 @@ class Dao_TableInfo {
 	{
 		return self::$prefix;
 	}
-	
+
 	/**
 	 * Sets default query tail to be used in CREATE TABLE
 	 *
