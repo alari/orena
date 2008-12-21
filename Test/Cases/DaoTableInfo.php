@@ -23,9 +23,9 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	{
 		parent::setUp();
 
-		Db_Manager::getConnection()->query("DROP TABLE IF EXISTS create_table");
+		Db_Manager::getConnection()->query( "DROP TABLE IF EXISTS create_table" );
 
-		$this->Dao_TableInfo = Dao_TableInfo::get("Test_Models_Tbl");
+		$this->Dao_TableInfo = Dao_TableInfo::get( "Test_Models_Tbl" );
 
 	}
 
@@ -34,43 +34,41 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	 */
 	protected function tearDown()
 	{
-		// TODO Auto-generated Test_Cases_DaoTableInfo::tearDown()
-
 
 		$this->Dao_TableInfo = null;
 
 		parent::tearDown();
 	}
 
-
 	/**
 	 * Tests Dao_TableInfo::get()
 	 */
 	public function testGet()
 	{
-		$this->assertEquals("Dao_TableInfo", get_class($this->Dao_TableInfo));
+		$this->assertEquals( "Dao_TableInfo", get_class( $this->Dao_TableInfo ) );
 
 	}
 
-	public function testCreateTable() {
-		$this->assertFalse($this->Dao_TableInfo->tableExists(), "Table should not exist");
+	public function testCreateTable()
+	{
+		$this->assertFalse( $this->Dao_TableInfo->tableExists(), "Table should not exist" );
 
-		$this->assertEquals("PDOStatement", get_class($this->Dao_TableInfo->createTable()), "Creating table");
+		$this->assertEquals( "PDOStatement", get_class( $this->Dao_TableInfo->createTable() ), "Creating table" );
 
-		$this->assertTrue($this->Dao_TableInfo->tableExists(), "Table should exist now");
+		$this->assertTrue( $this->Dao_TableInfo->tableExists(), "Table should exist now" );
 	}
 
-	public function testTableName() {
-		$this->assertEquals("create_table", $this->Dao_TableInfo->getTableName());
+	public function testTableName()
+	{
+		$this->assertEquals( "create_table", $this->Dao_TableInfo->getTableName() );
 	}
-
 
 	/**
 	 * Tests Dao_TableInfo->getFieldInfo()
 	 */
 	public function testGetFieldInfo()
 	{
-		$this->assertEquals("Dao_FieldInfo", get_class($this->Dao_TableInfo->getFieldInfo("textfield")));
+		$this->assertEquals( "Dao_FieldInfo", get_class( $this->Dao_TableInfo->getFieldInfo( "textfield" ) ) );
 	}
 
 	/**
@@ -78,7 +76,7 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	 */
 	public function testGetFields()
 	{
-		$this->assertEquals(2, count($this->Dao_TableInfo->getFields(/* parameters */)));
+		$this->assertEquals( 2, count( $this->Dao_TableInfo->getFields(/* parameters */) ) );
 
 	}
 
@@ -88,14 +86,22 @@ class Test_Cases_DaoTableInfo extends PHPUnit_Framework_TestCase {
 	public function testGetPrefix()
 	{
 
-		$this->assertEquals("", Dao_TableInfo::getPrefix(), "Prefix is clear");
+		$this->assertEquals( "", Dao_TableInfo::getPrefix(), "Prefix is clear" );
 
-		Dao_TableInfo::setPrefix("test");
+		Dao_TableInfo::setPrefix( "test" );
 
-		$this->assertEquals("test_", Dao_TableInfo::getPrefix(), "Setting test prefix");
+		$this->assertEquals( "test_", Dao_TableInfo::getPrefix(), "Setting test prefix" );
 
-		Dao_TableInfo::setPrefix("");
+		Dao_TableInfo::setPrefix( "" );
 
 	}
+
+	public function testGetParam() {
+		$fieldInfo = $this->Dao_TableInfo->getFieldInfo("intfield");
+
+		$this->assertEquals(1, $fieldInfo->getParam("test"));
+		$this->assertNull($fieldInfo->getParam("asdasas"));
+	}
+
 }
 

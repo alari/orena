@@ -1,7 +1,7 @@
 <?php
 /**
  * @table core_model
- * @field textfield text
+ * @field textfield text -render wysiwyg -title Текстовое поле
  * @field intfield int
  * @field subs -owns many Test_Models_Sub -inverse core
  * @field manysubs -owns many Test_Models_Sub -inverse cores

@@ -1,17 +1,17 @@
 <?php
 class Dao_TableInfo {
-
+	
 	private static $conf = Array();
 	private static $prefix = "";
 	private static $default_tail = "";
-
+	
 	private $table;
 	private $fields = Array();
 	private $class;
 	private $indexes = Array();
-
+	
 	private $tail = "";
-
+	
 	/**
 	 * Uses recursion to get table config
 	 *
@@ -20,15 +20,15 @@ class Dao_TableInfo {
 	private function __construct( $class )
 	{
 		$this->class = $class;
-
+		
 		$reflection = new ReflectionClass( $class );
 		if (!$reflection->isSubclassOf( "Dao_Object" ))
 			return;
-
+			
 		// Copy all data from parent object
 		if ($reflection->getParentClass()) {
 			$parent = self::get( $reflection->getParentClass()->getName() );
-
+			
 			$this->table = $parent->table;
 			foreach ($parent->fields as $name => $info) {
 				$this->fields[ $name ] = clone $info;
@@ -37,7 +37,7 @@ class Dao_TableInfo {
 			$this->indexes = $parent->indexes;
 			$this->tail = $parent->tail;
 		}
-
+		
 		// Override
 		foreach (explode( "\n", $reflection->getDocComment() ) as $line) {
 			$matches = Array();
@@ -74,7 +74,7 @@ class Dao_TableInfo {
 			}
 		}
 	}
-
+	
 	/**
 	 * Checks if table exists in database
 	 *
@@ -90,7 +90,7 @@ class Dao_TableInfo {
 		$stmt->execute();
 		return (bool)count( $stmt->fetchAll() );
 	}
-
+	
 	/**
 	 * Tries to create table
 	 *
@@ -100,15 +100,15 @@ class Dao_TableInfo {
 	{
 		if (!$this->table)
 			throw new Exception( "Can't create unnamed table." );
-
+		
 		$query = new Db_Query( $this->table );
-
+		
 		$query->field( "id", "int auto_increment primary key" );
-
+		
 		foreach ($this->fields as $fieldInfo) {
 			$fieldInfo->addFieldTypeToQuery( $query );
 		}
-
+		
 		foreach ($this->indexes as $fields => $keys) {
 			$indexType = "index";
 			if (isset( $keys[ "unique" ] ))
@@ -117,10 +117,10 @@ class Dao_TableInfo {
 				$indexType = "fulltext";
 			$query->index( $fields, $indexType, isset( $keys[ "name" ] ) ? $keys[ "name" ] : null );
 		}
-
+		
 		return $query->create( $this->tail ? $this->tail : self::$default_tail );
 	}
-
+	
 	/**
 	 * Returns field info object
 	 *
@@ -131,7 +131,7 @@ class Dao_TableInfo {
 	{
 		return isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null;
 	}
-
+	
 	/**
 	 * Returns table name
 	 *
@@ -141,7 +141,7 @@ class Dao_TableInfo {
 	{
 		return $this->table;
 	}
-
+	
 	/**
 	 * Returns array of field info
 	 *
@@ -151,7 +151,7 @@ class Dao_TableInfo {
 	{
 		return $this->fields;
 	}
-
+	
 	/**
 	 * Returns instance of table info object
 	 *
@@ -166,7 +166,7 @@ class Dao_TableInfo {
 			self::$conf[ $class ] = new self( $class );
 		return self::$conf[ $class ];
 	}
-
+	
 	/**
 	 * Sets the prefix for all table names
 	 *
@@ -182,7 +182,7 @@ class Dao_TableInfo {
 			$prefix .= "_";
 		self::$prefix = $prefix;
 	}
-
+	
 	/**
 	 * Returns the prefix for all table names
 	 *
@@ -192,7 +192,7 @@ class Dao_TableInfo {
 	{
 		return self::$prefix;
 	}
-
+	
 	/**
 	 * Sets default query tail to be used in CREATE TABLE
 	 *

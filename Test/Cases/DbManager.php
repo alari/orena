@@ -21,7 +21,6 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	{
 		parent::setUp();
 
-
 	}
 
 	/**
@@ -29,27 +28,17 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	 */
 	protected function tearDown()
 	{
-		// TODO Auto-generated Db_ManagerTest::tearDown()
-
-
 		parent::tearDown();
 	}
 
-	/**
-	 * Constructs the test case.
-	 */
-	public function __construct()
-	{
-		// TODO Auto-generated constructor
-	}
 
 	/**
 	 * Tests Db_Manager::getConnection()
 	 */
 	public function testGetConnection()
 	{
-		$this->assertEquals("PDO", get_class(Db_Manager::getConnection()));
-		$this->assertEquals("PDOStatement", get_class(Db_Manager::getConnection()->query("SELECT UNIX_TIMESTAMP()")));
+		$this->assertEquals( "PDO", get_class( Db_Manager::getConnection() ) );
+		$this->assertEquals( "PDOStatement", get_class( Db_Manager::getConnection()->query( "SELECT UNIX_TIMESTAMP()" ) ) );
 	}
 }
 

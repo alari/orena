@@ -13,3 +13,6 @@ Db_Manager::getConnection()->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
 echo "<pre>";
 PHPUnit_TextUI_TestRunner::run(Test_Suite::suite());
 echo "</pre>";
+
+$q = new Dao_Query("Test_Models_Core");
+Dao_Renderer::edit($q->current(), "test");

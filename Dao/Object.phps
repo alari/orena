@@ -45,7 +45,7 @@ abstract class Dao_Object {
 			return $this->getFieldInfo( $name )->getMappedQuery( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
 
-		return $this->getFieldInfo( $name )->getValue( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, isset( $this->fields[ $name ] ) );
+		return $this->getFieldInfo( $name )->getValue( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, array_key_exists( $name, $this->fields ) );
 	}
 
 	/**
@@ -130,7 +130,7 @@ abstract class Dao_Object {
 
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
-				if (isset( $this->fields[ $name ] ))
+				if (array_key_exists($name, $this->fields ))
 					$this->fields[ $name ] = $value;
 			$this->changed = array();
 			return true;
