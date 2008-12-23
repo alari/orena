@@ -135,6 +135,11 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals( get_class( $sub ), get_class( $sub->{"core.manysubs"}->getOne() ), 
 				"Getting one object -- sub from sub" );
+		
+		$obj->one_sub = $sub;
+		
+		$this->assertEquals( get_class( $sub ), get_class( $obj->{"manysubs.one_core.one_sub"}->current() ), 
+				"Getting one object -- one sub from sub" );
 	}
 
 	public function testAlias()

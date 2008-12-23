@@ -349,6 +349,12 @@ class Dao_FieldInfo {
 		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
+		if ($this->relationMany && $this->getInverse()->relationMany) {
+			$tbl = $this->getRelation( 0 )->getRelationTableName();
+			$query->join( $tbl, $tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
+					"CROSS" );
+			$joinOnField = $tbl . "." . Dao_TableInfo::get( $this->class )->getTableName();
+		}
 		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id );
 		return $query;
 	}
@@ -373,11 +379,12 @@ class Dao_FieldInfo {
 		}
 		
 		$joinOnField = null;
+		$i = 0;
 		while ($fieldInfo = current( $fieldInfos )) {
 			$nextInfo = next( $fieldInfos );
 			if (!$nextInfo)
 				$nextInfo = $this;
-			$joinOnField = $fieldInfo->modifyMappedQuery( $query, $joinOnField, $nextInfo );
+			$joinOnField = $fieldInfo->modifyMappedQuery( $query, $joinOnField, $nextInfo, $i++ );
 		}
 		return $joinOnField;
 	}
@@ -386,11 +393,12 @@ class Dao_FieldInfo {
 	 * Prepares query step for getting mapped query
 	 *
 	 * @param Dao_Query $query
-	 * @param string $joinOnField Given from previous request
 	 * @param Dao_FieldInfo $nextInfo
+	 * @param string $joinOnField From previous request
+	 * @param int $i Current iteration
 	 * @return string
 	 */
-	private function modifyMappedQuery( Dao_Query &$query = null, $joinOnField = null, Dao_FieldInfo $nextInfo = null )
+	private function modifyMappedQuery( Dao_Query &$query = null, $joinOnField = null, Dao_FieldInfo $nextInfo = null, $i = 0 )
 	{
 		if (!$query) {
 			$query = new Dao_Query( $this->relationTarget );
@@ -400,29 +408,31 @@ class Dao_FieldInfo {
 		$isOneToMany = $nextInfo->relationMany && !$nextInfo->getInverse()->relationMany;
 		
 		$currTable = Dao_TableInfo::get( $this->class )->getTableName();
+		$currAlias = $currTable . ($i ? "_" . $i : "");
 		
 		//many-to-many: relation is a special table
 		if ($this->relationMany && $this->getInverse()->relationMany) {
 			$tbl = $this->getRelation( 0 )->getRelationTableName();
+			$als = $tbl . ($i ? "_" . $i : "");
 			
-			$query->join( $tbl, 
-					$tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
+			$query->join( $tbl . " " . $als, 
+					$als . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
 					"CROSS" );
 			
 			if ($isOneToMany) {
-				$query->join( $currTable, $currTable . ".id=" . $tbl . "." . $currTable, "CROSS" );
-				return $currTable . "." . $nextInfo->getInverse()->name;
+				$query->join( $currTable . " " . $currAlias, $currAlias . ".id=" . $als . "." . $currTable, "CROSS" );
+				return $currAlias . "." . $nextInfo->getInverse()->name;
 			}
 			
-			return $tbl . "." . $currTable;
+			return $als . "." . $currTable;
 			//relation is current table itself
 		} else {
-			$query->join( $currTable, $currTable . "." . $this->name . "=" . $joinOnField, "CROSS" );
+			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
 			
 			if ($isOneToMany) {
-				return $currTable . "." . $nextInfo->getInverse()->name;
+				return $currAlias . "." . $nextInfo->getInverse()->name;
 			}
-			return $currTable . ".id";
+			return $currAlias . ".id";
 		}
 	}
 
