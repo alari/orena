@@ -42,10 +42,13 @@ abstract class Dao_Object {
 			return $this->fields[ "id" ];
 		if (strpos( $name, "." )) {
 			list ($name, $subreq) = explode( ".", $name, 2 );
-			return $this->getFieldInfo( $name )->getMappedQuery( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
+			return $this->getFieldInfo( $name )->getMappedQuery( $this, 
+					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
 		
-		return $this->getFieldInfo( $name )->getValue( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, array_key_exists( $name, $this->fields ) );
+		return $this->getFieldInfo( $name )->getValue( $this, 
+				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, 
+				array_key_exists( $name, $this->fields ) );
 	}
 
 	/**
@@ -59,7 +62,7 @@ abstract class Dao_Object {
 		if ($name == "id")
 			return;
 		
-		$this->getFieldInfo( $name )->setValue( $this, $value );
+		$this->getFieldInfo( $name )->setValue( $this, $value, array_key_exists( $name, $this->fields ) );
 	}
 
 	/**
@@ -187,6 +190,22 @@ abstract class Dao_Object {
 		
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
+	}
+
+	/**
+	 * Update all objects after table altering
+	 *
+	 * @param string $class
+	 * @access package
+	 */
+	static public function saveAndReload( $class )
+	{
+		if (isset( self::$objs[ $class ] ) && count( self::$objs[ $class ] )) {
+			foreach (self::$objs[ $class ] as $obj) {
+				$obj->save();
+				$obj->reload();
+			}
+		}
 	}
 
 }

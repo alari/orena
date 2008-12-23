@@ -37,7 +37,8 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	public function testGetConnection()
 	{
 		$this->assertEquals( "PDO", get_class( Db_Manager::getConnection() ) );
-		$this->assertEquals( "PDOStatement", get_class( Db_Manager::getConnection()->query( "SELECT UNIX_TIMESTAMP()" ) ) );
+		$this->assertEquals( "PDOStatement", 
+				get_class( Db_Manager::getConnection()->query( "SELECT UNIX_TIMESTAMP()" ) ) );
 	}
 }
 

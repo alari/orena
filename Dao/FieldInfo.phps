@@ -183,7 +183,9 @@ class Dao_FieldInfo {
 	{
 		$q = new Dao_Query( $this->class );
 		$this->addFieldTypeToQuery( $q );
-		return $q->alter( "ADD" );
+		$r = $q->alter( "ADD" );
+		Dao_Object::saveAndReload( $this->class );
+		return $r;
 	}
 
 	/**
@@ -197,10 +199,12 @@ class Dao_FieldInfo {
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->relationMany) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new Dao_Relation_ManyToMany( $this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name );
+				$this->relation[ $obj_id ] = new Dao_Relation_ManyToMany( $this->relationTarget, 
+						$this->relationInverse, $obj_id, $this->class, $this->name );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new Dao_Relation_OneToMany( $this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name );
+				$this->relation[ $obj_id ] = new Dao_Relation_OneToMany( $this->relationTarget, 
+						$this->relationInverse, $obj_id, $this->class, $this->name );
 			}
 		}
 		return $this->relation[ $obj_id ];
@@ -224,7 +228,8 @@ class Dao_FieldInfo {
 	private function getInverse()
 	{
 		if (!$this->relationInverseField)
-			$this->relationInverseField = Dao_TableInfo::get( $this->relationTarget )->getFieldInfo( $this->relationInverse );
+			$this->relationInverseField = Dao_TableInfo::get( $this->relationTarget )->getFieldInfo( 
+					$this->relationInverse );
 		return $this->relationInverseField;
 	}
 
@@ -246,17 +251,22 @@ class Dao_FieldInfo {
 	 * @throws Exception
 	 * @return bool
 	 */
-	public function setValue( Dao_Object $obj, $fieldValue )
+	public function setValue( Dao_Object $obj, $fieldValue, $fieldExists )
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, $obj, $obj->{$this->name} );
+			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
+					$obj, $obj->{$this->name} );
 			// New value is set
-			Dao_Signals::fire( Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, $obj, $fieldValue );
+			Dao_Signals::fire( Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, $obj, 
+					$fieldValue );
 			// TODO: maybe signal should be fired when field is saved to database, not just set?
 		}
 		// Value as is
 		if ($this->isAtomic) {
+			if (!$fieldExists) {
+				$this->addFieldToTable();
+			}
 			return $obj->setField( $this->name, $fieldValue );
 		}
 		// Alias -- setting impossible
@@ -268,11 +278,20 @@ class Dao_FieldInfo {
 			throw new Exception( "Cannot assign base-to-many relation." );
 		}
 		// Base-to-one
-		if ($fieldValue instanceof $this->relationTarget) {
-			$obj->setField( $this->name, $fieldValue );
+		if (get_class( $fieldValue ) == $this->relationTarget) {
+			if (!$fieldExists) {
+				$this->addFieldToTable();
+			}
+			$obj->setField( $this->name, $fieldValue->id );
 			// One-to-one is symmetric
-			if (!$this->getInverse()->relationMany)
-				$fieldValue->setField( $this->getInverse()->name, $obj->id );
+			if (!$this->getInverse()->relationMany) {
+				$inverseName = $this->getInverse()->name;
+				if (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id) {
+					$fieldValue->{$this->getInverse()->name} = $obj;
+					$fieldValue->save();
+				}
+			}
+			return $fieldValue;
 		}
 		throw new Exception( "Assigment of wrong value type." );
 	}
@@ -296,7 +315,8 @@ class Dao_FieldInfo {
 		if ($this->alias) {
 			if (!$this->aliasQuery) {
 				list ($name, $subreq) = explode( ".", $this->alias, 2 );
-				$this->aliasTestField = Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery( $this->aliasQuery, $subreq );
+				$this->aliasTestField = Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery( 
+						$this->aliasQuery, $subreq );
 			}
 			if (!$this->aliasQuery instanceof Dao_Query) {
 				throw new Exception( "Wrong mapped query produced by $name.$subreq map." );
@@ -385,7 +405,9 @@ class Dao_FieldInfo {
 		if ($this->relationMany && $this->getInverse()->relationMany) {
 			$tbl = $this->getRelation( 0 )->getRelationTableName();
 			
-			$query->join( $tbl, $tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, "CROSS" );
+			$query->join( $tbl, 
+					$tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
+					"CROSS" );
 			
 			if ($isOneToMany) {
 				$query->join( $currTable, $currTable . ".id=" . $tbl . "." . $currTable, "CROSS" );
@@ -414,7 +436,8 @@ class Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, $obj, $obj->{$this->name} );
+			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
+					$obj, $obj->{$this->name} );
 		}
 		if ($this->isAtomic || $this->alias) {
 			// TODO: add signal support for atomic fields

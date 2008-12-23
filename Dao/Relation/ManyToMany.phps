@@ -33,7 +33,9 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		
 		parent::__construct( $this->targetClass );
 		
-		$this->join( $this->relationTbl, $this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $baseId, "CROSS" );
+		$this->join( $this->relationTbl, 
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
+					 "." . $this->baseTbl . "=" . $baseId, "CROSS" );
 		//$this->addFrom($this->relationTbl)->where($this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $baseId);
 	}
 
@@ -61,7 +63,8 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 			$stmt->execute();
 		if (!$stmt || !count( $stmt->fetchAll() )) {
 			$q = new Db_Query( $r );
-			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index( $this->targetTbl . ", " . $this->baseTbl, "PRIMARY KEY" )->create();
+			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index( 
+					$this->targetTbl . ", " . $this->baseTbl, "PRIMARY KEY" )->create();
 		}
 		
 		self::$relationTblLoaded[ $r ] = 1;
@@ -86,7 +89,9 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new Dao_Query( $this->targetClass );
-		return $q->join( $this->relationTbl, $this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
+		return $q->join( $this->relationTbl, 
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
+					 "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
 	}
 
 	/**

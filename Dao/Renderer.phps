@@ -38,7 +38,8 @@ class Dao_Renderer {
 
 <?
 		foreach (array_keys( Dao_TableInfo::get( get_class( $obj ) )->getFields() ) as $fieldName) {
-			self::editField( $obj, $fieldName, isset( $errorsArray[ $fieldName ] ) ? $errorsArray[ $fieldName ] : null, $isAjax );
+			self::editField( $obj, $fieldName, 
+					isset( $errorsArray[ $fieldName ] ) ? $errorsArray[ $fieldName ] : null, $isAjax );
 		}
 		?>
 <input type="hidden" name="id" value="<?=$obj->id?>" /> <input

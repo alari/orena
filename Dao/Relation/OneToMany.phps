@@ -34,7 +34,8 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new Dao_Query( $this->targetClass );
-		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, $this->baseId );
+		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, 
+				$this->baseId );
 	}
 
 	/**

@@ -1,9 +1,4 @@
 <?php
-
-require_once 'Dao/Signals.php';
-
-require_once 'PHPUnit/Framework/TestCase.php';
-
 /**
  * Dao_Signals test case.
  */
@@ -98,12 +93,9 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 	{
 		$v = "test field";
 		$this->core->textfield = $v;
-		$expected = Array ("none" => array (null, $v), 
-				"event" => array (null), 
-				"signal" => array (null, $v), 
-				"class" => array (null, $v), 
-				"event-signal-class" => array ($v), 
-				"event-signal" => array ($v));
+		$expected = Array ("none" => array (null, $v), "event" => array (null), "signal" => array (null, $v), 
+							"class" => array (null, $v), "event-signal-class" => array ($v), 
+							"event-signal" => array ($v));
 		$this->assertEquals( $expected, self::$signalResults, "Results of value setting with signal type." );
 	}
 
