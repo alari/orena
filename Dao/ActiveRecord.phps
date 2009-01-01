@@ -1,5 +1,5 @@
 <?php
-abstract class Dao_Object {
+abstract class Dao_ActiveRecord {
 	private static $objs = array ();
 	
 	private $fields = array ();
@@ -159,7 +159,7 @@ abstract class Dao_Object {
 	 * @param int $id
 	 * @param string $class
 	 * @param array $row
-	 * @return Dao_Object
+	 * @return Dao_ActiveRecord
 	 */
 	static public function getById( $id, $class, Array $row = null )
 	{

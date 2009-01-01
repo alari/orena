@@ -22,7 +22,7 @@ class Dao_TableInfo {
 		$this->class = $class;
 		
 		$reflection = new ReflectionClass( $class );
-		if (!$reflection->isSubclassOf( "Dao_Object" ))
+		if (!$reflection->isSubclassOf( "Dao_ActiveRecord" ))
 			return;
 			
 		// Copy all data from parent object

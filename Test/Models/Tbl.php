@@ -4,6 +4,6 @@
  * @field textfield text
  * @field intfield int -test
  */
-class Test_Models_Tbl extends Dao_Object {
+class Test_Models_Tbl extends Dao_ActiveRecord {
 
 }

@@ -4,9 +4,9 @@ class Dao_Renderer {
 	/**
 	 * Echoes an object in HTML
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 */
-	static public function show( Dao_Object $obj )
+	static public function show( Dao_ActiveRecord $obj )
 	{
 		$obj;
 	}
@@ -14,12 +14,12 @@ class Dao_Renderer {
 	/**
 	 * Echoes an object edit form
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param string $action
 	 * @param bool $isAjax
 	 * @param array $errorsArray
 	 */
-	static public function edit( Dao_Object $obj, $action, $isAjax = false, Array $errorsArray = Array() )
+	static public function edit( Dao_ActiveRecord $obj, $action, $isAjax = false, Array $errorsArray = Array() )
 	{
 		$echoEditForm = false;
 		foreach (Dao_TableInfo::get( get_class( $obj ) )->getFields() as $fieldInfo) {
@@ -51,12 +51,12 @@ class Dao_Renderer {
 	/**
 	 * Renders one field of edit form
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param string $fieldName
 	 * @param string $errorMessage
 	 * @param bool $isAjax
 	 */
-	static private function editField( Dao_Object $obj, $fieldName, $errorMessage, $isAjax )
+	static private function editField( Dao_ActiveRecord $obj, $fieldName, $errorMessage, $isAjax )
 	{
 		$fieldInfo = Dao_TableInfo::get( get_class( $obj ) )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( "edit" );
@@ -94,7 +94,7 @@ class Dao_Renderer {
 		call_user_func_array( $callback, array ($obj, $fieldName, $title, $subparams, $errorMessage, $isAjax) );
 	}
 
-	static public function editorWysiwyg( Dao_Object $obj, $fieldName, $title, $subparams, $errorMessage, $isAjax )
+	static public function editorWysiwyg( Dao_ActiveRecord $obj, $fieldName, $title, $subparams, $errorMessage, $isAjax )
 	{
 		?>
 

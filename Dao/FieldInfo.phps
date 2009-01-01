@@ -63,7 +63,7 @@ class Dao_FieldInfo {
 	 */
 	private $relationObject;
 	/**
-	 * Classname of current Dao_Object
+	 * Classname of current Dao_ActiveRecord
 	 *
 	 * @var string
 	 */
@@ -184,7 +184,7 @@ class Dao_FieldInfo {
 		$q = new Dao_Query( $this->class );
 		$this->addFieldTypeToQuery( $q );
 		$r = $q->alter( "ADD" );
-		Dao_Object::saveAndReload( $this->class );
+		Dao_ActiveRecord::saveAndReload( $this->class );
 		return $r;
 	}
 
@@ -246,12 +246,12 @@ class Dao_FieldInfo {
 	/**
 	 * Sets the value with all tests provided
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 * @throws Exception
 	 * @return bool
 	 */
-	public function setValue( Dao_Object $obj, $fieldValue, $fieldExists )
+	public function setValue( Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
@@ -299,11 +299,11 @@ class Dao_FieldInfo {
 	/**
 	 * Returns the field value, even if it's a relation
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 * @return mixed
 	 */
-	public function getValue( Dao_Object $obj, $fieldValue, $fieldExists )
+	public function getValue( Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
 		// Value as is
 		if ($this->isAtomic) {
@@ -331,18 +331,18 @@ class Dao_FieldInfo {
 		// Base-to-one
 		if (!$fieldExists)
 			$this->addFieldToTable();
-		return Dao_Object::getById( $fieldValue, $this->relationTarget );
+		return Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
 	}
 
 	/**
 	 * Returns query by object relations mapping
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param int $fieldValue
 	 * @param string $subreq
 	 * @return Dao_Query
 	 */
-	public function getMappedQuery( Dao_Object $obj, $fieldValue = null, $subreq = "" )
+	public function getMappedQuery( Dao_ActiveRecord $obj, $fieldValue = null, $subreq = "" )
 	{
 		if ($this->isAtomic())
 			throw new Exception( "Cannot create mapped query field by atomic field basis." );
@@ -439,10 +439,10 @@ class Dao_FieldInfo {
 	/**
 	 * Handles deletion of object -- or just of relation
 	 *
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 */
-	public function deleteThis( Dao_Object $obj, $fieldValue = null )
+	public function deleteThis( Dao_ActiveRecord $obj, $fieldValue = null )
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
@@ -459,7 +459,7 @@ class Dao_FieldInfo {
 			$this->getRelation( $obj->id )->removeAll( $this->relationOwns );
 		} else {
 			// Action needed if target is set and must be deleted, or if inverse field must be cleaned
-			$relative = Dao_Object::getById( $fieldValue, $this->relationTarget );
+			$relative = Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
 			if ($relative) {
 				// If has one, the database field exists
 				if ($this->getInverse() && !$this->getInverse()->relationMany) {

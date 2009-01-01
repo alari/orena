@@ -1,0 +1,24 @@
+/* Globals */
+*{box-sizing:border-box; -moz-box-sizing:border-box}
+html,body{padding:0; margin:0}
+/* Header and footer position */
+body{position:relative; padding:100px 0 40px 0}
+#feet,#head{position:absolute; left:0; width:100%}
+#feet{bottom:0; height:40px}
+#head{top:0; height:100px}
+/* Columns model */
+#wrap{float:left; width:100%}
+#cont{margin:0 200px}
+#lcol,#rcol{float:left; width:200px}
+#lcol{margin-left:-100%;}
+#rcol{margin-left:-200px;}
+.clear{clear:both}
+
+/* Default styles */
+body{background:#fff}
+#feet{background:wheat; text-align:center}
+	#feet a{color:black}
+#head{background:wheat}
+#cont{border:1px solid red}
+#lcol{background:lightskyblue}
+#rcol{background:silver}

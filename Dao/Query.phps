@@ -34,24 +34,24 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	}
 
 	/**
-	 * Returns first Dao_Object from query
+	 * Returns first Dao_ActiveRecord from query
 	 *
-	 * @return Dao_Object
+	 * @return Dao_ActiveRecord
 	 */
 	public function getOne()
 	{
 		$o = $this->select()->fetch();
 		if ($o) {
-			return Dao_Object::getById( $o[ "id" ], $this->class, $o );
+			return Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
 		}
 		return null;
 	}
 
 	/**
-	 * Returns (cached) array of query results as Dao_Objects
+	 * Returns (cached) array of query results as Dao_ActiveRecords
 	 *
 	 * @param bool $forseCacheReload If true, objects are regenerated
-	 * @return Dao_Object[]
+	 * @return Dao_ActiveRecord[]
 	 */
 	public function getAll( $forse = false )
 	{
@@ -60,7 +60,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$r = $this->select()->fetchAll();
 		$this->objects = Array ();
 		foreach ($r as $o)
-			$this->objects[ $o[ "id" ] ] = Dao_Object::getById( $o[ "id" ], $this->class, $o );
+			$this->objects[ $o[ "id" ] ] = Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
 		return $this->objects;
 	}
 
@@ -79,7 +79,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * For Iterator
 	 *
-	 * @return Dao_Object
+	 * @return Dao_ActiveRecord
 	 * @access private
 	 */
 	public function current()
@@ -103,7 +103,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * For Iterator
 	 *
-	 * @return Dao_Object
+	 * @return Dao_ActiveRecord
 	 * @access private
 	 */
 	public function next()

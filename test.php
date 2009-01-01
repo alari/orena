@@ -10,6 +10,6 @@ function __autoload($class){
 ));
 Db_Manager::getConnection()->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 Db_Manager::getConnection()->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
-echo "<pre>";
-PHPUnit_TextUI_TestRunner::run(Test_Suite::suite());
-echo "</pre>";
+
+$tpl = new Test_Templates_Main;
+$tpl->display();

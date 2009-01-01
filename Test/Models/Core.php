@@ -11,6 +11,6 @@
  * @field core_direct -has one Test_Models_Core -inverse core_inverse
  * @field core_inverse -has one Test_Models_Core -inverse core_direct
  */
-class Test_Models_Core extends Dao_Object {
+class Test_Models_Core extends Dao_ActiveRecord {
 
 }

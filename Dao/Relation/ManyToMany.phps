@@ -97,11 +97,11 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	/**
 	 * Removes an object from relation (current query state influes)
 	 *
-	 * @param Dao_Object $object
+	 * @param Dao_ActiveRecord $object
 	 * @param bool $delete If true, not only relation removed, but also an object deleted
 	 * @return bool
 	 */
-	public function remove( Dao_Object $object, $delete = false )
+	public function remove( Dao_ActiveRecord $object, $delete = false )
 	{
 		if (!$object)
 			return false;
@@ -136,7 +136,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	 * Adds support for [] operator
 	 *
 	 * @param null $offset
-	 * @param Dao_Object $obj
+	 * @param Dao_ActiveRecord $obj
 	 * @return bool
 	 * @throws Exception
 	 */

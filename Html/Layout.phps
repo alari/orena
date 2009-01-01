@@ -51,6 +51,12 @@ class Html_Layout {
 	 * @var string
 	 */
 	protected $contentType = "text/html; charset=utf-8";
+	/**
+	 * Different links like "alternate"
+	 *
+	 * @var Array
+	 */
+	protected $headLinks = Array();
 
 	/**
 	 * HTTP response code
@@ -80,12 +86,11 @@ class Html_Layout {
 	 */
 	public function display() {
 		Header("HTTP/1.1 ".$this->responseCode." ".$this->responseMessage);
-		Header("Content-type: ".$this->contentType);
+		if($this->contentType) Header("Content-type: ".$this->contentType);
 ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
-		<title><?=$this->title?></title>
 		<?$this->displayHead()?>
 	</head><body>
 		<?$this->displayBody()?>
@@ -106,6 +111,12 @@ class Html_Layout {
 		foreach($this->jscriptSrc as $src) echo '<script type="text/javascript" src="',$src,'"></script>';
 		foreach($this->jscriptCode as $code) echo "<script type=\"text/javascript\">\n$code\n</script>";
 		foreach($this->metas as $meta) echo '<meta name="'.$meta[0].'" content="'.$meta[1].'" />';
+		foreach($this->headLinks as $link) {
+			echo "<link rel=\"{$link['rel']}\" href=\"{$link['href']}\"";
+			if($link["type"]) echo ' type="'.$link["type"].'"';
+			if($link["title"]) echo ' title="'.htmlspecialchars($link["title"]).'"';
+			echo " />";
+		}
 	}
 
 	/**
@@ -127,6 +138,17 @@ class Html_Layout {
 		$this->responseMessage = $message;
 	}
 
+	/**
+	 * Adds a link tag like <link rel=...
+	 *
+	 * @param string $rel
+	 * @param string $href
+	 * @param string $type
+	 * @param string $title
+	 */
+	public function addHeadLink($rel, $href, $type=null, $title=null) {
+		$this->headLinks[] = Array("rel"=>$rel, "href"=>$href, "type"=>$type, "title"=>$title);
+	}
 
 	/**
 	 * Adds meta name=... tag
