@@ -79,8 +79,7 @@ todo: add interface for right col generator
 	 *
 	 */
 	protected function displayHead() {
-		// TODO: add static root getting from environment
-		$this->addCssSrc($this->mainCssHref ? $this->mainCssHref : "static/css/main.css");
+		$this->addCssSrc($this->mainCssHref ? $this->mainCssHref : Registry::get("engine/static_root")."css/main.css");
 		parent::displayHead();
 	}
 

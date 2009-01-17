@@ -6,4 +6,11 @@ class Html_DaoRenderer_Show {
 		$this->layout = $layout;
 	}
 
+	public function display(Dao_ActiveRecord $obj) {
+		;
+	}
+
+	public function displayLoop(Dao_Query $query) {
+		;
+	}
 }

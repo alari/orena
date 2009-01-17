@@ -166,6 +166,7 @@ class Html_Layout {
 	 * @param string $src
 	 */
 	public function addJavaScriptSrc($src) {
+		$src = $this->staticUrl($src);
 		if(!in_array($src, $this->jscriptSrc)) $this->jscriptSrc[] = $src;
 	}
 
@@ -179,11 +180,12 @@ class Html_Layout {
 	}
 
 	/**
-	 * Adds source url of CSS file
+	 * Adds source url of CSS file.
 	 *
-	 * @param string $src
+	 * @param string $src URL from app/static_root, without trailing slash
 	 */
 	public function addCssSrc($src) {
+		$src = $this->staticUrl($src);
 		if(!in_array($src, $this->cssSrc)) $this->cssSrc[] = $src;
 	}
 
@@ -193,6 +195,7 @@ class Html_Layout {
 	 * @param string $src
 	 */
 	public function setFavicon($src) {
+		$src = $this->staticUrl($src);
 		$this->favicon = $src;
 	}
 
@@ -204,4 +207,15 @@ class Html_Layout {
 	public function setTitle($title) {
 		$this->title = $title;
 	}
+
+	/**
+	 * Returns full URL to static file
+	 *
+	 * @param string $url
+	 */
+	public function staticUrl($url) {
+		if($url[0] != "/" && $url[0] != ".") return Registry::get("app/static_root").$url;
+		return $url;
+	}
+
 }

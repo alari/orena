@@ -50,18 +50,29 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * Returns (cached) array of query results as Dao_ActiveRecords
 	 *
-	 * @param bool $forseCacheReload If true, objects are regenerated
+	 * @param bool $forceCacheReload If true, objects are regenerated
 	 * @return Dao_ActiveRecord[]
 	 */
-	public function getAll( $forse = false )
+	public function getAll( $forceCacheReload = false )
 	{
-		if (!$forse && count( $this->objects ))
+		if (!$forceCacheReload && count( $this->objects ))
 			return $this->objects;
 		$r = $this->select()->fetchAll();
 		$this->objects = Array ();
 		foreach ($r as $o)
 			$this->objects[ $o[ "id" ] ] = Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
 		return $this->objects;
+	}
+
+	/**
+	 * Displays all objects from getAll() in a loop
+	 *
+	 * @param Html_Layout $layout
+	 */
+	public function display( Html_Layout $layout = null )
+	{
+		$renderer = new Dao_Renderer_Loop( $this, $layout );
+		$renderer->display();
 	}
 
 	/**

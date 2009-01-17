@@ -13,3 +13,5 @@ Db_Manager::getConnection()->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
 
 $tpl = new Test_Templates_Main;
 $tpl->display();
+
+//Dao_Renderer::edit(Dao_ActiveRecord::getById(55,"Test_Models_Core"), "/");

@@ -12,93 +12,45 @@ class Dao_Renderer {
 	}
 
 	/**
-	 * Echoes an object edit form
+	 * Echoes rendered create form, similar to edit form
 	 *
-	 * @param Dao_ActiveRecord $obj
+	 * @param string $class
 	 * @param string $action
+	 * @param Html_Layout $layout
 	 * @param bool $isAjax
 	 * @param array $errorsArray
+	 * @param string $formTitle
 	 */
-	static public function edit( Dao_ActiveRecord $obj, $action, $isAjax = false, Array $errorsArray = Array() )
+	static public function create( $class, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
-		$echoEditForm = false;
-		foreach (Dao_TableInfo::get( get_class( $obj ) )->getFields() as $fieldInfo) {
-			if ($fieldInfo->getParam( "edit" ) || $fieldInfo->getParam( "render" )) {
-				$echoEditForm = true;
-				break;
-			}
-		}
-		if (!$echoEditForm)
-			throw new Exception( "Cannot render edit form for object of class class " . get_class( $obj ) . "." );
-		
-		?>
-
-<form method="POST" enctype="application/x-www-form-urlencoded"
-	action="<?=$action?>">
-
-<?
-		foreach (array_keys( Dao_TableInfo::get( get_class( $obj ) )->getFields() ) as $fieldName) {
-			self::editField( $obj, $fieldName, 
-					isset( $errorsArray[ $fieldName ] ) ? $errorsArray[ $fieldName ] : null, $isAjax );
-		}
-		?>
-<input type="hidden" name="id" value="<?=$obj->id?>" /> <input
-	type="submit" /></form>
-
-<?
+		$renderer = new Html_DaoRenderer_Form( $action, $layout );
+		$renderer->setActiveRecordClass( $class );
+		if ($formTitle)
+			$renderer->setTitle( $formTitle );
+		$renderer->setAjaxMode( $isAjax );
+		$renderer->setErrorsArray( $errorsArray );
+		$renderer->display();
 	}
 
 	/**
-	 * Renders one field of edit form
+	 * Echoes rendered edit form
 	 *
-	 * @param Dao_ActiveRecord $obj
-	 * @param string $fieldName
-	 * @param string $errorMessage
+	 * @param Dao_ActiveRecord $record
+	 * @param string $action
+	 * @param Html_Layout $layout
 	 * @param bool $isAjax
+	 * @param array $errorsArray
+	 * @param string $formTitle
 	 */
-	static private function editField( Dao_ActiveRecord $obj, $fieldName, $errorMessage, $isAjax )
+	static public function edit( Dao_ActiveRecord $record, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
-		$fieldInfo = Dao_TableInfo::get( get_class( $obj ) )->getFieldInfo( $fieldName );
-		$param = $fieldInfo->getParam( "edit" );
-		if (!$param)
-			$param = $fieldInfo->getParam( "render" );
-		if (!$param)
-			return;
-		
-		$title = $fieldInfo->getParam( "title" );
-		if (!$title)
-			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-		
-		if ($param === 1) {
-			// Auto-generate renderer by field type
-			if (!$fieldInfo->isAtomic())
-				throw new Exception( "Cannot autogenerate renderer for non-atomic field!" );
-				// Finally it should produce $callback and $subparams
-			// TODO: add logic to autogenerate callback for atomic fields
-			return;
-		} else {
-			
-			$subparams = "";
-			if (strpos( $param, " " )) {
-				list ($callback, $subparams) = explode( " ", $param, 2 );
-			} else {
-				$callback = $param;
-			}
-		
-		}
-		
-		if (!strpos( $callback, "::" )) {
-			$callback = __CLASS__ . "::editor" . ucfirst( $callback );
-		}
-		
-		call_user_func_array( $callback, array ($obj, $fieldName, $title, $subparams, $errorMessage, $isAjax) );
+		$renderer = new Html_DaoRenderer_Form( $action, $layout );
+		$renderer->setActiveRecord( $record );
+		if ($formTitle)
+			$renderer->setTitle( $formTitle );
+		$renderer->setAjaxMode( $isAjax );
+		$renderer->setErrorsArray( $errorsArray );
+		$renderer->display();
 	}
 
-	static public function editorWysiwyg( Dao_ActiveRecord $obj, $fieldName, $title, $subparams, $errorMessage, $isAjax )
-	{
-		?>
-
-<?=$title?>:
-<br />
-<textarea cols="100" rows="40"><?=$obj->$fieldName?></textarea><?=$subparams . $errorMessage?>
-<?}}
+}
