@@ -24,10 +24,11 @@ abstract class Html_Template {
 	 *
 	 * @return Html_Layout
 	 */
-	public function getLayout() {
-		if(!$this->layoutObject) {
+	public function getLayout()
+	{
+		if (!$this->layoutObject) {
 			$class = $this->layoutClass;
-			$this->layoutObject = new $class($this);
+			$this->layoutObject = new $class( $this );
 		}
 		return $this->layoutObject;
 	}
@@ -36,7 +37,8 @@ abstract class Html_Template {
 	 * Unsets current layout object so it will be reinitiated
 	 *
 	 */
-	public function reloadLayout() {
+	public function reloadLayout()
+	{
 		$this->layoutObject = null;
 	}
 
@@ -44,7 +46,8 @@ abstract class Html_Template {
 	 * Echoes template page
 	 *
 	 */
-	public function display() {
+	public function display()
+	{
 		$this->getLayout()->display();
 	}
 

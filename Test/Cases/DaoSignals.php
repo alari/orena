@@ -118,13 +118,14 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 
 	public function testUnbind()
 	{
-		Dao_Signals::unbind( __CLASS__ . "::listener_sc" );
-		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_ec");
-		$this->assertEquals( $expected, Dao_Signals::getListeners( Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ) );
+		Dao_Signals::unbind( __CLASS__ . "::listener_ec" );
+		$expected = Array (__CLASS__ . "::listener");
+
+		$this->assertEquals( $expected, Dao_Signals::getListeners( Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ) , "By event");
 
 		Dao_Signals::unbind( null, Dao_Signals::EVENT_SET );
 		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_signal");
-		$this->assertEquals( $expected, Dao_Signals::getListeners( null, "test", null ) );
+		$this->assertEquals( $expected, Dao_Signals::getListeners( null, "test", null ), "By signal" );
 
 		Dao_Signals::unbind();
 	}

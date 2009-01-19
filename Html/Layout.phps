@@ -7,38 +7,38 @@ class Html_Layout {
 	 * @var Html_Template
 	 */
 	protected $tpl;
-
+	
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-
+	
 	/**
 	 * Array of metatags
 	 *
 	 * @var Array
 	 */
-	protected $metas = Array();
+	protected $metas = Array ();
 	/**
 	 * Array of javascript source urls
 	 *
 	 * @var Array
 	 */
-	protected $jscriptSrc = Array();
+	protected $jscriptSrc = Array ();
 	/**
 	 * Array of javascript codeblocks
 	 *
 	 * @var Array
 	 */
-	protected $jscriptCode = Array();
+	protected $jscriptCode = Array ();
 	/**
 	 * Array of css sources
 	 *
 	 * @var Array
 	 */
-	protected $cssSrc = Array();
+	protected $cssSrc = Array ();
 	/**
 	 * Source of page shortcut icon
 	 *
@@ -56,8 +56,8 @@ class Html_Layout {
 	 *
 	 * @var Array
 	 */
-	protected $headLinks = Array();
-
+	protected $headLinks = Array ();
+	
 	/**
 	 * HTTP response code
 	 *
@@ -76,7 +76,8 @@ class Html_Layout {
 	 *
 	 * @param Html_Template $tpl
 	 */
-	public function __construct(Html_Template $tpl) {
+	public function __construct( Html_Template $tpl )
+	{
 		$this->tpl = $tpl;
 	}
 
@@ -84,16 +85,21 @@ class Html_Layout {
 	 * Echoes the page
 	 *
 	 */
-	public function display() {
-		Header("HTTP/1.1 ".$this->responseCode." ".$this->responseMessage);
-		if($this->contentType) Header("Content-type: ".$this->contentType);
-?>
+	public function display()
+	{
+		Header( "HTTP/1.1 " . $this->responseCode . " " . $this->responseMessage );
+		if ($this->contentType)
+			Header( "Content-type: " . $this->contentType );
+		?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
-	<head>
-		<?$this->displayHead()?>
-	</head><body>
-		<?$this->displayBody()?>
+<head>
+		<?
+		$this->displayHead()?>
+	</head>
+<body>
+		<?
+		$this->displayBody()?>
 	</body>
 </html>
 <?
@@ -103,18 +109,28 @@ class Html_Layout {
 	 * Echoes contents of head tag
 	 *
 	 */
-	protected function displayHead() {
-		if($this->contentType) echo '<meta http-equiv="Content-type" content="'.$this->contentType.'" />';
-		if($this->title) echo '<title>', $this->title, "</title>";
-		if($this->favicon) echo '<link rel="SHORTCUT ICON" href="'.$this->favicon.'"/>';
-		foreach($this->cssSrc as $href) echo '<link rel="Stylesheet" type="text/css" href="'.$href.'"/>';
-		foreach($this->jscriptSrc as $src) echo '<script type="text/javascript" src="',$src,'"></script>';
-		foreach($this->jscriptCode as $code) echo "<script type=\"text/javascript\">\n$code\n</script>";
-		foreach($this->metas as $meta) echo '<meta name="'.$meta[0].'" content="'.$meta[1].'" />';
-		foreach($this->headLinks as $link) {
+	protected function displayHead()
+	{
+		if ($this->contentType)
+			echo '<meta http-equiv="Content-type" content="' . $this->contentType . '" />';
+		if ($this->title)
+			echo '<title>', $this->title, "</title>";
+		if ($this->favicon)
+			echo '<link rel="SHORTCUT ICON" href="' . $this->favicon . '"/>';
+		foreach ($this->cssSrc as $href)
+			echo '<link rel="Stylesheet" type="text/css" href="' . $href . '"/>';
+		foreach ($this->jscriptSrc as $src)
+			echo '<script type="text/javascript" src="', $src, '"></script>';
+		foreach ($this->jscriptCode as $code)
+			echo "<script type=\"text/javascript\">\n$code\n</script>";
+		foreach ($this->metas as $meta)
+			echo '<meta name="' . $meta[ 0 ] . '" content="' . $meta[ 1 ] . '" />';
+		foreach ($this->headLinks as $link) {
 			echo "<link rel=\"{$link['rel']}\" href=\"{$link['href']}\"";
-			if($link["type"]) echo ' type="'.$link["type"].'"';
-			if($link["title"]) echo ' title="'.htmlspecialchars($link["title"]).'"';
+			if ($link[ "type" ])
+				echo ' type="' . $link[ "type" ] . '"';
+			if ($link[ "title" ])
+				echo ' title="' . htmlspecialchars( $link[ "title" ] ) . '"';
 			echo " />";
 		}
 	}
@@ -123,7 +139,8 @@ class Html_Layout {
 	 * Echoes contents of body tag
 	 *
 	 */
-	protected function displayBody() {
+	protected function displayBody()
+	{
 		$this->tpl->displayContents();
 	}
 
@@ -133,7 +150,8 @@ class Html_Layout {
 	 * @param int $code
 	 * @param string $message
 	 */
-	public function setResponseStatus($code, $message) {
+	public function setResponseStatus( $code, $message )
+	{
 		$this->responseCode = (int)$code;
 		$this->responseMessage = $message;
 	}
@@ -146,8 +164,9 @@ class Html_Layout {
 	 * @param string $type
 	 * @param string $title
 	 */
-	public function addHeadLink($rel, $href, $type=null, $title=null) {
-		$this->headLinks[] = Array("rel"=>$rel, "href"=>$href, "type"=>$type, "title"=>$title);
+	public function addHeadLink( $rel, $href, $type = null, $title = null )
+	{
+		$this->headLinks[] = Array ("rel" => $rel, "href" => $href, "type" => $type, "title" => $title);
 	}
 
 	/**
@@ -156,8 +175,9 @@ class Html_Layout {
 	 * @param string $name
 	 * @param string $content
 	 */
-	public function addMeta($name, $content) {
-		$this->metas[] = Array($name, $content);
+	public function addMeta( $name, $content )
+	{
+		$this->metas[] = Array ($name, $content);
 	}
 
 	/**
@@ -165,9 +185,11 @@ class Html_Layout {
 	 *
 	 * @param string $src
 	 */
-	public function addJavaScriptSrc($src) {
-		$src = $this->staticUrl($src);
-		if(!in_array($src, $this->jscriptSrc)) $this->jscriptSrc[] = $src;
+	public function addJavaScriptSrc( $src )
+	{
+		$src = $this->staticUrl( $src );
+		if (!in_array( $src, $this->jscriptSrc ))
+			$this->jscriptSrc[] = $src;
 	}
 
 	/**
@@ -175,7 +197,8 @@ class Html_Layout {
 	 *
 	 * @param string $code
 	 */
-	public function addJavaScriptCode($code) {
+	public function addJavaScriptCode( $code )
+	{
 		$this->jscriptCode[] = $code;
 	}
 
@@ -184,9 +207,11 @@ class Html_Layout {
 	 *
 	 * @param string $src URL from app/static_root, without trailing slash
 	 */
-	public function addCssSrc($src) {
-		$src = $this->staticUrl($src);
-		if(!in_array($src, $this->cssSrc)) $this->cssSrc[] = $src;
+	public function addCssSrc( $src )
+	{
+		$src = $this->staticUrl( $src );
+		if (!in_array( $src, $this->cssSrc ))
+			$this->cssSrc[] = $src;
 	}
 
 	/**
@@ -194,8 +219,9 @@ class Html_Layout {
 	 *
 	 * @param string $src
 	 */
-	public function setFavicon($src) {
-		$src = $this->staticUrl($src);
+	public function setFavicon( $src )
+	{
+		$src = $this->staticUrl( $src );
 		$this->favicon = $src;
 	}
 
@@ -204,7 +230,8 @@ class Html_Layout {
 	 *
 	 * @param string $title
 	 */
-	public function setTitle($title) {
+	public function setTitle( $title )
+	{
 		$this->title = $title;
 	}
 
@@ -213,8 +240,10 @@ class Html_Layout {
 	 *
 	 * @param string $url
 	 */
-	public function staticUrl($url) {
-		if($url[0] != "/" && $url[0] != ".") return Registry::get("app/static_root").$url;
+	public function staticUrl( $url )
+	{
+		if ($url[ 0 ] != "/" && $url[ 0 ] != ".")
+			return Registry::get( "app/static_root" ) . $url;
 		return $url;
 	}
 

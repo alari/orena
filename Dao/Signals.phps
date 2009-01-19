@@ -1,7 +1,7 @@
 <?php
 class Dao_Signals {
 	private static $listeners = Array ();
-
+	
 	const EVENT_REMOVE = "remove";
 	const EVENT_SET = "set";
 	const EVENT_CREATE = "create";
@@ -17,12 +17,17 @@ class Dao_Signals {
 	 */
 	static public function bind( $callback, $event = null, $signal = null, $class = null )
 	{
-		$event = (string)$event;
-		$signal = (string)$signal;
-		$class = (string)$class;
-		$key = $event . "-" . $signal . "-" . $class;
-		if (!isset( self::$listeners[ $key ] ) || !in_array( $callback, self::$listeners[ $key ] ))
-			self::$listeners[ $key ][] = $callback;
+		$event = $event ? (string)$event : "-";
+		$signal = $signal ? (string)$signal : "-";
+		$class = $class ? (string)$class : "-";
+		$signals = explode( " ", $signal );
+		if (!count( $signals ))
+			$signals = array ("-");
+		foreach ($signals as $s) {
+			if (!isset( self::$listeners[ $event ][ $s ][ $class ] ) || !in_array( $callback, 
+					self::$listeners[ $event ][ $s ][ $class ] ))
+				self::$listeners[ $event ][ $s ][ $class ][] = $callback;
+		}
 	}
 
 	/**
@@ -51,31 +56,38 @@ class Dao_Signals {
 	 */
 	static public function getListeners( $event, $signal, $class )
 	{
-
-		$keys = Array ();
-
-		// TODO: clean-up keys construction; parse $signal with space
-
-
-		$keys[] = "--";
-		$keys[] = $event . "--";
-		$keys[] = "-" . $signal . "-";
-		$keys[] = "--" . $class;
-		$keys[] = "$event-$signal-";
-		$keys[] = "$event--$class";
-		$keys[] = "-$signal-$class";
-		$keys[] = "$event-$signal-$class";
-
 		$listeners = Array ();
-
-		foreach ($keys as $key) {
-			if (isset( self::$listeners[ $key ] ) && count( self::$listeners[ $key ] )) {
-				foreach (self::$listeners[ $key ] as $callback) {
-					if (!in_array( $callback, $listeners ))
-						$listeners[] = $callback;
+		
+		$events = Array ("-");
+		if ($event && $event != "-")
+			$events[] = (string)$event;
+		
+		$classes = Array ("-");
+		if ($class && $class != "-")
+			$classes[] = (string)$class;
+		
+		$signals = Array ("-");
+		if ($signal) {
+			$signal = explode( " ", $signal );
+			foreach ($signal as $s)
+				if (!in_array( $s, $signals ))
+					$signals[] = $s;
+		}
+		
+		foreach ($events as $e) {
+			foreach ($signals as $s) {
+				foreach ($classes as $c) {
+					if (isset( self::$listeners[ $e ][ $s ][ $c ] ) && is_array( self::$listeners[ $e ][ $s ][ $c ] )) {
+						$listeners = array_merge( $listeners, self::$listeners[ $e ][ $s ][ $c ] );
+					}
 				}
 			}
 		}
+		
+		$listeners = array_unique( $listeners );
+		$null = array_search( null, $listeners );
+		if ($null)
+			unset( $listeners[ $null ] );
 		return $listeners;
 	}
 
@@ -93,45 +105,33 @@ class Dao_Signals {
 			self::$listeners = Array ();
 			return;
 		}
-		$cmp = Array ();
-		if ($event)
-			$cmp[] = $event;
-		if ($signal)
-			$cmp[] = $signal;
-		if ($class)
-			$cmp[] = $class;
-		foreach (self::$listeners as $k => &$v) {
-			list ($e, $s, $c) = explode( "-", $k, 3 );
-			$k_cmp = Array ();
-			// TODO remove copy-paste
-			if ($event && !$e)
+		
+		$signals = Array ();
+		if ($signal) {
+			$signal = explode( " ", $signal );
+			foreach ($signal as $s)
+				if (!in_array( $s, $signals ))
+					$signals[] = $s;
+		}
+		
+		foreach (self::$listeners as $e => &$listeners_ev) {
+			if ($event && $e != $event)
 				continue;
-			if ($event)
-				$k_cmp[] = $e;
-
-			if ($signal && !$s)
-				continue;
-			if ($signal)
-				$k_cmp[] = $s;
-
-			if ($class && !$c)
-				continue;
-			if ($class)
-				$k_cmp[] = $c;
-
-			if ($k_cmp != $cmp)
-				continue;
-
-			if (!$callback) {
-				$v = Array ();
-				continue;
-			}
-
-			$kk = array_search( $callback, $v );
-			if ($kk) {
-				unset( $v[ $kk ] );
+			foreach ($listeners_ev as $s => &$listeners_sg) {
+				if (count( $signals ) && !in_array( $s, $signals ))
+					continue;
+				foreach ($listeners_sg as $c => &$listeners_cl) {
+					if ($class && $c != $class)
+						continue;
+					if ($callback) {
+						$remove = array_search( $callback, $listeners_cl );
+						if ($remove !== false)
+							$listeners_cl[ $remove ] = $remove;
+					} else {
+						$listeners_cl = Array ();
+					}
+				}
 			}
 		}
 	}
-
 }

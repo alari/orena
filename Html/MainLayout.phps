@@ -12,19 +12,32 @@ class Html_MainLayout extends Html_Layout {
 	 * Simple layout with three columns
 	 *
 	 */
-	public function displayBody() {
-?>
-<div id="wrap"><div id="cont">
-		<?$this->displayContents();?>
-</div></div>
+	public function displayBody()
+	{
+		?>
+<div id="wrap">
+<div id="cont">
+		<?
+		$this->displayContents();
+		?>
+</div>
+</div>
 
-<div id="head"><?$this->displayHeader();?></div>
-<div id="lcol"><?$this->displayColLeft();?></div>
-<div id="rcol"><?$this->displayColRight();?></div>
+<div id="head"><?
+		$this->displayHeader();
+		?></div>
+<div id="lcol"><?
+		$this->displayColLeft();
+		?></div>
+<div id="rcol"><?
+		$this->displayColRight();
+		?></div>
 
 <div class="clear"><!--  --></div>
 
-<div id="feet"><?$this->displayFooter();?></div>
+<div id="feet"><?
+		$this->displayFooter();
+		?></div>
 <?
 	}
 
@@ -32,7 +45,8 @@ class Html_MainLayout extends Html_Layout {
 	 * Default contents of page header
 	 *
 	 */
-	protected function displayHeader() {
+	protected function displayHeader()
+	{
 		echo $this->title;
 	}
 
@@ -40,9 +54,12 @@ class Html_MainLayout extends Html_Layout {
 	 * Default contents of page footer
 	 *
 	 */
-	protected function displayFooter() {
-?>
-&copy; <a href="http://orena.org/">Orena Framework</a> 2008-2009
+	protected function displayFooter()
+	{
+		?>
+&copy;
+<a href="http://orena.org/">Orena Framework</a>
+2008-2009
 <?
 	}
 
@@ -50,7 +67,8 @@ class Html_MainLayout extends Html_Layout {
 	 * Default contents of middle zone
 	 *
 	 */
-	protected function displayContents() {
+	protected function displayContents()
+	{
 		$this->tpl->displayContents();
 	}
 
@@ -58,8 +76,9 @@ class Html_MainLayout extends Html_Layout {
 	 * Contents for left column
 	 * @todo add interface
 	 */
-	protected function displayColLeft() {
-?>
+	protected function displayColLeft()
+	{
+		?>
 todo: add interface for left col generator
 <?
 	}
@@ -68,8 +87,9 @@ todo: add interface for left col generator
 	 * Contents for right column
 	 * @todo add interface
 	 */
-	protected function displayColRight() {
-?>
+	protected function displayColRight()
+	{
+		?>
 todo: add interface for right col generator
 <?
 	}
@@ -78,8 +98,9 @@ todo: add interface for right col generator
 	 * Contents of HEAD tag -- adds main css file source
 	 *
 	 */
-	protected function displayHead() {
-		$this->addCssSrc($this->mainCssHref ? $this->mainCssHref : Registry::get("engine/static_root")."css/main.css");
+	protected function displayHead()
+	{
+		$this->addCssSrc( $this->mainCssHref ? $this->mainCssHref : Registry::get( "engine/static_root" ) . "css/main.css" );
 		parent::displayHead();
 	}
 

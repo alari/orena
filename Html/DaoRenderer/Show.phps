@@ -62,34 +62,36 @@ class Html_DaoRenderer_Show {
 	{
 		$fieldInfo = Dao_TableInfo::get( $this->record )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( $this->mode );
-
+		
 		if (!$param)
 			return;
-
+		
 		$title = $fieldInfo->getParam( "title" );
 		if (!$title)
 			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-
+		
 		$subparams = "";
-
+		
 		if ($param === 1) {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic()) {
 				// TODO: add tests for loop
-				if($fieldValue instanceof Dao_Query) $callback = "loop";
-				else throw new Exception( "Cannot autogenerate renderer for non-atomic field!" );
+				if ($fieldValue instanceof Dao_Query)
+					$callback = "loop";
+				else
+					throw new Exception( "Cannot autogenerate renderer for non-atomic field!" );
 			} else {
 				$callback = "simple";
 			}
 		} else {
-
+			
 			if (strpos( $param, " " )) {
 				list ($callback, $subparams) = explode( " ", $param, 2 );
 			} else {
 				$callback = $param;
 			}
 		}
-
+		
 		if (!strpos( $callback, "::" )) {
 			$callback = "shower" . ucfirst( $callback );
 			if (!method_exists( $this, $callback ))
@@ -97,7 +99,7 @@ class Html_DaoRenderer_Show {
 			$this->$callback( $fieldValue, $title, $subparams );
 			return;
 		}
-
+		
 		call_user_func_array( $callback, array ($this->record, $fieldName, $title, $subparams, $this->layout) );
 	}
 
@@ -132,7 +134,7 @@ class Html_DaoRenderer_Show {
 	 * @param string $title
 	 * @param string $subparams
 	 */
-	private function showerArea($fieldValue, $title, $subparams )
+	private function showerArea( $fieldValue, $title, $subparams )
 	{
 		echo '<div id="oo-renderer-area">', htmlspecialchars( $fieldValue ), "</div>";
 	}
@@ -144,8 +146,10 @@ class Html_DaoRenderer_Show {
 	 * @param string $title
 	 * @param string $subparams
 	 */
-	private function showerLoop($fieldValue, $title, $subparams) {
-		if($fieldValue instanceof Dao_Query) Dao_Renderer::showLoop($fieldValue, $this->layout);
+	private function showerLoop( $fieldValue, $title, $subparams )
+	{
+		if ($fieldValue instanceof Dao_Query)
+			Dao_Renderer::showLoop( $fieldValue, $this->layout );
 	}
 
 }

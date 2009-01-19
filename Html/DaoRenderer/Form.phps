@@ -101,7 +101,8 @@ class Html_DaoRenderer_Form {
 	public function setActiveRecordClass( $class )
 	{
 		$this->class = $class;
-		if(!$this->record instanceof $class) $this->record = null;
+		if (!$this->record instanceof $class)
+			$this->record = null;
 		// TODO: add default things getting, like form name and submit button title
 	}
 
@@ -140,7 +141,8 @@ class Html_DaoRenderer_Form {
 	 *
 	 * @param unknown_type $text
 	 */
-	public function setSubmitText($text) {
+	public function setSubmitText( $text )
+	{
 		$this->submitText = $text;
 	}
 
@@ -149,7 +151,8 @@ class Html_DaoRenderer_Form {
 	 *
 	 * @param string $text
 	 */
-	public function setResetText($text) {
+	public function setResetText( $text )
+	{
 		$this->resetText = $text;
 	}
 
@@ -164,10 +167,9 @@ class Html_DaoRenderer_Form {
 		$ref = new ReflectionClass( $this->class );
 		if (!$ref->isSubclassOf( "Dao_ActiveRecord" ))
 			throw new Exception( "Cannot render classes that are not subclasses of Dao_ActiveRecord." );
-
+		
 		$tableInfo = Dao_TableInfo::get( $this->class );
-
-
+		
 		// TODO: add ajax support after choosing JS framework
 		?>
 <form method="POST" enctype="application/x-www-form-urlencoded"
@@ -177,11 +179,11 @@ class Html_DaoRenderer_Form {
 		if ($this->formTitle) {
 			?><legend><?=$this->formTitle?></legend><?
 		}
-
+		
 		foreach (array_keys( $tableInfo->getFields() ) as $fieldName) {
 			$this->displayField( $fieldName, $this->record ? $this->record->$fieldName : null );
 		}
-
+		
 		if ($this->record) {
 			?>
 
@@ -190,10 +192,16 @@ class Html_DaoRenderer_Form {
 		}
 		?>
 
-<input type="submit" value="<?=$this->submitText?>" class="oo-renderer-submit" />
-<?if($this->resetText){?>
-<input type="reset" value="<?=$this->resetText?>" class="oo-renderer-reset" />
-<?}?>
+<input type="submit" value="<?=$this->submitText?>"
+	class="oo-renderer-submit" />
+<?
+		if ($this->resetText) {
+			?>
+<input type="reset" value="<?=$this->resetText?>"
+	class="oo-renderer-reset" />
+<?
+		}
+		?>
 </fieldset>
 </form>
 <?
@@ -209,14 +217,14 @@ class Html_DaoRenderer_Form {
 	{
 		$fieldInfo = Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( "edit" );
-
+		
 		if (!$param)
 			return;
-
+		
 		$title = $fieldInfo->getParam( "title" );
 		if (!$title)
 			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-
+		
 		if ($param === 1) {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic())
@@ -225,7 +233,7 @@ class Html_DaoRenderer_Form {
 			// TODO: add logic to autogenerate callback for atomic fields
 			return;
 		} else {
-
+			
 			$subparams = "";
 			if (strpos( $param, " " )) {
 				list ($callback, $subparams) = explode( " ", $param, 2 );
@@ -233,9 +241,9 @@ class Html_DaoRenderer_Form {
 				$callback = $param;
 			}
 		}
-
+		
 		$errorMessage = isset( $this->errorsArray[ $fieldName ] ) ? $this->errorsArray[ $fieldName ] : null;
-
+		
 		if (!strpos( $callback, "::" )) {
 			$callback = "editor" . ucfirst( $callback );
 			if (!method_exists( $this, $callback ))
@@ -243,9 +251,9 @@ class Html_DaoRenderer_Form {
 			$this->$callback( $fieldName, $fieldValue, $title, $subparams, $errorMessage );
 			return;
 		}
-
-		call_user_func_array( $callback,
-				array ($this->record, $this->class, $fieldName, $title, $subparams, $errorMessage, $this->isAjax,
+		
+		call_user_func_array( $callback, 
+				array ($this->record, $this->class, $fieldName, $title, $subparams, $errorMessage, $this->isAjax, 
 						$this->layout) );
 	}
 
