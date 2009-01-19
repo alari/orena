@@ -3,7 +3,7 @@
  * Dao_Signals test case.
  */
 class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
-	
+
 	protected static $signalResults = Array ();
 
 	/**
@@ -66,6 +66,10 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 
 	public function __construct()
 	{
+
+		$this->core = new Test_Models_Core( );
+		$this->sub = new Test_Models_Sub( );
+
 		Dao_Signals::bind( __CLASS__ . "::listener" );
 		Dao_Signals::bind( __CLASS__ . "::listener_class", null, null, "Test_Models_Core" );
 		Dao_Signals::bind( __CLASS__ . "::listener_event", Dao_Signals::EVENT_REMOVE );
@@ -74,16 +78,14 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 		Dao_Signals::bind( __CLASS__ . "::listener_es", Dao_Signals::EVENT_SET, "test" );
 		Dao_Signals::bind( __CLASS__ . "::listener_ec", Dao_Signals::EVENT_SET, null, "Test_Models_Sub" );
 		Dao_Signals::bind( __CLASS__ . "::listener_sc", null, "test", "Test_Models_Sub" );
-		
-		$this->core = new Test_Models_Core( );
-		$this->sub = new Test_Models_Sub( );
+
 	}
 
 	public function testListen()
 	{
 		$this->core->subs[] = $this->sub;
 		$this->assertEquals( Array (), self::$signalResults, "No signal given" );
-		
+
 		$this->core->intfield = 5;
 		$expected = Array ("none" => array (null, 5), "class" => array (null, 5), "event" => array (null));
 		$this->assertEquals( $expected, self::$signalResults, "Results of value setting without signal type." );
@@ -93,22 +95,37 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 	{
 		$v = "test field";
 		$this->core->textfield = $v;
-		$expected = Array ("none" => array (null, $v), "event" => array (null), "signal" => array (null, $v), 
-							"class" => array (null, $v), "event-signal-class" => array ($v), 
+		$expected = Array ("none" => array (null, $v), "event" => array (null), "signal" => array (null, $v),
+							"class" => array (null, $v), "event-signal-class" => array ($v),
 							"event-signal" => array ($v));
+
+		//print_r(self::$signalResults);
 		$this->assertEquals( $expected, self::$signalResults, "Results of value setting with signal type." );
 	}
+
+	public function _testNewDelete() {
+		$expected = self::$signalResults;
+
+		$a = new Test_Models_Core();
+		$a -> delete();
+
+		print_r($expected);
+		print_r(self::$signalResults);
+
+		$this->assertEquals($expected, self::$signalResults);
+	}
+
 
 	public function testUnbind()
 	{
 		Dao_Signals::unbind( __CLASS__ . "::listener_sc" );
 		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_ec");
 		$this->assertEquals( $expected, Dao_Signals::getListeners( Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ) );
-		
+
 		Dao_Signals::unbind( null, Dao_Signals::EVENT_SET );
 		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_signal");
 		$this->assertEquals( $expected, Dao_Signals::getListeners( null, "test", null ) );
-		
+
 		Dao_Signals::unbind();
 	}
 

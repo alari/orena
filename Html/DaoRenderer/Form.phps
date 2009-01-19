@@ -209,8 +209,7 @@ class Html_DaoRenderer_Form {
 	{
 		$fieldInfo = Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( "edit" );
-		if (!$param)
-			$param = $fieldInfo->getParam( "render" );
+
 		if (!$param)
 			return;
 

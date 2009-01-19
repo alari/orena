@@ -1,6 +1,6 @@
 <?php
 /**
- * @table sub_model
+ * @table sub_model -signal
  * @field core -has one Test_Models_Core -inverse subs
  * @field cores -has many Test_Models_Core -inverse manysubs
  * @field testsignal tinytext -signal test

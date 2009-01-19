@@ -14,4 +14,8 @@ Db_Manager::getConnection()->setAttribute(PDO::ATTR_AUTOCOMMIT, true);
 $tpl = new Test_Templates_Main;
 $tpl->display();
 
-//Dao_Renderer::edit(Dao_ActiveRecord::getById(55,"Test_Models_Core"), "/");
+/*$r = Dao_ActiveRecord::getById(59,"Test_Models_Core");
+
+Dao_Renderer::show($r);
+$q = new Dao_Query("Test_Models_Core");
+Dao_Renderer::showLoop($q->limit(10));*/

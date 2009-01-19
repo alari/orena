@@ -1,16 +1,16 @@
 <?php
 class Dao_TableInfo {
-	
+
 	private static $conf = Array ();
 	private static $prefix = "";
 	private static $default_tail = "";
-	
+
 	private $table;
 	private $fields = Array ();
 	private $class;
 	private $indexes = Array ();
 	private $params = Array ();
-	
+
 	private $tail = "";
 
 	/**
@@ -21,15 +21,15 @@ class Dao_TableInfo {
 	private function __construct( $class )
 	{
 		$this->class = $class;
-		
+
 		$reflection = new ReflectionClass( $class );
 		if (!$reflection->isSubclassOf( "Dao_ActiveRecord" ))
 			return;
-			
+
 		// Copy all data from parent object
 		if ($reflection->getParentClass()) {
 			$parent = self::get( $reflection->getParentClass()->getName() );
-			
+
 			$this->table = $parent->table;
 			foreach ($parent->fields as $name => $info) {
 				$this->fields[ $name ] = clone $info;
@@ -39,7 +39,7 @@ class Dao_TableInfo {
 			$this->indexes = $parent->indexes;
 			$this->tail = $parent->tail;
 		}
-		
+
 		// Override
 		$docCommentLines = explode( "\n", $reflection->getDocComment() );
 		for ($line = current( $docCommentLines ); $line; $line = next( $docCommentLines )) {
@@ -48,26 +48,26 @@ class Dao_TableInfo {
 			if ($matches) {
 				$lineDirective = $matches[ 1 ];
 				$lineContent = trim( $matches[ 2 ] );
-				
+
 				// Processing multiline config
 				while ($lineContent[ strlen( $lineContent ) - 1 ] == '\\') {
 					$line = next( $docCommentLines );
 					$lineContent = substr( $lineContent, 0, -1 ) . " " . trim( substr( $line, 2 ) );
 				}
-				
+
 				// Processing tail directive before parsing subkeys
 				if ($lineDirective == "tail") {
 					$this->tail = $lineContent;
 					continue;
 				}
-				
+
 				$_subkeys = explode( " -", $lineContent );
 				$value = array_shift( $_subkeys );
 				$subkeys = array ();
 				if (count( $_subkeys )) {
 					foreach ($_subkeys as $v) {
 						$v = explode( " ", $v, 2 );
-						$subkeys[ trim( $v[ 0 ] ) ] = isset( $v[ 1 ] ) ? $v[ 1 ] : 1;
+						$subkeys[ trim( $v[ 0 ] ) ] = isset( $v[ 1 ] ) ? trim($v[ 1 ]) : 1;
 					}
 				}
 				switch ($lineDirective) {
@@ -128,15 +128,15 @@ class Dao_TableInfo {
 	{
 		if (!$this->table)
 			throw new Exception( "Can't create unnamed table." );
-		
+
 		$query = new Db_Query( $this->table );
-		
+
 		$query->field( "id", "int auto_increment primary key" );
-		
+
 		foreach ($this->fields as $fieldInfo) {
 			$fieldInfo->addFieldTypeToQuery( $query );
 		}
-		
+
 		foreach ($this->indexes as $fields => $keys) {
 			$indexType = "index";
 			if (isset( $keys[ "unique" ] ))
@@ -145,7 +145,7 @@ class Dao_TableInfo {
 				$indexType = "fulltext";
 			$query->index( $fields, $indexType, isset( $keys[ "name" ] ) ? $keys[ "name" ] : null );
 		}
-		
+
 		return $query->create( $this->tail ? $this->tail : self::$default_tail );
 	}
 

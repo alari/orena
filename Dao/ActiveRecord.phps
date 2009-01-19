@@ -27,7 +27,12 @@ abstract class Dao_ActiveRecord {
 			}
 		}
 		$this->reload();
-		self::$objs[ get_class( $this ) ][ $this->fields[ "id" ] ] = $this;
+		$class = get_class( $this );
+		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
+		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
+			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+					$this, $this->fields[ "id" ] );
+		}
 	}
 
 	/**
@@ -190,6 +195,12 @@ abstract class Dao_ActiveRecord {
 		
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
+		
+		$class = get_class( $this );
+		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
+			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+					$this, $this->fields[ "id" ] );
+		}
 	}
 
 	/**

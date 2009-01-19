@@ -2,13 +2,29 @@
 class Dao_Renderer {
 
 	/**
+	 * Renders loop query / without pager
+	 *
+	 * @param Dao_Query $query
+	 * @param Html_Layout $layout
+	 */
+	static public function showLoop( Dao_Query $query, Html_Layout $layout = null )
+	{
+		// TODO: add more complex logic for loop renderer, e.g. envelop
+		foreach ($query as $record) {
+			$renderer = new Html_DaoRenderer_Show( $record, $layout, "loop" );
+			$renderer->display();
+		}
+	}
+
+	/**
 	 * Echoes an object in HTML
 	 *
 	 * @param Dao_ActiveRecord $obj
 	 */
-	static public function show( Dao_ActiveRecord $obj )
+	static public function show( Dao_ActiveRecord $record, Html_Layout $layout = null )
 	{
-		$obj;
+		$renderer = new Html_DaoRenderer_Show( $record, $layout );
+		$renderer->display();
 	}
 
 	/**

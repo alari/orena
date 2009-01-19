@@ -1,9 +1,11 @@
 <?php
 class Dao_Signals {
 	private static $listeners = Array ();
-	
+
 	const EVENT_REMOVE = "remove";
 	const EVENT_SET = "set";
+	const EVENT_CREATE = "create";
+	const EVENT_DELETE = "delete";
 
 	/**
 	 * Adds listener for signal. Attention: field must contain "-signal" directive to fire signals.
@@ -24,7 +26,7 @@ class Dao_Signals {
 	}
 
 	/**
-	 * Fire signal that something had happen with the object
+	 * Fires signal that something had happen with the object
 	 *
 	 * @param const $event
 	 * @param string $signal
@@ -49,11 +51,11 @@ class Dao_Signals {
 	 */
 	static public function getListeners( $event, $signal, $class )
 	{
-		
+
 		$keys = Array ();
-		
+
 		// TODO: clean-up keys construction; parse $signal with space
-		
+
 
 		$keys[] = "--";
 		$keys[] = $event . "--";
@@ -63,9 +65,9 @@ class Dao_Signals {
 		$keys[] = "$event--$class";
 		$keys[] = "-$signal-$class";
 		$keys[] = "$event-$signal-$class";
-		
+
 		$listeners = Array ();
-		
+
 		foreach ($keys as $key) {
 			if (isset( self::$listeners[ $key ] ) && count( self::$listeners[ $key ] )) {
 				foreach (self::$listeners[ $key ] as $callback) {
@@ -106,25 +108,25 @@ class Dao_Signals {
 				continue;
 			if ($event)
 				$k_cmp[] = $e;
-			
+
 			if ($signal && !$s)
 				continue;
 			if ($signal)
 				$k_cmp[] = $s;
-			
+
 			if ($class && !$c)
 				continue;
 			if ($class)
 				$k_cmp[] = $c;
-			
+
 			if ($k_cmp != $cmp)
 				continue;
-			
+
 			if (!$callback) {
 				$v = Array ();
 				continue;
 			}
-			
+
 			$kk = array_search( $callback, $v );
 			if ($kk) {
 				unset( $v[ $kk ] );
