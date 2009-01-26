@@ -5,7 +5,7 @@ function __autoload($class){
 	include_once is_file($filename) ? $filename : $filename."s";
 }
 
-Registry::set( "fw/html/static_root", "./static/" );
+Registry::set( "fw/html/static_root", "./O/static/" );
 
 @Db_Manager::connect(array(
 	"host"=>"localhost",
