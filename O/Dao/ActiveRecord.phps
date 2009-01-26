@@ -133,8 +133,7 @@ abstract class Dao_ActiveRecord {
 		
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
-				if (array_key_exists( $name, $this->fields ))
-					$this->fields[ $name ] = $value;
+				$this->fields[ $name ] = $value;
 			$this->changed = array ();
 			return true;
 		}
@@ -212,9 +211,12 @@ abstract class Dao_ActiveRecord {
 	static public function saveAndReload( $class )
 	{
 		if (isset( self::$objs[ $class ] ) && count( self::$objs[ $class ] )) {
-			foreach (self::$objs[ $class ] as $obj) {
-				$obj->save();
-				$obj->reload();
+			foreach (self::$objs[ $class ] as $id => $obj) {
+				if ($obj instanceof self) {
+					$obj->save();
+					$obj->reload();
+				} else
+					unset( self::$objs[ $class ][ $id ] );
 			}
 		}
 	}

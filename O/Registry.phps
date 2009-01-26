@@ -7,7 +7,7 @@ class Registry {
 	 * @var Array
 	 */
 	public static $registry = Array ();
-
+	
 	/**
 	 * Inheritance dependencies between registry keys
 	 *
@@ -25,7 +25,7 @@ class Registry {
 	{
 		$keys = explode( "/", $key );
 		$value = self::$registry;
-		foreach ($keys as $i => $k) {
+		foreach ($keys as $k) {
 			if (isset( $value[ $k ] )) {
 				$value = $value[ $k ];
 				continue;
@@ -34,7 +34,7 @@ class Registry {
 			for ($j = count( $keys ); $j > 0; $j--) {
 				$_key = join( "/", array_slice( $keys, 0, $j ) );
 				if (isset( self::$inheritance[ $_key ] )) {
-					$key = self::$inheritance[ $_key ] . ($j + 1 < count( $keys ) ? "/" . join( "/",
+					$key = self::$inheritance[ $_key ] . ($j < count( $keys ) ? "/" . join( "/", 
 							array_slice( $keys, $j ) ) : "");
 					return self::get( $key );
 				} else
@@ -42,7 +42,7 @@ class Registry {
 			}
 			if (!$key)
 				return $value;
-			throw new Exception( "Unknown registry key: $key, $i." );
+			return null;
 		}
 		return $value;
 	}
@@ -55,6 +55,29 @@ class Registry {
 	 */
 	static public function set( $key, $value )
 	{
+		self::setOrAdd( $key, $value );
+	}
+
+	/**
+	 * Adds value at the bottom of key array values
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 */
+	static public function add( $key, $value )
+	{
+		self::setOrAdd( $key, $value, true );
+	}
+
+	/**
+	 * Handler for add and set methods
+	 *
+	 * @param string $key
+	 * @param mixed $value
+	 * @param bool $add
+	 */
+	static private function setOrAdd( $key, $value, $add = false )
+	{
 		$keys = explode( "/", $key );
 		$registry = &self::$registry;
 		foreach ($keys as $i => $k) {
@@ -64,9 +87,18 @@ class Registry {
 				$registry[ $k ] = Array ();
 				$registry = &$registry[ $k ];
 			} else {
-				$registry[ $k ] = $value;
+				if ($add) {
+					if (!isset( $registry[ $k ] ) || !is_array( $registry[ $k ] ))
+						$registry[ $k ] = Array ();
+					$registry[ $k ][] = $value;
+					return;
+				} else {
+					$registry[ $k ] = $value;
+					return;
+				}
 			}
 		}
+		$registry[] = $value;
 	}
 
 	/**

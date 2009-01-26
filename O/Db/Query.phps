@@ -14,7 +14,7 @@ class Db_Query {
 	 * @see Query::setSqlOption(), Query::prepareSelect()
 	 */
 	protected $sql_options = array ();
-
+	
 	/**
 	 * Array of join conditions
 	 *
@@ -22,7 +22,7 @@ class Db_Query {
 	 * @see Query::join(), Query::prepareFrom()
 	 */
 	protected $joins = array ();
-
+	
 	/**
 	 * Array of WHERE parameters
 	 *
@@ -30,7 +30,7 @@ class Db_Query {
 	 * @see Query::where(), Query::test(), Query::prepareWhere()
 	 */
 	protected $where = array ();
-
+	
 	/**
 	 * Array of fields to select/update/insert/create table
 	 *
@@ -38,7 +38,7 @@ class Db_Query {
 	 * @see Query::field(), Query::prepareInsert(), Query::prepareUpdate(), Query::prepareSelect(), Query::prepareCreate
 	 */
 	protected $fields = array ();
-
+	
 	/**
 	 * Array of indexes to create table
 	 *
@@ -46,7 +46,7 @@ class Db_Query {
 	 * @see Query::index(), Query::prepareCreate()
 	 */
 	protected $indexes = array ();
-
+	
 	/**
 	 * Array of fields to sort by
 	 *
@@ -54,7 +54,7 @@ class Db_Query {
 	 * @see Query::orderBy(), Query::prepareTail()
 	 */
 	protected $orders = array ();
-
+	
 	/**
 	 * Array of fields to group by
 	 *
@@ -62,7 +62,7 @@ class Db_Query {
 	 * @see Query::groupBy(), Query::prepareTail()
 	 */
 	protected $group_by = array ();
-
+	
 	/**
 	 * Limit by
 	 *
@@ -77,7 +77,7 @@ class Db_Query {
 	 * @see Query::limit(), Query::prepareTail()
 	 */
 	protected $offset = 0;
-
+	
 	/**
 	 * Condition to execute after query
 	 *
@@ -92,7 +92,7 @@ class Db_Query {
 	 * @see Query::having(), Query::prepareTail()
 	 */
 	protected $having_params = array ();
-
+	
 	/**
 	 * Array of params used to execute query
 	 *
@@ -101,7 +101,7 @@ class Db_Query {
 	 * @access private
 	 */
 	protected $params = array ();
-
+	
 	/**
 	 * ID of database connection
 	 *
@@ -110,7 +110,7 @@ class Db_Query {
 	 * @access private
 	 */
 	protected $db_conn = 1;
-
+	
 	/**
 	 * Last executed statement object
 	 *
@@ -118,20 +118,34 @@ class Db_Query {
 	 * @access private
 	 */
 	protected $stmt;
-
+	
 	/**
 	 * Prepared statements
 	 *
 	 * @var PDOStatement[]
 	 */
 	protected static $prepared_stmts = Array ();
-
+	
+	/**
+	 * Line of tables used in query
+	 *
+	 * @var string
+	 */
+	protected $tables = "";
+	
+	/**
+	 * Array of tables with deny to prepare statements
+	 *
+	 * @var Array
+	 */
+	protected static $disable_preparing = Array ();
+	
 	/**
 	 * @see Query::setSqlOption()
 	 */
 	const CALC_FOUND_ROWS = "SQL_CALC_FOUND_ROWS";
 	const CACHE = "SQL_CACHE";
-
+	
 	/**
 	 * @see Query::test()
 	 */
@@ -140,7 +154,7 @@ class Db_Query {
 	const GT = ">";
 	const LT = "<";
 	const EXISTS = " EXISTS ";
-
+	
 	/**
 	 * @access private
 	 */
@@ -438,12 +452,12 @@ class Db_Query {
 	public function select()
 	{
 		$this->stmt = $this->prepareStmt( $this->prepareSelect() );
-
+		
 		$this->bindParams( $this->stmt );
 		$this->stmt->execute();
-
+		
 		$this->stmt->setFetchMode( PDO::FETCH_ASSOC );
-
+		
 		return $this->stmt;
 	}
 
@@ -456,9 +470,9 @@ class Db_Query {
 	public function create( $tail = "" )
 	{
 		$this->stmt = $this->conn()->prepare( $this->prepareCreate( $tail ) );
-
+		
 		$this->stmt->execute();
-
+		
 		return $this->stmt;
 	}
 
@@ -471,9 +485,9 @@ class Db_Query {
 	public function alter( $command = "ADD" )
 	{
 		$this->stmt = $this->conn()->prepare( $this->prepareAlter( $command ) );
-
+		
 		$this->stmt->execute();
-
+		
 		return $this->stmt;
 	}
 
@@ -485,10 +499,10 @@ class Db_Query {
 	public function update()
 	{
 		$this->stmt = $this->prepareStmt( $this->prepareUpdate() );
-
+		
 		$this->bindParams( $this->stmt );
 		$this->stmt->execute();
-
+		
 		return $this->stmt->rowCount();
 	}
 
@@ -500,10 +514,10 @@ class Db_Query {
 	public function delete()
 	{
 		$this->stmt = $this->prepareStmt( $this->prepareDelete() );
-
+		
 		$this->bindParams( $this->stmt );
 		$this->stmt->execute();
-
+		
 		return $this->stmt->rowCount();
 	}
 
@@ -515,12 +529,23 @@ class Db_Query {
 	public function insert()
 	{
 		$this->stmt = $this->prepareStmt( $this->prepareInsert() );
-
+		
 		$this->bindParams( $this->stmt );
-
+		
 		$this->stmt->execute();
-
+		
 		return $this->conn()->lastInsertId();
+	}
+
+	/**
+	 * Disables statements preparing for particular table use
+	 *
+	 * @param string $table
+	 */
+	static public function disablePreparing( $table )
+	{
+		if (!in_array( $table, self::$disable_preparing ))
+			self::$disable_preparing[] = $table;
 	}
 
 	/**
@@ -531,6 +556,12 @@ class Db_Query {
 	 */
 	protected function prepareStmt( $query )
 	{
+		if ($this->tables && count( self::$disable_preparing )) {
+			foreach (self::$disable_preparing as $table)
+				if (strpos( $this->tables, $table ) !== false) {
+					return $this->conn()->prepare( $query );
+				}
+		}
 		if (!isset( self::$prepared_stmts[ $query ] ) || !self::$prepared_stmts[ $query ] instanceof PDOStatement) {
 			self::$prepared_stmts[ $query ] = $this->conn()->prepare( $query );
 		}
@@ -586,7 +617,7 @@ class Db_Query {
 			$query .= ",\n" . $v[ 0 ] . ($v[ 2 ] ? " `{$v[2]}` " : "") . "(" . $v[ 1 ] . ")";
 		}
 		$query .= ") " . $tail;
-
+		
 		return $query;
 	}
 
@@ -603,9 +634,10 @@ class Db_Query {
 			$query .= ($k ? ",\n" : "") . $cmd . " COLUMN " . $v[ 0 ] . " " . $v[ 1 ];
 		}
 		foreach ($this->indexes as $k => $v) {
-			$query .= ($k || count( $this->fields) ? ",\n" : "" ) . $cmd . " " .$v[0]. ($v[ 2 ] ? " `{$v[2]}` " : "") . "(" . $v[ 1 ] . ")";
+			$query .= ($k || count( $this->fields ) ? ",\n" : "") . $cmd . " " . $v[ 0 ] . ($v[ 2 ] ? " `{$v[2]}` " : "") .
+						 "(" . $v[ 1 ] . ")";
 		}
-
+		
 		return $query;
 	}
 
@@ -617,14 +649,14 @@ class Db_Query {
 	protected function prepareInsert()
 	{
 		$this->params = array ();
-
+		
 		$query = "INSERT INTO " . $this->from[ 0 ];
-
+		
 		if (!count( $this->fields ))
 			return $query . "() VALUES()";
-
+		
 		$query .= " SET ";
-
+		
 		foreach ($this->fields as $k => $v) {
 			$query .= ($k ? ", " : "") . $v[ 0 ] . "=";
 			if ($v[ 2 ]) {
@@ -634,7 +666,7 @@ class Db_Query {
 				$this->params[] = $v[ 1 ];
 			}
 		}
-
+		
 		return $query;
 	}
 
@@ -646,13 +678,13 @@ class Db_Query {
 	protected function prepareUpdate()
 	{
 		$this->params = array ();
-
+		
 		$query = "UPDATE ";
 		foreach ($this->from as $k => $v) {
 			$query .= ($k ? ", " : "") . $v;
 		}
 		$query .= " SET ";
-
+		
 		foreach ($this->fields as $k => $v) {
 			$query .= ($k ? ", " : "") . $v[ 0 ] . "=";
 			if ($v[ 2 ]) {
@@ -662,9 +694,9 @@ class Db_Query {
 				$this->params[] = $v[ 1 ];
 			}
 		}
-
+		
 		$this->prepareWhere( $query );
-
+		
 		return $query;
 	}
 
@@ -676,10 +708,10 @@ class Db_Query {
 	protected function prepareDelete()
 	{
 		$this->params = array ();
-
+		
 		$query = "DELETE";
 		$this->prepareFrom( $query );
-
+		
 		return $query;
 	}
 
@@ -691,7 +723,7 @@ class Db_Query {
 	public function prepareSelect()
 	{
 		$this->params = array ();
-
+		
 		$query = "SELECT ";
 		foreach ($this->sql_options as $option) {
 			$query .= $option . " ";
@@ -708,7 +740,7 @@ class Db_Query {
 				$tbl = "";
 			$query .= $tbl . "*";
 		}
-
+		
 		$this->prepareFrom( $query );
 		return $query;
 	}
@@ -721,12 +753,15 @@ class Db_Query {
 	 */
 	protected function prepareFrom( &$query )
 	{
+		$this->tables = "";
 		$query .= " FROM ";
 		foreach ($this->from as $k => $v) {
 			$query .= ($k ? ", " : "") . $v;
+			$this->tables .= " " . $v;
 		}
 		foreach ($this->joins as $j) {
 			$query .= " " . $j[ "type" ] . " JOIN " . $j[ "table" ] . " ON (" . $j[ "cond" ] . ")";
+			$this->tables .= " " . $j[ "table" ];
 		}
 		$this->prepareWhere( $query );
 	}
@@ -739,13 +774,13 @@ class Db_Query {
 	 */
 	protected function prepareWhere( &$query )
 	{
-
+		
 		if (count( $this->where )) {
 			$query .= " WHERE ";
-
+			
 			$where = "";
 			$was_or = false;
-
+			
 			foreach ($this->where as $k => $v) {
 				switch ($v[ "t" ]) {
 					case self::T_WHERE_SIMPLE :
@@ -771,6 +806,7 @@ class Db_Query {
 						} elseif ($v[ "param" ] instanceof self) {
 							$where .= "(";
 							$where .= $v[ "param" ]->prepareSelect();
+							$this->tables .= $v[ "param" ]->tables;
 							foreach ($v[ "param" ]->params as $p)
 								$this->params[] = $p;
 							$where .= ")";
@@ -788,14 +824,14 @@ class Db_Query {
 					break;
 				}
 			}
-
+			
 			if ($was_or)
 				$where = "($where)";
-
+			
 			$query .= $where;
-
+		
 		}
-
+		
 		$this->prepareTail( $query );
 	}
 
@@ -813,21 +849,21 @@ class Db_Query {
 				$query .= ($k ? ", " : "") . $v;
 			}
 		}
-
+		
 		if (count( $this->group_by )) {
 			$query .= " GROUP BY ";
 			foreach ($this->group_by as $k => $v) {
 				$query .= ($k ? ", " : "") . $v;
 			}
 		}
-
+		
 		if ($this->limit) {
 			$query .= " LIMIT " . ($this->offset ? $this->offset . ", " : "") . $this->limit;
 		}
-
+		
 		if ($this->having_condition) {
 			$query .= " HAVING " . $this->having_condition;
-
+			
 			foreach ($this->having_params as $p) {
 				$this->params[] = $p;
 			}

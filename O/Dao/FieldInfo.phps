@@ -181,10 +181,15 @@ class Dao_FieldInfo {
 	 */
 	private function addFieldToTable()
 	{
+		static $is_added = false;
+		if ($is_added)
+			return null;
 		$q = new Dao_Query( $this->class );
 		$this->addFieldTypeToQuery( $q );
 		$r = $q->alter( "ADD" );
 		Dao_ActiveRecord::saveAndReload( $this->class );
+		Dao_Query::disablePreparing( $this->class );
+		$is_added = true;
 		return $r;
 	}
 
@@ -307,8 +312,9 @@ class Dao_FieldInfo {
 	{
 		// Value as is
 		if ($this->isAtomic) {
-			if (!$fieldExists)
+			if (!$fieldExists) {
 				$this->addFieldToTable();
+			}
 			return $fieldValue;
 		}
 		// Alias -- cached query
@@ -333,8 +339,9 @@ class Dao_FieldInfo {
 			return $this->getRelation( $obj->id );
 		}
 		// Base-to-one
-		if (!$fieldExists)
+		if (!$fieldExists) {
 			$this->addFieldToTable();
+		}
 		return Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
 	}
 
@@ -455,7 +462,6 @@ class Dao_FieldInfo {
 					$obj, $obj->{$this->name} );
 		}
 		if ($this->isAtomic || $this->alias) {
-			// TODO: add signal support for atomic fields
 			return;
 		}
 		unset( $this->relation[ $obj->id ] );

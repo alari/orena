@@ -76,6 +76,16 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	}
 
 	/**
+	 * Disables statements preparing for particular class table use
+	 *
+	 * @param string $class
+	 */
+	static public function disablePreparing( $class )
+	{
+		parent::disablePreparing( Dao_TableInfo::get( $class )->getTableName() );
+	}
+
+	/**
 	 * For Iterator
 	 *
 	 * @return bool

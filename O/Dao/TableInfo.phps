@@ -1,16 +1,16 @@
 <?php
 class Dao_TableInfo {
-	
+
 	private static $conf = Array ();
 	private static $prefix = "";
 	private static $default_tail = "";
-	
+
 	private $table;
 	private $fields = Array ();
 	private $class;
 	private $indexes = Array ();
 	private $params = Array ();
-	
+
 	private $tail = "";
 
 	/**
@@ -21,15 +21,15 @@ class Dao_TableInfo {
 	private function __construct( $class )
 	{
 		$this->class = $class;
-		
+
 		$reflection = new ReflectionClass( $class );
 		if (!$reflection->isSubclassOf( "Dao_ActiveRecord" ))
 			return;
-			
+
 		// Copy all data from parent object
 		if ($reflection->getParentClass()) {
 			$parent = self::get( $reflection->getParentClass()->getName() );
-			
+
 			$this->table = $parent->table;
 			foreach ($parent->fields as $name => $info) {
 				$this->fields[ $name ] = clone $info;
@@ -39,28 +39,44 @@ class Dao_TableInfo {
 			$this->indexes = $parent->indexes;
 			$this->tail = $parent->tail;
 		}
-		
+
+		$docCommentLines = Array ();
+
+		// Import data from plugins
+		$plugins = Registry::get( "app/dao/$class/plugins" );
+		if (is_array( $plugins )) {
+			foreach ($plugins as $plugin) {
+				if (!class_exists( $plugin ))
+					throw new Exception( "Unexistent plugin class: $plugin." );
+				$pluginReflection = new ReflectionClass( $plugin );
+				if (!$pluginReflection->implementsInterface( "Dao_iPlugin" ))
+					throw new Exception( "Dao plugins must implement interface Dao_iPlugin, but $plugin doesn't." );
+				$docCommentLines = array_merge( $docCommentLines,
+						explode( "\n", $pluginReflection->getDocComment() ) );
+			}
+		}
+
 		// Override
-		$docCommentLines = explode( "\n", $reflection->getDocComment() );
+		$docCommentLines = array_merge( $docCommentLines, explode( "\n", $reflection->getDocComment() ) );
 		for ($line = current( $docCommentLines ); $line; $line = next( $docCommentLines )) {
 			$matches = Array ();
 			preg_match( "/@(table|field|index|tail) (.*)/", $line, $matches );
 			if ($matches) {
 				$lineDirective = $matches[ 1 ];
 				$lineContent = trim( $matches[ 2 ] );
-				
+
 				// Processing multiline config
 				while ($lineContent[ strlen( $lineContent ) - 1 ] == '\\') {
 					$line = next( $docCommentLines );
 					$lineContent = substr( $lineContent, 0, -1 ) . " " . trim( substr( $line, 2 ) );
 				}
-				
+
 				// Processing tail directive before parsing subkeys
 				if ($lineDirective == "tail") {
 					$this->tail = $lineContent;
 					continue;
 				}
-				
+
 				$_subkeys = explode( " -", $lineContent );
 				$value = array_shift( $_subkeys );
 				$subkeys = array ();
@@ -128,15 +144,15 @@ class Dao_TableInfo {
 	{
 		if (!$this->table)
 			throw new Exception( "Can't create unnamed table." );
-		
+
 		$query = new Db_Query( $this->table );
-		
+
 		$query->field( "id", "int auto_increment primary key" );
-		
+
 		foreach ($this->fields as $fieldInfo) {
 			$fieldInfo->addFieldTypeToQuery( $query );
 		}
-		
+
 		foreach ($this->indexes as $fields => $keys) {
 			$indexType = "index";
 			if (isset( $keys[ "unique" ] ))
@@ -145,7 +161,7 @@ class Dao_TableInfo {
 				$indexType = "fulltext";
 			$query->index( $fields, $indexType, isset( $keys[ "name" ] ) ? $keys[ "name" ] : null );
 		}
-		
+
 		return $query->create( $this->tail ? $this->tail : self::$default_tail );
 	}
 

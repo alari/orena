@@ -1,7 +1,5 @@
 <?php
 
-require_once 'Test/Models/Core.php';
-
 require_once 'PHPUnit/Framework/TestCase.php';
 
 /**
@@ -168,6 +166,19 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( get_class( $obj ), get_class( $obj->myalias->getOne() ) );
 		$this->assertEquals( $obj->id, $obj->myalias->getOne()->id );
 	}
+
+	public function testPlugin() {
+		$obj = new Test_Models_Core;
+		$obj->plugin_field = "test plugin field";
+		$obj->save();
+
+		$v = $obj->plugin_field;
+		$q = new Dao_Query(get_class($obj));
+		$q->field("plugin_field")->alter("DROP");
+
+		$this->assertEquals("test plugin field", $v);
+	}
+
 
 }
 

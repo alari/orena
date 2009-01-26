@@ -11,7 +11,9 @@ class Db_Manager {
 	 */
 	static public function connect( Array $conf, $conn_id = 1 )
 	{
-		return self::$connections[ $conn_id ] = new PDO( $conf[ "engine" ] . ":host=" . $conf[ "host" ] . ";port=" . $conf[ "port" ] . ";dbname=" . $conf[ "dbname" ], $conf[ "user" ], $conf[ "password" ] );
+		return self::$connections[ $conn_id ] = new PDO( 
+				$conf[ "engine" ] . ":host=" . $conf[ "host" ] . ";port=" . $conf[ "port" ] . ";dbname=" . $conf[ "dbname" ], 
+				$conf[ "user" ], $conf[ "password" ] );
 	}
 
 	/**
