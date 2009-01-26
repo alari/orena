@@ -100,7 +100,7 @@ todo: add interface for right col generator
 	 */
 	protected function displayHead()
 	{
-		$this->addCssSrc( $this->mainCssHref ? $this->mainCssHref : Registry::get( "engine/static_root" ) . "css/main.css" );
+		$this->addCssSrc( $this->mainCssHref ? $this->mainCssHref : Registry::get( "fw/html/static_root" ) . "css/main.css" );
 		parent::displayHead();
 	}
 

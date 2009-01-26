@@ -7,14 +7,14 @@ class Html_Layout {
 	 * @var Html_Template
 	 */
 	protected $tpl;
-	
+
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-	
+
 	/**
 	 * Array of metatags
 	 *
@@ -57,7 +57,7 @@ class Html_Layout {
 	 * @var Array
 	 */
 	protected $headLinks = Array ();
-	
+
 	/**
 	 * HTTP response code
 	 *
@@ -242,8 +242,8 @@ class Html_Layout {
 	 */
 	public function staticUrl( $url )
 	{
-		if ($url[ 0 ] != "/" && $url[ 0 ] != ".")
-			return Registry::get( "app/static_root" ) . $url;
+		if ($url[ 0 ] != "/" && $url[ 0 ] != "." && strpos($url, "http://") !== 0)
+			return Registry::get( "app/html/static_root" ) . $url;
 		return $url;
 	}
 

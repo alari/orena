@@ -3,6 +3,9 @@ function __autoload($class){
 	$filename = str_replace("_", "/", $class).".php";
 	include_once is_file($filename) ? $filename : $filename."s";
 }
+
+Registry::set( "fw/html/static_root", "./static/" );
+
 @Db_Manager::connect(array(
 	"host"=>"localhost",
 	"dbname"=>"Orena",
