@@ -40,6 +40,11 @@ class Dao_TableInfo {
 			$this->tail = $parent->tail;
 		}
 
+		// Inherited injections
+		foreach (Dao_ActiveRecord::getInjectedMethods( $reflection->getParentClass()->getName() ) as $name => $callback) {
+			Dao_ActiveRecord::injectMethod( $class, $name, $callback );
+		}
+
 		$docCommentLines = Array ();
 
 		// Import data from plugins
@@ -51,6 +56,22 @@ class Dao_TableInfo {
 				$pluginReflection = new ReflectionClass( $plugin );
 				if (!$pluginReflection->implementsInterface( "Dao_iPlugin" ))
 					throw new Exception( "Dao plugins must implement interface Dao_iPlugin, but $plugin doesn't." );
+
+				// Methods injection
+				foreach ($pluginReflection->getMethods() as $method) {
+					if (substr( $method->getName(), 0, 2 ) != "i_")
+						continue;
+					if (!$method->isPublic())
+						continue;
+					if (!$method->isStatic())
+						continue;
+					if ($method->getNumberOfParameters() < 1)
+						continue;
+					Dao_ActiveRecord::injectMethod( $class, substr( $method->getName(), 2 ),
+							array ($plugin, $method->getName()) );
+				}
+
+				// Attributes injection
 				$docCommentLines = array_merge( $docCommentLines,
 						explode( "\n", $pluginReflection->getDocComment() ) );
 			}

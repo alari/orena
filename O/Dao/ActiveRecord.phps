@@ -1,7 +1,8 @@
 <?php
 abstract class Dao_ActiveRecord {
 	private static $objs = array ();
-	
+	private static $injected_methods = Array ();
+
 	private $fields = array ();
 	private $changed = array ();
 
@@ -30,7 +31,7 @@ abstract class Dao_ActiveRecord {
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
 		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}
@@ -47,12 +48,12 @@ abstract class Dao_ActiveRecord {
 			return $this->fields[ "id" ];
 		if (strpos( $name, "." )) {
 			list ($name, $subreq) = explode( ".", $name, 2 );
-			return $this->getFieldInfo( $name )->getMappedQuery( $this, 
+			return $this->getFieldInfo( $name )->getMappedQuery( $this,
 					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
-		
-		return $this->getFieldInfo( $name )->getValue( $this, 
-				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, 
+
+		return $this->getFieldInfo( $name )->getValue( $this,
+				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null,
 				array_key_exists( $name, $this->fields ) );
 	}
 
@@ -66,7 +67,7 @@ abstract class Dao_ActiveRecord {
 	{
 		if ($name == "id")
 			return;
-		
+
 		$this->getFieldInfo( $name )->setValue( $this, $value, array_key_exists( $name, $this->fields ) );
 	}
 
@@ -110,7 +111,7 @@ abstract class Dao_ActiveRecord {
 		$fieldInfo = Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new Exception( "Unknown field: $name." );
-		
+
 		return $fieldInfo;
 	}
 
@@ -123,21 +124,21 @@ abstract class Dao_ActiveRecord {
 	{
 		if (!count( $this->changed ))
 			return true;
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
-		
+
 		foreach ($this->changed as $name => $value) {
 			$query->field( $name, $value );
 		}
-		
+
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
 				$this->fields[ $name ] = $value;
 			$this->changed = array ();
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -169,7 +170,7 @@ abstract class Dao_ActiveRecord {
 	{
 		if (isset( self::$objs[ $class ][ $id ] ))
 			return self::$objs[ $class ][ $id ];
-		
+
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new Dao_Query( $class );
@@ -191,13 +192,13 @@ abstract class Dao_ActiveRecord {
 		$fields = Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
 			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
-		
+
 		$class = get_class( $this );
 		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}
@@ -219,6 +220,49 @@ abstract class Dao_ActiveRecord {
 					unset( self::$objs[ $class ][ $id ] );
 			}
 		}
+	}
+
+	/**
+	 * Makes method injection. $this is given for $callback as first parameter.
+	 *
+	 * @param string $class
+	 * @param string $method_name
+	 * @param callback $callback
+	 * @throws Exception
+	 */
+	static public function injectMethod( $class, $method_name, $callback )
+	{
+		if (is_callable( $callback ))
+			self::$injected_methods[ $class ][ $method_name ] = $callback;
+		else
+			throw new Exception( "Not a valid callback for injection: $callback." );
+	}
+
+	/**
+	 * Returns all injected methods for specified class
+	 *
+	 * @param string $class
+	 * @return array
+	 */
+	static public function getInjectedMethods( $class )
+	{
+		return isset( self::$injected_methods[ $class ] ) ? self::$injected_methods[ $class ] : Array ();
+	}
+
+	/**
+	 * Magic functionality to handle calls to injected methods
+	 *
+	 * @param string $name
+	 * @param array $arguments
+	 * @return mixed or "" if method is not implemented
+	 */
+	public function __call( $name, $arguments )
+	{
+		if (isset( self::$injected_methods[ get_class( $this ) ][ $name ] )) {
+			array_unshift( $arguments, $this );
+			return call_user_func_array( self::$injected_methods[ get_class( $this ) ][ $name ], $arguments );
+		}
+		return "";
 	}
 
 }
