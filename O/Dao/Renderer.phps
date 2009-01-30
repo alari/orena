@@ -1,29 +1,43 @@
 <?php
+/**
+ * Renders an object, an object set as loop, or a form based on ActiveRecord class or object.
+ *
+ * @see Html_DaoRenderer_Loop
+ * @see Html_DaoRenderer_Show
+ * @see Html_DaoRenderer_Form
+ *
+ * @author Dmitry Kourinski
+ */
 class Dao_Renderer {
+	
+	const MODE_SHOW = "show";
+	const MODE_LOOP = "loop";
 
 	/**
-	 * Renders loop query / without pager
+	 * Renders loop query
 	 *
+	 * @see Html_DaoRenderer_Loop
 	 * @param Dao_Query $query
 	 * @param Html_Layout $layout
+	 * @param string $subparams
 	 */
-	static public function showLoop( Dao_Query $query, Html_Layout $layout = null )
+	static public function showLoop( Dao_Query $query, Html_Layout $layout = null, $subparams = "" )
 	{
-		// TODO: add more complex logic for loop renderer, e.g. envelop
-		foreach ($query as $record) {
-			$renderer = new Html_DaoRenderer_Show( $record, $layout, "loop" );
-			$renderer->display();
-		}
+		$renderer = new Html_DaoRenderer_Loop( $query, $layout, $subparams );
+		$renderer->display();
 	}
 
 	/**
 	 * Echoes an object in HTML
 	 *
+	 * @see Html_DaoRenderer_Show
 	 * @param Dao_ActiveRecord $obj
+	 * @param Html_Layout $layout
+	 * @param string $mode
 	 */
-	static public function show( Dao_ActiveRecord $record, Html_Layout $layout = null )
+	static public function show( Dao_ActiveRecord $record, Html_Layout $layout = null, $mode = self::MODE_SHOW )
 	{
-		$renderer = new Html_DaoRenderer_Show( $record, $layout );
+		$renderer = new Html_DaoRenderer_Show( $record, $layout, $mode );
 		$renderer->display();
 	}
 
@@ -36,6 +50,7 @@ class Dao_Renderer {
 	 * @param bool $isAjax
 	 * @param array $errorsArray
 	 * @param string $formTitle
+	 * @see Html_DaoRenderer_Form
 	 */
 	static public function create( $class, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
@@ -57,6 +72,7 @@ class Dao_Renderer {
 	 * @param bool $isAjax
 	 * @param array $errorsArray
 	 * @param string $formTitle
+	 * @see Html_DaoRenderer_Form
 	 */
 	static public function edit( Dao_ActiveRecord $record, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
@@ -68,5 +84,4 @@ class Dao_Renderer {
 		$renderer->setErrorsArray( $errorsArray );
 		$renderer->display();
 	}
-
 }

@@ -71,8 +71,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function display( Html_Layout $layout = null )
 	{
-		$renderer = new Dao_Renderer_Loop( $this, $layout );
-		$renderer->display();
+		Dao_Renderer::showLoop( $this, $layout );
 	}
 
 	/**

@@ -22,4 +22,4 @@ $tpl->display();
 
 Dao_Renderer::show($r);
 $q = new Dao_Query("Test_Models_Core");
-Dao_Renderer::showLoop($q->limit(10));*/
+Dao_Renderer::showLoop($q->where("intfield is not null"));*/

@@ -1,18 +1,19 @@
 <?php
 /**
- * Class to render Dao_ActiveRecord's.
- * Callback for user edit fragments must have the following arguments:
+ * Displays create or edit form for Dao_ActiveRecord class or instance.
  *
- * Dao_ActiveRecord|null $record
- * string $className
- * string $fieldName
- * string $title
- * array $subparams
- * string $errorMessage
- * bool $isAjax
- * Html_Layout|null $layout
- * ($record, $class, $fieldName, $title, $subparams, $errorMessage, $isAjax, $layout)
+ * To use this, specify "-edit[ callback]" flag in configuration of each field you want to edit.
+ * Callback must be like "[classname::]methodname[ params]". If classname is specified,
+ * classname::methodname($record, $class, $fieldName, $title, $subparams, $errorMessage, $isAjax, $layout)
+ * will be called, otherwise built-in renderers are used.
+ * Field titles are from "-title $title" param.
  *
+ * @see Dao_ActiveRecord::edit()
+ * @see Dao_ActiveRecord::show()
+ *
+ * @author Dmitry Kourinski
+ *
+ * @todo Add type=hidden params to create form
  */
 class Html_DaoRenderer_Form {
 	/**

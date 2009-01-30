@@ -1,4 +1,21 @@
 <?php
+/**
+ * Displays one Dao_ActiveRecord object in HTML.
+ *
+ * To use this, type "-show[ callback]" (or "-loop[ callback]") in each Dao field you want to be displayed.
+ * "-loop" params will be used in (simplified) loop rendering, e.g. article anonces.
+ * @see Html_DaoRenderer_Loop
+ *
+ * Callback (optional) must look like "[classname::]methodname[ params]". ("[]" means that it's optional.)
+ * If it contains classname, classname::methodname($record, $fieldName, $title, $params, $layout) will be called.
+ * (To specify $title use "-title $title" flag in field info).
+ * Otherwise default render method is called.
+ *
+ * Usually this class is used via
+ * @see Dao_Renderer::show()
+ *
+ * @author Dmitry Kourinski
+ */
 class Html_DaoRenderer_Show {
 	/**
 	 * Layout object to modify by fields
@@ -26,7 +43,7 @@ class Html_DaoRenderer_Show {
 	 * @param Html_Layout $layout
 	 * @param string $mode
 	 */
-	public function __construct( Dao_ActiveRecord $record, Html_Layout $layout = null, $mode = "show" )
+	public function __construct( Dao_ActiveRecord $record, Html_Layout $layout = null, $mode = Dao_Renderer::MODE_SHOW )
 	{
 		$this->record = $record;
 		$this->layout = $layout;
@@ -148,8 +165,9 @@ class Html_DaoRenderer_Show {
 	 */
 	private function showerLoop( $fieldValue, $title, $subparams )
 	{
+		// TODO: $title must be used
 		if ($fieldValue instanceof Dao_Query)
-			Dao_Renderer::showLoop( $fieldValue, $this->layout );
+			Dao_Renderer::showLoop( $fieldValue, $this->layout, $subparams );
 	}
 
 }
