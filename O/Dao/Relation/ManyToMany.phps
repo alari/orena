@@ -1,4 +1,12 @@
 <?php
+/**
+ * ManyToMany relation workaround.
+ *
+ * @see Dao_Relation_BaseToMany
+ * @see Dao_FieldInfo
+ *
+ * @author Dmitry Kourinski
+ */
 class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	private $targetClass;
 	private $targetField;
@@ -7,9 +15,9 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	private $baseClass;
 	private $baseField;
 	private $baseTbl;
-	
+
 	private $relationTbl;
-	
+
 	private static $relationTblLoaded = Array ();
 
 	/**
@@ -18,6 +26,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	 * @param string $targetClass
 	 * @param string $inverseField
 	 * @param int $baseId
+	 * @access private
 	 */
 	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField )
 	{
@@ -28,15 +37,14 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
 		$this->baseTbl = Dao_TableInfo::get( $baseClass )->getTableName();
-		
+
 		$this->relationTbl = $this->getRelationTableName();
-		
+
 		parent::__construct( $this->targetClass );
-		
-		$this->join( $this->relationTbl, 
+
+		$this->join( $this->relationTbl,
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
 					 "." . $this->baseTbl . "=" . $baseId, "CROSS" );
-		//$this->addFrom($this->relationTbl)->where($this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl . "." . $this->baseTbl . "=" . $baseId);
 	}
 
 	/**
@@ -54,21 +62,21 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 			$a = $c;
 		}
 		$r = substr( $a . "_to_" . $b, 0, 64 );
-		
+
 		if (isset( self::$relationTblLoaded[ $r ] ))
 			return $r;
-		
+
 		$stmt = Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $r . "'" );
 		if ($stmt)
 			$stmt->execute();
 		if (!$stmt || !count( $stmt->fetchAll() )) {
 			$q = new Db_Query( $r );
-			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index( 
+			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index(
 					$this->targetTbl . ", " . $this->baseTbl, "PRIMARY KEY" )->create();
 		}
-		
+
 		self::$relationTblLoaded[ $r ] = 1;
-		
+
 		return $r;
 	}
 
@@ -89,7 +97,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new Dao_Query( $this->targetClass );
-		return $q->join( $this->relationTbl, 
+		return $q->join( $this->relationTbl,
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
 					 "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
 	}
@@ -109,15 +117,15 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 			return false;
 		if (!$this->offsetExists( $object->id ))
 			return false;
-		
+
 		$q = new Db_Query( $this->relationTbl );
 		$q->test( $this->targetTbl, $object->id )->test( $this->baseTbl, $this->baseId )->delete();
-		
+
 		if ($delete)
 			$object->delete();
-		
+
 		$this->reload();
-		
+
 		return true;
 	}
 
@@ -150,16 +158,16 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 			throw new Exception( "Wrong object type for assignation." );
 		if ($offset !== null)
 			throw new Exception( "Can assign only new value with [] operator." );
-		
+
 		if ($this->offsetExists( $obj->id )) {
 			return true;
 		}
-		
+
 		$q = new Db_Query( $this->relationTbl );
 		$q->field( $this->targetTbl, $obj->id )->field( $this->baseTbl, $this->baseId )->insert();
-		
+
 		$this->reload();
-		
+
 		return true;
 	}
 

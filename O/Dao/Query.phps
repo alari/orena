@@ -1,7 +1,27 @@
 <?php
+/**
+ * Query builder extension to ease work with Dao_ActiveRecord sets.
+ *
+ * @see Db_Query
+ *
+ * Dao_Query could be automatically rendered,
+ * @see Dao_Renderer
+ * @see Dao_Query::display()
+ *
+ * @author Dmitry Kourinski
+ */
 class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
-	
+	/**
+	 * Classname we're selecting objects from
+	 *
+	 * @var string
+	 */
 	protected $class;
+	/**
+	 * Array of objects given by getAll() method, used for Iterator and ArrayAccess
+	 *
+	 * @var array
+	 */
 	protected $objects = Array ();
 
 	/**

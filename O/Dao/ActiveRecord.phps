@@ -1,9 +1,50 @@
 <?php
+/**
+ * Implements ActiveRecord pattern. Simply extend this class to create a new model.
+ *
+ * To see configuration rules and examples,
+ * @see Dao_TableInfo
+ *
+ * Active records could be automatically rendered,
+ * @see Dao_Renderer
+ *
+ * Active record models could be dynamically extended by plugins,
+ * @see Dao_iPlugin
+ *
+ * Signals support is provided by
+ * @see Dao_Signals
+ *
+ * To retrieve Dao_ActiveRecord objects, use
+ * @see Dao_Query
+ *
+ * @author Dmitry Kourinski
+ */
 abstract class Dao_ActiveRecord {
+	/**
+	 * All Dao_ActiveRecord objects loaded during current HTTP request.
+	 *
+	 * @var array
+	 */
 	private static $objs = array ();
+	/**
+	 * Injected methods for classes.
+	 *
+	 * @see Dao_iPlugin
+	 * @var Array
+	 */
 	private static $injected_methods = Array ();
-	
+
+	/**
+	 * Array of SQL field values of a database record
+	 *
+	 * @var array
+	 */
 	private $fields = array ();
+	/**
+	 * Changed, but not saved yet database values of fields
+	 *
+	 * @var array
+	 */
 	private $changed = array ();
 
 	/**
@@ -31,7 +72,7 @@ abstract class Dao_ActiveRecord {
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
 		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}
@@ -48,12 +89,12 @@ abstract class Dao_ActiveRecord {
 			return $this->fields[ "id" ];
 		if (strpos( $name, "." )) {
 			list ($name, $subreq) = explode( ".", $name, 2 );
-			return $this->getFieldInfo( $name )->getMappedQuery( $this, 
+			return $this->getFieldInfo( $name )->getMappedQuery( $this,
 					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
-		
-		return $this->getFieldInfo( $name )->getValue( $this, 
-				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, 
+
+		return $this->getFieldInfo( $name )->getValue( $this,
+				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null,
 				array_key_exists( $name, $this->fields ) );
 	}
 
@@ -67,7 +108,7 @@ abstract class Dao_ActiveRecord {
 	{
 		if ($name == "id")
 			return;
-		
+
 		$this->getFieldInfo( $name )->setValue( $this, $value, array_key_exists( $name, $this->fields ) );
 	}
 
@@ -111,7 +152,7 @@ abstract class Dao_ActiveRecord {
 		$fieldInfo = Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new Exception( "Unknown field: $name." );
-		
+
 		return $fieldInfo;
 	}
 
@@ -124,21 +165,21 @@ abstract class Dao_ActiveRecord {
 	{
 		if (!count( $this->changed ))
 			return true;
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
-		
+
 		foreach ($this->changed as $name => $value) {
 			$query->field( $name, $value );
 		}
-		
+
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
 				$this->fields[ $name ] = $value;
 			$this->changed = array ();
 			return true;
 		}
-		
+
 		return false;
 	}
 
@@ -170,7 +211,7 @@ abstract class Dao_ActiveRecord {
 	{
 		if (isset( self::$objs[ $class ][ $id ] ))
 			return self::$objs[ $class ][ $id ];
-		
+
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new Dao_Query( $class );
@@ -192,13 +233,13 @@ abstract class Dao_ActiveRecord {
 		$fields = Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
 			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
-		
+
 		$query = new Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
-		
+
 		$class = get_class( $this );
 		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class, 
+			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}

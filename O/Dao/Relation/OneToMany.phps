@@ -1,4 +1,12 @@
 <?php
+/**
+ * OneToMany relation workaround.
+ *
+ * @see Dao_Relation_BaseToMany
+ * @see Dao_FieldInfo
+ *
+ * @author Dmitry Kourinski
+ */
 class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	private $targetClass;
 	private $targetField;
@@ -21,7 +29,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		$this->baseId = $baseId;
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
-		
+
 		$tbl = Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->test( $tbl . "." . $targetField, $baseId );
 	}
@@ -34,7 +42,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new Dao_Query( $this->targetClass );
-		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, 
+		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField,
 				$this->baseId );
 	}
 
@@ -62,16 +70,16 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 			return false;
 		if (!$this->offsetExists( $object->id ))
 			return false;
-		
+
 		$object->setField( $this->targetField, 0 );
-		
+
 		if ($delete)
 			$object->delete();
 		else
 			$object->save();
-		
+
 		$this->reload();
-		
+
 		return true;
 	}
 
