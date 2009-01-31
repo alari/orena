@@ -1,7 +1,4 @@
 <?php
-
-require_once 'O/Registry.phps';
-
 require_once 'PHPUnit/Framework/TestCase.php';
 
 /**
@@ -15,7 +12,7 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	protected function setUp()
 	{
 		parent::setUp();
-	
+
 	}
 
 	/**
@@ -23,7 +20,7 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	 */
 	protected function tearDown()
 	{
-		
+
 		parent::tearDown();
 	}
 
@@ -42,10 +39,10 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	{
 		Registry::add( "test/add/var", "var1" );
 		$this->assertEquals( "var1", Registry::get( "test/add/var/0" ), "First array key" );
-		
+
 		Registry::add( "test/add/var", "var2" );
 		$this->assertEquals( "var2", Registry::get( "test/add/var/1" ), "Second array key" );
-		
+
 		$this->assertEquals( array ("var1", "var2"), Registry::get( "test/add/var" ), "Array equal" );
 	}
 
@@ -55,17 +52,17 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	public function testGetSet()
 	{
 		Registry::set( "test/get-set/b/c", "d" );
-		
+
 		$this->assertArrayHasKey( "b", Registry::get( "test/get-set" ), "Base level" );
 		$this->assertArrayHasKey( "c", Registry::get( "test/get-set/b" ), "Middle level" );
 		$this->assertEquals( "d", Registry::get( "test/get-set/b/c" ), "Bottom-level" );
-		
+
 		Registry::set( "test/get-set/b/q", "e" );
-		
+
 		$this->assertArrayHasKey( "b", Registry::get( "test/get-set" ), "Base level (2)" );
 		$this->assertArrayHasKey( "c", Registry::get( "test/get-set/b" ), "Middle level (2)" );
 		$this->assertEquals( "e", Registry::get( "test/get-set/b/q" ), "Bottom-level (2)" );
-	
+
 	}
 
 	/**
@@ -75,11 +72,11 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	{
 		Registry::setInheritance( "test/base/params", "test/extended" );
 		Registry::setInheritance( "test/base", "test/extended/params" );
-		
+
 		Registry::set( "test/base/params/a", "b" );
-		
+
 		$this->assertEquals( "b", Registry::get( "test/extended/a" ), "Short to long" );
-		$this->assertEquals( array ("params" => array ("a" => "b")), Registry::get( "test/extended/params" ), 
+		$this->assertEquals( array ("params" => array ("a" => "b")), Registry::get( "test/extended/params" ),
 				"Long to short, as array" );
 	}
 
