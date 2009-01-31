@@ -1,5 +1,5 @@
 <?php
-ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."./O");
+ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."./O".PATH_SEPARATOR."./O/src");
 function __autoload($class){
 	$filename = str_replace("_", "/", $class).".php";
 	include_once is_file($filename) ? $filename : $filename."s";
