@@ -1,6 +1,6 @@
 <?php
 /**
- * Dao_Signals test case.
+ * O_Dao_Signals test case.
  */
 class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 	
@@ -70,14 +70,14 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 		$this->core = new Test_Models_Core( );
 		$this->sub = new Test_Models_Sub( );
 		
-		Dao_Signals::bind( __CLASS__ . "::listener" );
-		Dao_Signals::bind( __CLASS__ . "::listener_class", null, null, "Test_Models_Core" );
-		Dao_Signals::bind( __CLASS__ . "::listener_event", Dao_Signals::EVENT_REMOVE );
-		Dao_Signals::bind( __CLASS__ . "::listener_signal", null, "test" );
-		Dao_Signals::bind( __CLASS__ . "::listener_esc", Dao_Signals::EVENT_SET, "test", "Test_Models_Core" );
-		Dao_Signals::bind( __CLASS__ . "::listener_es", Dao_Signals::EVENT_SET, "test" );
-		Dao_Signals::bind( __CLASS__ . "::listener_ec", Dao_Signals::EVENT_SET, null, "Test_Models_Sub" );
-		Dao_Signals::bind( __CLASS__ . "::listener_sc", null, "test", "Test_Models_Sub" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_class", null, null, "Test_Models_Core" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_event", O_Dao_Signals::EVENT_REMOVE );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_signal", null, "test" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_esc", O_Dao_Signals::EVENT_SET, "test", "Test_Models_Core" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_es", O_Dao_Signals::EVENT_SET, "test" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_ec", O_Dao_Signals::EVENT_SET, null, "Test_Models_Sub" );
+		O_Dao_Signals::bind( __CLASS__ . "::listener_sc", null, "test", "Test_Models_Sub" );
 	
 	}
 
@@ -118,17 +118,17 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 
 	public function testUnbind()
 	{
-		Dao_Signals::unbind( __CLASS__ . "::listener_ec" );
+		O_Dao_Signals::unbind( __CLASS__ . "::listener_ec" );
 		$expected = Array (__CLASS__ . "::listener");
 		
-		$this->assertEquals( $expected, Dao_Signals::getListeners( Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ), 
+		$this->assertEquals( $expected, O_Dao_Signals::getListeners( O_Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ), 
 				"By event" );
 		
-		Dao_Signals::unbind( null, Dao_Signals::EVENT_SET );
+		O_Dao_Signals::unbind( null, O_Dao_Signals::EVENT_SET );
 		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_signal");
-		$this->assertEquals( $expected, Dao_Signals::getListeners( null, "test", null ), "By signal" );
+		$this->assertEquals( $expected, O_Dao_Signals::getListeners( null, "test", null ), "By signal" );
 		
-		Dao_Signals::unbind();
+		O_Dao_Signals::unbind();
 	}
 
 }

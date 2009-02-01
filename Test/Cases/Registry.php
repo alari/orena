@@ -2,7 +2,7 @@
 require_once 'PHPUnit/Framework/TestCase.php';
 
 /**
- * Registry test case.
+ * O_Registry test case.
  */
 class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 
@@ -33,50 +33,50 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * Tests Registry::add()
+	 * Tests O_Registry::add()
 	 */
 	public function testAdd()
 	{
-		Registry::add( "test/add/var", "var1" );
-		$this->assertEquals( "var1", Registry::get( "test/add/var/0" ), "First array key" );
+		O_Registry::add( "test/add/var", "var1" );
+		$this->assertEquals( "var1", O_Registry::get( "test/add/var/0" ), "First array key" );
 
-		Registry::add( "test/add/var", "var2" );
-		$this->assertEquals( "var2", Registry::get( "test/add/var/1" ), "Second array key" );
+		O_Registry::add( "test/add/var", "var2" );
+		$this->assertEquals( "var2", O_Registry::get( "test/add/var/1" ), "Second array key" );
 
-		$this->assertEquals( array ("var1", "var2"), Registry::get( "test/add/var" ), "Array equal" );
+		$this->assertEquals( array ("var1", "var2"), O_Registry::get( "test/add/var" ), "Array equal" );
 	}
 
 	/**
-	 * Tests Registry::get()
+	 * Tests O_Registry::get()
 	 */
 	public function testGetSet()
 	{
-		Registry::set( "test/get-set/b/c", "d" );
+		O_Registry::set( "test/get-set/b/c", "d" );
 
-		$this->assertArrayHasKey( "b", Registry::get( "test/get-set" ), "Base level" );
-		$this->assertArrayHasKey( "c", Registry::get( "test/get-set/b" ), "Middle level" );
-		$this->assertEquals( "d", Registry::get( "test/get-set/b/c" ), "Bottom-level" );
+		$this->assertArrayHasKey( "b", O_Registry::get( "test/get-set" ), "Base level" );
+		$this->assertArrayHasKey( "c", O_Registry::get( "test/get-set/b" ), "Middle level" );
+		$this->assertEquals( "d", O_Registry::get( "test/get-set/b/c" ), "Bottom-level" );
 
-		Registry::set( "test/get-set/b/q", "e" );
+		O_Registry::set( "test/get-set/b/q", "e" );
 
-		$this->assertArrayHasKey( "b", Registry::get( "test/get-set" ), "Base level (2)" );
-		$this->assertArrayHasKey( "c", Registry::get( "test/get-set/b" ), "Middle level (2)" );
-		$this->assertEquals( "e", Registry::get( "test/get-set/b/q" ), "Bottom-level (2)" );
+		$this->assertArrayHasKey( "b", O_Registry::get( "test/get-set" ), "Base level (2)" );
+		$this->assertArrayHasKey( "c", O_Registry::get( "test/get-set/b" ), "Middle level (2)" );
+		$this->assertEquals( "e", O_Registry::get( "test/get-set/b/q" ), "Bottom-level (2)" );
 
 	}
 
 	/**
-	 * Tests Registry::setInheritance()
+	 * Tests O_Registry::setInheritance()
 	 */
 	public function testSetInheritance()
 	{
-		Registry::setInheritance( "test/base/params", "test/extended" );
-		Registry::setInheritance( "test/base", "test/extended/params" );
+		O_Registry::setInheritance( "test/base/params", "test/extended" );
+		O_Registry::setInheritance( "test/base", "test/extended/params" );
 
-		Registry::set( "test/base/params/a", "b" );
+		O_Registry::set( "test/base/params/a", "b" );
 
-		$this->assertEquals( "b", Registry::get( "test/extended/a" ), "Short to long" );
-		$this->assertEquals( array ("params" => array ("a" => "b")), Registry::get( "test/extended/params" ),
+		$this->assertEquals( "b", O_Registry::get( "test/extended/a" ), "Short to long" );
+		$this->assertEquals( array ("params" => array ("a" => "b")), O_Registry::get( "test/extended/params" ),
 				"Long to short, as array" );
 	}
 

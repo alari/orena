@@ -2,12 +2,12 @@
 /**
  * ManyToMany relation workaround.
  *
- * @see Dao_Relation_BaseToMany
- * @see Dao_FieldInfo
+ * @see O_Dao_Relation_BaseToMany
+ * @see O_Dao_FieldInfo
  *
  * @author Dmitry Kourinski
  */
-class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
+class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	private $targetClass;
 	private $targetField;
 	private $targetTbl;
@@ -32,11 +32,11 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	{
 		$this->targetClass = $targetClass;
 		$this->targetField = $targetField;
-		$this->targetTbl = Dao_TableInfo::get( $targetClass )->getTableName();
+		$this->targetTbl = O_Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->baseId = $baseId;
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
-		$this->baseTbl = Dao_TableInfo::get( $baseClass )->getTableName();
+		$this->baseTbl = O_Dao_TableInfo::get( $baseClass )->getTableName();
 
 		$this->relationTbl = $this->getRelationTableName();
 
@@ -66,11 +66,11 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		if (isset( self::$relationTblLoaded[ $r ] ))
 			return $r;
 
-		$stmt = Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $r . "'" );
+		$stmt = O_Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $r . "'" );
 		if ($stmt)
 			$stmt->execute();
 		if (!$stmt || !count( $stmt->fetchAll() )) {
-			$q = new Db_Query( $r );
+			$q = new O_Db_Query( $r );
 			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index(
 					$this->targetTbl . ", " . $this->baseTbl, "PRIMARY KEY" )->create();
 		}
@@ -86,17 +86,17 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
-		Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
+		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
 	}
 
 	/**
 	 * Returns clear query with related objects
 	 *
-	 * @return Dao_Query
+	 * @return O_Dao_Query
 	 */
 	public function query()
 	{
-		$q = new Dao_Query( $this->targetClass );
+		$q = new O_Dao_Query( $this->targetClass );
 		return $q->join( $this->relationTbl,
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
 					 "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
@@ -105,11 +105,11 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	/**
 	 * Removes an object from relation (current query state influes)
 	 *
-	 * @param Dao_ActiveRecord $object
+	 * @param O_Dao_ActiveRecord $object
 	 * @param bool $delete If true, not only relation removed, but also an object deleted
 	 * @return bool
 	 */
-	public function remove( Dao_ActiveRecord $object, $delete = false )
+	public function remove( O_Dao_ActiveRecord $object, $delete = false )
 	{
 		if (!$object)
 			return false;
@@ -118,7 +118,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 		if (!$this->offsetExists( $object->id ))
 			return false;
 
-		$q = new Db_Query( $this->relationTbl );
+		$q = new O_Db_Query( $this->relationTbl );
 		$q->test( $this->targetTbl, $object->id )->test( $this->baseTbl, $this->baseId )->delete();
 
 		if ($delete)
@@ -144,7 +144,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 	 * Adds support for [] operator
 	 *
 	 * @param null $offset
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -163,7 +163,7 @@ class Dao_Relation_ManyToMany extends Dao_Relation_BaseToMany {
 			return true;
 		}
 
-		$q = new Db_Query( $this->relationTbl );
+		$q = new O_Db_Query( $this->relationTbl );
 		$q->field( $this->targetTbl, $obj->id )->field( $this->baseTbl, $this->baseId )->insert();
 
 		$this->reload();

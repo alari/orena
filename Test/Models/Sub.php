@@ -6,6 +6,6 @@
  * @field testsignal tinytext -signal test
  * @field one_core -has one Test_Models_Core -inverse one_sub
  */
-class Test_Models_Sub extends Dao_ActiveRecord {
+class Test_Models_Sub extends O_Dao_ActiveRecord {
 
 }

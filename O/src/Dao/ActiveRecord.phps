@@ -3,25 +3,25 @@
  * Implements ActiveRecord pattern. Simply extend this class to create a new model.
  *
  * To see configuration rules and examples,
- * @see Dao_TableInfo
+ * @see O_Dao_TableInfo
  *
  * Active records could be automatically rendered,
- * @see Dao_Renderer
+ * @see O_Dao_Renderer
  *
  * Active record models could be dynamically extended by plugins,
- * @see Dao_iPlugin
+ * @see O_Dao_iPlugin
  *
  * Signals support is provided by
- * @see Dao_Signals
+ * @see O_Dao_Signals
  *
- * To retrieve Dao_ActiveRecord objects, use
- * @see Dao_Query
+ * To retrieve O_Dao_ActiveRecord objects, use
+ * @see O_Dao_Query
  *
  * @author Dmitry Kourinski
  */
-abstract class Dao_ActiveRecord {
+abstract class O_Dao_ActiveRecord {
 	/**
-	 * All Dao_ActiveRecord objects loaded during current HTTP request.
+	 * All O_Dao_ActiveRecord objects loaded during current HTTP request.
 	 *
 	 * @var array
 	 */
@@ -29,7 +29,7 @@ abstract class Dao_ActiveRecord {
 	/**
 	 * Injected methods for classes.
 	 *
-	 * @see Dao_iPlugin
+	 * @see O_Dao_iPlugin
 	 * @var Array
 	 */
 	private static $injected_methods = Array ();
@@ -53,12 +53,12 @@ abstract class Dao_ActiveRecord {
 	 */
 	public function __construct()
 	{
-		$query = new Dao_Query( $this );
+		$query = new O_Dao_Query( $this );
 		try {
 			$this->fields[ "id" ] = $query->insert();
 		}
 		catch (PDOException $e) {
-			$tableInfo = Dao_TableInfo::get( $this );
+			$tableInfo = O_Dao_TableInfo::get( $this );
 			if (!$tableInfo->tableExists()) {
 				$tableInfo->createTable();
 			}
@@ -71,8 +71,8 @@ abstract class Dao_ActiveRecord {
 		$this->reload();
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
-		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_CREATE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
+		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}
@@ -133,7 +133,7 @@ abstract class Dao_ActiveRecord {
 	 */
 	public function setScalarField( $name, $value )
 	{
-		$query = new Dao_Query( $this );
+		$query = new O_Dao_Query( $this );
 		if ($query->test( "id", $this->fields[ "id" ] )->field( $name, $value, true )->update()) {
 			$this->fields[ $name ] = $value;
 			return true;
@@ -145,11 +145,11 @@ abstract class Dao_ActiveRecord {
 	 * Returns field info object
 	 *
 	 * @param string $name
-	 * @return Dao_FieldInfo
+	 * @return O_Dao_FieldInfo
 	 */
 	private function getFieldInfo( $name )
 	{
-		$fieldInfo = Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
+		$fieldInfo = O_Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new Exception( "Unknown field: $name." );
 
@@ -166,7 +166,7 @@ abstract class Dao_ActiveRecord {
 		if (!count( $this->changed ))
 			return true;
 
-		$query = new Dao_Query( $this );
+		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
 
 		foreach ($this->changed as $name => $value) {
@@ -191,9 +191,9 @@ abstract class Dao_ActiveRecord {
 	public function reload()
 	{
 		$this->changed = Array ();
-		$query = new Dao_Query( $this );
+		$query = new O_Dao_Query( $this );
 		$this->fields = $query->test( "id", $this->fields[ "id" ] )->select()->fetch();
-		foreach (Dao_TableInfo::get( get_class( $this ) )->getFields() as $fieldInfo)
+		foreach (O_Dao_TableInfo::get( get_class( $this ) )->getFields() as $fieldInfo)
 			if (!$fieldInfo->isAtomic())
 				$fieldInfo->reload( $this->id );
 		return true;
@@ -205,7 +205,7 @@ abstract class Dao_ActiveRecord {
 	 * @param int $id
 	 * @param string $class
 	 * @param array $row
-	 * @return Dao_ActiveRecord
+	 * @return O_Dao_ActiveRecord
 	 */
 	static public function getById( $id, $class, Array $row = null )
 	{
@@ -214,7 +214,7 @@ abstract class Dao_ActiveRecord {
 
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
-			$query = new Dao_Query( $class );
+			$query = new O_Dao_Query( $class );
 			$row = $query->test( "id", $id )->select()->fetch();
 		}
 		if (isset( $row[ "id" ] ) && $row[ "id" ] == $id) {
@@ -230,16 +230,16 @@ abstract class Dao_ActiveRecord {
 	 */
 	public function delete()
 	{
-		$fields = Dao_TableInfo::get( $this )->getFields();
+		$fields = O_Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
 			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
 
-		$query = new Dao_Query( $this );
+		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
 
 		$class = get_class( $this );
-		if (Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			Dao_Signals::fire( Dao_Signals::EVENT_DELETE, Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
+		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_DELETE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
 					$this, $this->fields[ "id" ] );
 		}
 	}

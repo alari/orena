@@ -1,6 +1,6 @@
 <?php
 /**
- * Class to store and parse configuration of Dao_ActiveRecord subclass.
+ * Class to store and parse configuration of O_Dao_ActiveRecord subclass.
  *
  * It parses the classes PHPDoc and finds config params there
  * Configs looks like this:
@@ -16,18 +16,18 @@
  * @tail tail-directives
  *
  * Possible params of table and fields are used and described in other classes, e.g.
- * @see Dao_Renderer
+ * @see O_Dao_Renderer
  *
  * Description of fields declaration:
- * @see Dao_FieldInfo
+ * @see O_Dao_FieldInfo
  *
  * @author Dmitry Kourinski
  */
-class Dao_TableInfo {
+class O_Dao_TableInfo {
 	/**
 	 * Array of constructed table info objects
 	 *
-	 * @var Dao_TableInfo[]
+	 * @var O_Dao_TableInfo[]
 	 */
 	private static $conf = Array ();
 	/**
@@ -53,7 +53,7 @@ class Dao_TableInfo {
 	/**
 	 * Array of fields infos
 	 *
-	 * @var Dao_FieldInfo[]
+	 * @var O_Dao_FieldInfo[]
 	 */
 	private $fields = Array ();
 	/**
@@ -91,7 +91,7 @@ class Dao_TableInfo {
 		$this->class = $class;
 
 		$reflection = new ReflectionClass( $class );
-		if (!$reflection->isSubclassOf( "Dao_ActiveRecord" ))
+		if (!$reflection->isSubclassOf( "O_Dao_ActiveRecord" ))
 			return;
 
 		// Copy all data from parent object
@@ -109,21 +109,21 @@ class Dao_TableInfo {
 		}
 
 		// Inherited injections
-		foreach (Dao_ActiveRecord::getInjectedMethods( $reflection->getParentClass()->getName() ) as $name => $callback) {
-			Dao_ActiveRecord::injectMethod( $class, $name, $callback );
+		foreach (O_Dao_ActiveRecord::getInjectedMethods( $reflection->getParentClass()->getName() ) as $name => $callback) {
+			O_Dao_ActiveRecord::injectMethod( $class, $name, $callback );
 		}
 
 		$docCommentLines = Array ();
 
 		// Import data from plugins
-		$plugins = Registry::get( "app/dao/$class/plugins" );
+		$plugins = O_Registry::get( "app/dao/$class/plugins" );
 		if (is_array( $plugins )) {
 			foreach ($plugins as $plugin) {
 				if (!class_exists( $plugin ))
 					throw new Exception( "Unexistent plugin class: $plugin." );
 				$pluginReflection = new ReflectionClass( $plugin );
-				if (!$pluginReflection->implementsInterface( "Dao_iPlugin" ))
-					throw new Exception( "Dao plugins must implement interface Dao_iPlugin, but $plugin doesn't." );
+				if (!$pluginReflection->implementsInterface( "O_Dao_iPlugin" ))
+					throw new Exception( "Dao plugins must implement interface O_Dao_iPlugin, but $plugin doesn't." );
 
 				// Methods injection
 				foreach ($pluginReflection->getMethods() as $method) {
@@ -135,7 +135,7 @@ class Dao_TableInfo {
 						continue;
 					if ($method->getNumberOfParameters() < 1)
 						continue;
-					Dao_ActiveRecord::injectMethod( $class, substr( $method->getName(), 2 ),
+					O_Dao_ActiveRecord::injectMethod( $class, substr( $method->getName(), 2 ),
 							array ($plugin, $method->getName()) );
 				}
 
@@ -187,7 +187,7 @@ class Dao_TableInfo {
 						$type = null;
 						if (strpos( $name, " " ))
 							list ($name, $type) = explode( " ", $value, 2 );
-						$this->fields[ $name ] = new Dao_FieldInfo( $this->class, $name, $type, $subkeys );
+						$this->fields[ $name ] = new O_Dao_FieldInfo( $this->class, $name, $type, $subkeys );
 					break;
 					case "index" :
 						$this->indexes[ $value ] = $subkeys;
@@ -217,7 +217,7 @@ class Dao_TableInfo {
 	{
 		if (!$this->table)
 			throw new Exception( "Table name isn't specified for " . $this->class );
-		$stmt = Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $this->table . "'" );
+		$stmt = O_Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $this->table . "'" );
 		if (!$stmt)
 			return false;
 		$stmt->execute();
@@ -234,7 +234,7 @@ class Dao_TableInfo {
 		if (!$this->table)
 			throw new Exception( "Can't create unnamed table." );
 
-		$query = new Db_Query( $this->table );
+		$query = new O_Db_Query( $this->table );
 
 		$query->field( "id", "int auto_increment primary key" );
 
@@ -258,7 +258,7 @@ class Dao_TableInfo {
 	 * Returns field info object
 	 *
 	 * @param string $name
-	 * @return Dao_FieldInfo or null
+	 * @return O_Dao_FieldInfo or null
 	 */
 	public function getFieldInfo( $name )
 	{
@@ -278,7 +278,7 @@ class Dao_TableInfo {
 	/**
 	 * Returns array of field info
 	 *
-	 * @return Dao_FieldInfo[]
+	 * @return O_Dao_FieldInfo[]
 	 */
 	public function getFields()
 	{
@@ -289,7 +289,7 @@ class Dao_TableInfo {
 	 * Returns instance of table info object
 	 *
 	 * @param string $class
-	 * @return Dao_TableInfo
+	 * @return O_Dao_TableInfo
 	 */
 	static public function get( $class )
 	{

@@ -1,7 +1,7 @@
 <?php
-class Test_Templates_Main extends Html_Template {
+class Test_Templates_Main extends O_Html_Template {
 	public function __construct() {
-		$this->layoutClass = "Html_MainLayout";
+		$this->layoutClass = "O_Html_MainLayout";
 		$this->getLayout()->title = "Orena Framework Test Suite Running";
 	}
 

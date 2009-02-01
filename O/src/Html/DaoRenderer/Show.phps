@@ -1,10 +1,10 @@
 <?php
 /**
- * Displays one Dao_ActiveRecord object in HTML.
+ * Displays one O_Dao_ActiveRecord object in HTML.
  *
  * To use this, type "-show[ callback]" (or "-loop[ callback]") in each Dao field you want to be displayed.
  * "-loop" params will be used in (simplified) loop rendering, e.g. article anonces.
- * @see Html_DaoRenderer_Loop
+ * @see O_Html_DaoRenderer_Loop
  *
  * Callback (optional) must look like "[classname::]methodname[ params]". ("[]" means that it's optional.)
  * If it contains classname, classname::methodname($record, $fieldName, $title, $params, $layout) will be called.
@@ -12,21 +12,21 @@
  * Otherwise default render method is called.
  *
  * Usually this class is used via
- * @see Dao_Renderer::show()
+ * @see O_Dao_Renderer::show()
  *
  * @author Dmitry Kourinski
  */
-class Html_DaoRenderer_Show {
+class O_Html_DaoRenderer_Show {
 	/**
 	 * Layout object to modify by fields
 	 *
-	 * @var Html_Layout
+	 * @var O_Html_Layout
 	 */
 	private $layout;
 	/**
 	 * Object to show
 	 *
-	 * @var Dao_ActiveRecord
+	 * @var O_Dao_ActiveRecord
 	 */
 	private $record;
 	/**
@@ -39,11 +39,11 @@ class Html_DaoRenderer_Show {
 	/**
 	 * Constructor
 	 *
-	 * @param Dao_ActiveRecord $record
-	 * @param Html_Layout $layout
+	 * @param O_Dao_ActiveRecord $record
+	 * @param O_Html_Layout $layout
 	 * @param string $mode
 	 */
-	public function __construct( Dao_ActiveRecord $record, Html_Layout $layout = null, $mode = Dao_Renderer::MODE_SHOW )
+	public function __construct( O_Dao_ActiveRecord $record, O_Html_Layout $layout = null, $mode = O_Dao_Renderer::MODE_SHOW )
 	{
 		$this->record = $record;
 		$this->layout = $layout;
@@ -57,7 +57,7 @@ class Html_DaoRenderer_Show {
 	public function display()
 	{
 		// TODO: add usable classes for renderer
-		$tableInfo = Dao_TableInfo::get( get_class( $this->record ) );
+		$tableInfo = O_Dao_TableInfo::get( get_class( $this->record ) );
 		?>
 <div class="oo-renderer">
 <?
@@ -77,7 +77,7 @@ class Html_DaoRenderer_Show {
 	 */
 	private function displayField( $fieldName, $fieldValue )
 	{
-		$fieldInfo = Dao_TableInfo::get( $this->record )->getFieldInfo( $fieldName );
+		$fieldInfo = O_Dao_TableInfo::get( $this->record )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( $this->mode );
 		
 		if (!$param)
@@ -93,7 +93,7 @@ class Html_DaoRenderer_Show {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic()) {
 				// TODO: add tests for loop
-				if ($fieldValue instanceof Dao_Query)
+				if ($fieldValue instanceof O_Dao_Query)
 					$callback = "loop";
 				else
 					throw new Exception( "Cannot autogenerate renderer for non-atomic field!" );
@@ -159,15 +159,15 @@ class Html_DaoRenderer_Show {
 	/**
 	 * Shows field values in a loop mode
 	 *
-	 * @param Dao_Query $fieldValue
+	 * @param O_Dao_Query $fieldValue
 	 * @param string $title
 	 * @param string $subparams
 	 */
 	private function showerLoop( $fieldValue, $title, $subparams )
 	{
 		// TODO: $title must be used
-		if ($fieldValue instanceof Dao_Query)
-			Dao_Renderer::showLoop( $fieldValue, $this->layout, $subparams );
+		if ($fieldValue instanceof O_Dao_Query)
+			O_Dao_Renderer::showLoop( $fieldValue, $this->layout, $subparams );
 	}
 
 }

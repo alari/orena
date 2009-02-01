@@ -1,6 +1,6 @@
 <?php
 
-class Registry {
+class O_Registry {
 	/**
 	 * Parsed ini-files -- registry defaults
 	 *

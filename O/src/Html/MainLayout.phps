@@ -1,5 +1,5 @@
 <?php
-class Html_MainLayout extends Html_Layout {
+class O_Html_MainLayout extends O_Html_Layout {
 	/**
 	 * Source of main css-file of layout.
 	 * If not specified by extensions, default one is used
@@ -101,7 +101,7 @@ todo: add interface for right col generator
 	protected function displayHead()
 	{
 		$this->addCssSrc( 
-				$this->mainCssHref ? $this->mainCssHref : Registry::get( "fw/html/static_root" ) . "css/main.css" );
+				$this->mainCssHref ? $this->mainCssHref : O_Registry::get( "fw/html/static_root" ) . "css/main.css" );
 		parent::displayHead();
 	}
 

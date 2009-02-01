@@ -16,7 +16,7 @@ class Test_Suite extends PHPUnit_Framework_TestSuite {
 	 */
 	public function __construct()
 	{
-		Registry::add("app/dao/Test_Models_Core/plugins", "Test_Models_CorePlugin");
+		O_Registry::add("app/dao/Test_Models_Core/plugins", "Test_Models_CorePlugin");
 
 		$this->setName( 'Test_Suite' );
 

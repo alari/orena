@@ -1,16 +1,16 @@
 <?php
 /**
- * Query builder extension to ease work with Dao_ActiveRecord sets.
+ * Query builder extension to ease work with O_Dao_ActiveRecord sets.
  *
- * @see Db_Query
+ * @see O_Db_Query
  *
- * Dao_Query could be automatically rendered,
- * @see Dao_Renderer
- * @see Dao_Query::display()
+ * O_Dao_Query could be automatically rendered,
+ * @see O_Dao_Renderer
+ * @see O_Dao_Query::display()
  *
  * @author Dmitry Kourinski
  */
-class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
+class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * Classname we're selecting objects from
 	 *
@@ -35,7 +35,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		if (is_object( $class ))
 			$class = get_class( $class );
 		$this->class = $class;
-		parent::__construct( Dao_TableInfo::get( $class )->getTableName(), $alias );
+		parent::__construct( O_Dao_TableInfo::get( $class )->getTableName(), $alias );
 	}
 
 	/**
@@ -43,35 +43,35 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	 *
 	 * @param string $class
 	 * @param string $alias
-	 * @return Dao_Query
+	 * @return O_Dao_Query
 	 */
 	public function from( $class, $alias = null )
 	{
 		if (is_object( $class ))
 			$class = get_class( $class );
 		$this->class = $class;
-		return parent::from( Dao_TableInfo::get( $class )->getTableName(), $alias );
+		return parent::from( O_Dao_TableInfo::get( $class )->getTableName(), $alias );
 	}
 
 	/**
-	 * Returns first Dao_ActiveRecord from query
+	 * Returns first O_Dao_ActiveRecord from query
 	 *
-	 * @return Dao_ActiveRecord
+	 * @return O_Dao_ActiveRecord
 	 */
 	public function getOne()
 	{
 		$o = $this->select()->fetch();
 		if ($o) {
-			return Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
+			return O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
 		}
 		return null;
 	}
 
 	/**
-	 * Returns (cached) array of query results as Dao_ActiveRecords
+	 * Returns (cached) array of query results as O_Dao_ActiveRecords
 	 *
 	 * @param bool $forceCacheReload If true, objects are regenerated
-	 * @return Dao_ActiveRecord[]
+	 * @return O_Dao_ActiveRecord[]
 	 */
 	public function getAll( $forceCacheReload = false )
 	{
@@ -80,18 +80,18 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 		$r = $this->select()->fetchAll();
 		$this->objects = Array ();
 		foreach ($r as $o)
-			$this->objects[ $o[ "id" ] ] = Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
+			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
 		return $this->objects;
 	}
 
 	/**
 	 * Displays all objects from getAll() in a loop
 	 *
-	 * @param Html_Layout $layout
+	 * @param O_Html_Layout $layout
 	 */
-	public function display( Html_Layout $layout = null )
+	public function display( O_Html_Layout $layout = null )
 	{
-		Dao_Renderer::showLoop( $this, $layout );
+		O_Dao_Renderer::showLoop( $this, $layout );
 	}
 
 	/**
@@ -101,7 +101,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	 */
 	static public function disablePreparing( $class )
 	{
-		parent::disablePreparing( Dao_TableInfo::get( $class )->getTableName() );
+		parent::disablePreparing( O_Dao_TableInfo::get( $class )->getTableName() );
 	}
 
 	/**
@@ -119,7 +119,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * For Iterator
 	 *
-	 * @return Dao_ActiveRecord
+	 * @return O_Dao_ActiveRecord
 	 * @access private
 	 */
 	public function current()
@@ -143,7 +143,7 @@ class Dao_Query extends Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * For Iterator
 	 *
-	 * @return Dao_ActiveRecord
+	 * @return O_Dao_ActiveRecord
 	 * @access private
 	 */
 	public function next()

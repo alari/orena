@@ -1,21 +1,21 @@
 <?php
 /**
- * Abstract class to describe standard jobs with Dao_ActiveRecord-to-many relations.
+ * Abstract class to describe standard jobs with O_Dao_ActiveRecord-to-many relations.
  *
- * @see Dao_FieldInfo
- * @see Dao_Relation_ManyToMany
- * @see Dao_Relation_OneToMany
+ * @see O_Dao_FieldInfo
+ * @see O_Dao_Relation_ManyToMany
+ * @see O_Dao_Relation_OneToMany
  *
  * @author Dmitry Kourinski
  */
-abstract class Dao_Relation_BaseToMany extends Dao_Query implements Countable {
+abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countable {
 	/**
 	 * Removes linked object from relation.
 	 *
-	 * @param Dao_ActiveRecord $object
+	 * @param O_Dao_ActiveRecord $object
 	 * @param bool $delete If set to true, linked object will be deleted
 	 */
-	abstract public function remove( Dao_ActiveRecord $object, $delete = false );
+	abstract public function remove( O_Dao_ActiveRecord $object, $delete = false );
 
 	/**
 	 * Removes all linked objects from relation
@@ -27,7 +27,7 @@ abstract class Dao_Relation_BaseToMany extends Dao_Query implements Countable {
 	/**
 	 * Returns query with all linked objects.
 	 *
-	 * @return Dao_Query
+	 * @return O_Dao_Query
 	 */
 	abstract public function query();
 

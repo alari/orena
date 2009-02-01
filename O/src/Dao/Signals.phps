@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides support for Dao_ActiveRecord signals fired when the object is changed, created or deleted.
+ * Provides support for O_Dao_ActiveRecord signals fired when the object is changed, created or deleted.
  *
  * The field or ActiveRecord class, to fire signals, must have "-signal" configuration key.
  * Listener can be attached to classname, event type, signal name, or to any combination of them.
@@ -8,7 +8,7 @@
  *
  * @author Dmitry Kourinski
  */
-class Dao_Signals {
+class O_Dao_Signals {
 	/**
 	 * Array of listeners callbacks
 	 *
@@ -24,7 +24,7 @@ class Dao_Signals {
 	/**
 	 * Adds listener for signal. Attention: field must contain "-signal" directive to fire signals.
 	 *
-	 * @param callback $callback interface: function(mixed $fieldValue, Dao_ActiveRecord $object, const $event)
+	 * @param callback $callback interface: function(mixed $fieldValue, O_Dao_ActiveRecord $object, const $event)
 	 * @param const $event
 	 * @param string $signal Keystring from "-signal $signal" directive.
 	 * @param string $class
@@ -50,10 +50,10 @@ class Dao_Signals {
 	 * @param const $event
 	 * @param string $signal
 	 * @param string $class
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 */
-	static public function fire( $event, $signal, $class, Dao_ActiveRecord $obj, $fieldValue = null )
+	static public function fire( $event, $signal, $class, O_Dao_ActiveRecord $obj, $fieldValue = null )
 	{
 		foreach (self::getListeners( $event, $signal, $class ) as $callback) {
 			call_user_func_array( $callback, array ($fieldValue, $obj, $event) );

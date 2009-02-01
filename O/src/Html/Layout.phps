@@ -1,10 +1,10 @@
 <?php
 
-class Html_Layout {
+class O_Html_Layout {
 	/**
 	 * Template object to display
 	 *
-	 * @var Html_Template
+	 * @var O_Html_Template
 	 */
 	protected $tpl;
 	
@@ -74,9 +74,9 @@ class Html_Layout {
 	/**
 	 * Creates an instance of html-layout
 	 *
-	 * @param Html_Template $tpl
+	 * @param O_Html_Template $tpl
 	 */
-	public function __construct( Html_Template $tpl )
+	public function __construct( O_Html_Template $tpl )
 	{
 		$this->tpl = $tpl;
 	}
@@ -243,7 +243,7 @@ class Html_Layout {
 	public function staticUrl( $url )
 	{
 		if ($url[ 0 ] != "/" && $url[ 0 ] != "." && strpos( $url, "http://" ) !== 0)
-			return Registry::get( "app/html/static_root" ) . $url;
+			return O_Registry::get( "app/html/static_root" ) . $url;
 		return $url;
 	}
 

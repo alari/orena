@@ -1,6 +1,6 @@
 <?php
 /**
- * Displays create or edit form for Dao_ActiveRecord class or instance.
+ * Displays create or edit form for O_Dao_ActiveRecord class or instance.
  *
  * To use this, specify "-edit[ callback]" flag in configuration of each field you want to edit.
  * Callback must be like "[classname::]methodname[ params]". If classname is specified,
@@ -8,28 +8,28 @@
  * will be called, otherwise built-in renderers are used.
  * Field titles are from "-title $title" param.
  *
- * @see Dao_ActiveRecord::edit()
- * @see Dao_ActiveRecord::show()
+ * @see O_Dao_ActiveRecord::edit()
+ * @see O_Dao_ActiveRecord::show()
  *
  * @author Dmitry Kourinski
  *
  * @todo Add type=hidden params to create form
  */
-class Html_DaoRenderer_Form {
+class O_Html_DaoRenderer_Form {
 	/**
 	 * Layout object to add styles to
 	 *
-	 * @var Html_Layout
+	 * @var O_Html_Layout
 	 */
 	private $layout;
 	/**
 	 * ActiveRecord object to edit
 	 *
-	 * @var Dao_ActiveRecord
+	 * @var O_Dao_ActiveRecord
 	 */
 	private $record;
 	/**
-	 * Classname of Dao_ActiveRecord to work with
+	 * Classname of O_Dao_ActiveRecord to work with
 	 *
 	 * @var string
 	 */
@@ -75,9 +75,9 @@ class Html_DaoRenderer_Form {
 	 * Constructor
 	 *
 	 * @param string $action
-	 * @param Html_Layout $layout
+	 * @param O_Html_Layout $layout
 	 */
-	public function __construct( $action, Html_Layout $layout = null )
+	public function __construct( $action, O_Html_Layout $layout = null )
 	{
 		$this->action = $action;
 		$this->layout = $layout;
@@ -86,9 +86,9 @@ class Html_DaoRenderer_Form {
 	/**
 	 * Sets an active record object to edit
 	 *
-	 * @param Dao_ActiveRecord $record
+	 * @param O_Dao_ActiveRecord $record
 	 */
-	public function setActiveRecord( Dao_ActiveRecord $record )
+	public function setActiveRecord( O_Dao_ActiveRecord $record )
 	{
 		$this->record = $record;
 		$this->setActiveRecordClass( get_class( $record ) );
@@ -166,10 +166,10 @@ class Html_DaoRenderer_Form {
 		if (!$this->class)
 			throw new Exception( "Cannot render nothing." );
 		$ref = new ReflectionClass( $this->class );
-		if (!$ref->isSubclassOf( "Dao_ActiveRecord" ))
-			throw new Exception( "Cannot render classes that are not subclasses of Dao_ActiveRecord." );
+		if (!$ref->isSubclassOf( "O_Dao_ActiveRecord" ))
+			throw new Exception( "Cannot render classes that are not subclasses of O_Dao_ActiveRecord." );
 		
-		$tableInfo = Dao_TableInfo::get( $this->class );
+		$tableInfo = O_Dao_TableInfo::get( $this->class );
 		
 		// TODO: add ajax support after choosing JS framework
 		?>
@@ -216,7 +216,7 @@ class Html_DaoRenderer_Form {
 	 */
 	private function displayField( $fieldName, $fieldValue )
 	{
-		$fieldInfo = Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
+		$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( "edit" );
 		
 		if (!$param)
@@ -316,7 +316,7 @@ class Html_DaoRenderer_Form {
 	private function editorWysiwyg( $fieldName, $fieldValue, $title, $subparams, $errorMessage )
 	{
 		if ($this->layout) {
-			$this->layout->addJavaScriptSrc( Registry::get( "fw/html/static_root" ) . "fckeditor/fckeditor.js" );
+			$this->layout->addJavaScriptSrc( O_Registry::get( "fw/html/static_root" ) . "fckeditor/fckeditor.js" );
 			// TODO: add wysiwyg initiator after choosing JS framework
 		}
 		?>

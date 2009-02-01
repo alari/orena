@@ -2,7 +2,7 @@
 /**
  * @field plugin_field text
  */
-class Test_Models_CorePlugin implements Dao_iPlugin {
+class Test_Models_CorePlugin implements O_Dao_iPlugin {
 
 	static protected function i_notInjection( $a )
 	{

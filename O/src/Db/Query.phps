@@ -1,5 +1,5 @@
 <?php
-class Db_Query {
+class O_Db_Query {
 	/**
 	 * Array of tables to work with
 	 *
@@ -182,7 +182,7 @@ class Db_Query {
 	 *
 	 * @param string $table Table name
 	 * @param string $alias Table alias
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function from( $table, $alias = null )
 	{
@@ -195,7 +195,7 @@ class Db_Query {
 	 *
 	 * @param string $table
 	 * @param string $alias
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function addFrom( $table, $alias = null )
 	{
@@ -206,7 +206,7 @@ class Db_Query {
 	/**
 	 * Removes all tables from FROM section
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearFrom()
 	{
@@ -220,7 +220,7 @@ class Db_Query {
 	 * @param string $table Table to join. With alias separated by space if needed
 	 * @param strig $condition Condition to join
 	 * @param string $type Join type
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function join( $table, $condition, $type = "LEFT" )
 	{
@@ -234,7 +234,7 @@ class Db_Query {
 	 * @param string $table Table to join. With alias separated by space if needed
 	 * @param strig $condition Condition to join
 	 * @param string $type Join type
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function joinOnce( $table, $condition, $type = "LEFT" )
 	{
@@ -247,7 +247,7 @@ class Db_Query {
 	/**
 	 * Removes all JOIN tables
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearJoins()
 	{
@@ -260,7 +260,7 @@ class Db_Query {
 	 *
 	 * @param string $condition
 	 * @param mixed $param ...
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function where( $condition )
 	{
@@ -275,7 +275,7 @@ class Db_Query {
 	/**
 	 * Removes all conditions from WHERE
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearWhere()
 	{
@@ -289,7 +289,7 @@ class Db_Query {
 	 * @param string $field Database column name
 	 * @param mixed $value Null, bool, int, double, string, other query
 	 * @param const $type
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function test( $field, $value, $type = self::EQ )
 	{
@@ -300,7 +300,7 @@ class Db_Query {
 	/**
 	 * Adds OR in condition
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function addOr()
 	{
@@ -314,7 +314,7 @@ class Db_Query {
 	 * @param string $name Database column name
 	 * @param string $aliasOrValue Alias to select or value to update/insert or field type to create/alter table
 	 * @param bool $asIs If true, no escaping will be produced
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function field( $name, $aliasOrValue = null, $asIs = false )
 	{
@@ -325,7 +325,7 @@ class Db_Query {
 	/**
 	 * Removes all fields
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearFields()
 	{
@@ -340,7 +340,7 @@ class Db_Query {
 	 * @param string $type
 	 * @param string $name
 	 * @see Query::prepareCreate()
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function index( $field, $type = "key", $name = null )
 	{
@@ -352,7 +352,7 @@ class Db_Query {
 	 * Adds SQL SELECT options like SQL_CACHE or SQL_CALC_FOUND_ROWS
 	 *
 	 * @param const $option
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function setSqlOption( $option )
 	{
@@ -364,7 +364,7 @@ class Db_Query {
 	 * Adds a field to order by
 	 *
 	 * @param string $field
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function orderBy( $field )
 	{
@@ -375,7 +375,7 @@ class Db_Query {
 	/**
 	 * Removes all OrderBy fields
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearOrders()
 	{
@@ -387,7 +387,7 @@ class Db_Query {
 	 * Adds field to GROUP BY condition
 	 *
 	 * @param string $field
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function groupBy( $field )
 	{
@@ -398,7 +398,7 @@ class Db_Query {
 	/**
 	 * Clears all GroupBy fields
 	 *
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function clearGroupBy()
 	{
@@ -411,7 +411,7 @@ class Db_Query {
 	 *
 	 * @param [opt]int $offset
 	 * @param int $limit
-	 * @return Db_Query
+	 * @return O_Db_Query
 	 */
 	public function limit( $offset = 0, $limit = 0 )
 	{
@@ -598,7 +598,7 @@ class Db_Query {
 	 */
 	protected function conn()
 	{
-		return Db_Manager::getConnection( $this->db_conn );
+		return O_Db_Manager::getConnection( $this->db_conn );
 	}
 
 	/**

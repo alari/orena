@@ -2,12 +2,12 @@
 /**
  * OneToMany relation workaround.
  *
- * @see Dao_Relation_BaseToMany
- * @see Dao_FieldInfo
+ * @see O_Dao_Relation_BaseToMany
+ * @see O_Dao_FieldInfo
  *
  * @author Dmitry Kourinski
  */
-class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
+class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	private $targetClass;
 	private $targetField;
 	private $baseId;
@@ -30,19 +30,19 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
 
-		$tbl = Dao_TableInfo::get( $targetClass )->getTableName();
+		$tbl = O_Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->test( $tbl . "." . $targetField, $baseId );
 	}
 
 	/**
 	 * Returns clear query with related objects
 	 *
-	 * @return Dao_Query
+	 * @return O_Dao_Query
 	 */
 	public function query()
 	{
-		$q = new Dao_Query( $this->targetClass );
-		return $q->test( Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField,
+		$q = new O_Dao_Query( $this->targetClass );
+		return $q->test( O_Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField,
 				$this->baseId );
 	}
 
@@ -52,17 +52,17 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
-		Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
+		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
 	}
 
 	/**
 	 * Removes an object from relation (current query state influes)
 	 *
-	 * @param Dao_ActiveRecord $object
+	 * @param O_Dao_ActiveRecord $object
 	 * @param bool $delete If true, not only relation removed, but also an object deleted
 	 * @return bool
 	 */
-	public function remove( Dao_ActiveRecord $object, $delete = false )
+	public function remove( O_Dao_ActiveRecord $object, $delete = false )
 	{
 		if (!$object)
 			return false;
@@ -98,7 +98,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 	 * Adds support for [] operator
 	 *
 	 * @param null $offset
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @return bool
 	 * @throws Exception
 	 */
@@ -112,7 +112,7 @@ class Dao_Relation_OneToMany extends Dao_Relation_BaseToMany {
 			throw new Exception( "Wrong object type for assignation." );
 		if ($offset !== null)
 			throw new Exception( "Can assign new value only with [] operator." );
-			/* @var $obj Dao_ActiveRecord */
+			/* @var $obj O_Dao_ActiveRecord */
 		$obj->setField( $this->targetField, $this->baseId );
 		$this->reload();
 		return $obj->save();

@@ -1,15 +1,15 @@
 <?php
-abstract class Html_Template {
+abstract class O_Html_Template {
 	/**
 	 * Classname of layout assotiated with current template
 	 *
 	 * @var string
 	 */
-	protected $layoutClass = "Html_Layout";
+	protected $layoutClass = "O_Html_Layout";
 	/**
 	 * Layout object
 	 *
-	 * @var Html_Layout
+	 * @var O_Html_Layout
 	 */
 	private $layoutObject;
 
@@ -22,7 +22,7 @@ abstract class Html_Template {
 	/**
 	 * Returns layout object assotiated with this template
 	 *
-	 * @return Html_Layout
+	 * @return O_Html_Layout
 	 */
 	public function getLayout()
 	{

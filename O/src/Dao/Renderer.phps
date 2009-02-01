@@ -2,13 +2,13 @@
 /**
  * Renders an object, an object set as loop, or a form based on ActiveRecord class or object.
  *
- * @see Html_DaoRenderer_Loop
- * @see Html_DaoRenderer_Show
- * @see Html_DaoRenderer_Form
+ * @see O_Html_DaoRenderer_Loop
+ * @see O_Html_DaoRenderer_Show
+ * @see O_Html_DaoRenderer_Form
  *
  * @author Dmitry Kourinski
  */
-class Dao_Renderer {
+class O_Dao_Renderer {
 	
 	const MODE_SHOW = "show";
 	const MODE_LOOP = "loop";
@@ -16,28 +16,28 @@ class Dao_Renderer {
 	/**
 	 * Renders loop query
 	 *
-	 * @see Html_DaoRenderer_Loop
-	 * @param Dao_Query $query
-	 * @param Html_Layout $layout
+	 * @see O_Html_DaoRenderer_Loop
+	 * @param O_Dao_Query $query
+	 * @param O_Html_Layout $layout
 	 * @param string $subparams
 	 */
-	static public function showLoop( Dao_Query $query, Html_Layout $layout = null, $subparams = "" )
+	static public function showLoop( O_Dao_Query $query, O_Html_Layout $layout = null, $subparams = "" )
 	{
-		$renderer = new Html_DaoRenderer_Loop( $query, $layout, $subparams );
+		$renderer = new O_Html_DaoRenderer_Loop( $query, $layout, $subparams );
 		$renderer->display();
 	}
 
 	/**
 	 * Echoes an object in HTML
 	 *
-	 * @see Html_DaoRenderer_Show
-	 * @param Dao_ActiveRecord $obj
-	 * @param Html_Layout $layout
+	 * @see O_Html_DaoRenderer_Show
+	 * @param O_Dao_ActiveRecord $obj
+	 * @param O_Html_Layout $layout
 	 * @param string $mode
 	 */
-	static public function show( Dao_ActiveRecord $record, Html_Layout $layout = null, $mode = self::MODE_SHOW )
+	static public function show( O_Dao_ActiveRecord $record, O_Html_Layout $layout = null, $mode = self::MODE_SHOW )
 	{
-		$renderer = new Html_DaoRenderer_Show( $record, $layout, $mode );
+		$renderer = new O_Html_DaoRenderer_Show( $record, $layout, $mode );
 		$renderer->display();
 	}
 
@@ -46,15 +46,15 @@ class Dao_Renderer {
 	 *
 	 * @param string $class
 	 * @param string $action
-	 * @param Html_Layout $layout
+	 * @param O_Html_Layout $layout
 	 * @param bool $isAjax
 	 * @param array $errorsArray
 	 * @param string $formTitle
-	 * @see Html_DaoRenderer_Form
+	 * @see O_Html_DaoRenderer_Form
 	 */
-	static public function create( $class, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
+	static public function create( $class, $action, O_Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
-		$renderer = new Html_DaoRenderer_Form( $action, $layout );
+		$renderer = new O_Html_DaoRenderer_Form( $action, $layout );
 		$renderer->setActiveRecordClass( $class );
 		if ($formTitle)
 			$renderer->setTitle( $formTitle );
@@ -66,17 +66,17 @@ class Dao_Renderer {
 	/**
 	 * Echoes rendered edit form
 	 *
-	 * @param Dao_ActiveRecord $record
+	 * @param O_Dao_ActiveRecord $record
 	 * @param string $action
-	 * @param Html_Layout $layout
+	 * @param O_Html_Layout $layout
 	 * @param bool $isAjax
 	 * @param array $errorsArray
 	 * @param string $formTitle
-	 * @see Html_DaoRenderer_Form
+	 * @see O_Html_DaoRenderer_Form
 	 */
-	static public function edit( Dao_ActiveRecord $record, $action, Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
+	static public function edit( O_Dao_ActiveRecord $record, $action, O_Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
 	{
-		$renderer = new Html_DaoRenderer_Form( $action, $layout );
+		$renderer = new O_Html_DaoRenderer_Form( $action, $layout );
 		$renderer->setActiveRecord( $record );
 		if ($formTitle)
 			$renderer->setTitle( $formTitle );

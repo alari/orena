@@ -1,6 +1,6 @@
 <?php
 /**
- * Handles one persistent field of Dao_ActiveRecord.
+ * Handles one persistent field of O_Dao_ActiveRecord.
  *
  * Supported configuration.
  *
@@ -14,9 +14,9 @@
  * It will be one to many or many to many due to inverse field description.
  *
  * Base to one relations returns target object as value. Base to many returns instance of
- * @see Dao_Relation_OneToMany
+ * @see O_Dao_Relation_OneToMany
  * or
- * @see Dao_Relation_ManyToMany
+ * @see O_Dao_Relation_ManyToMany
  *
  * To add an object, use [] operator, e.g. $record->objs[] = new obj.
  * To remove an object, use remove() or removeAll() method:
@@ -24,20 +24,20 @@
  * @example $record->removeAll() to delete relations with all objects
  * Those methods gets one additional bool parameter. If it's set to true, relative object will be deleted.
  *
- * Dao_FieldInfo also supports special "alias" fieldtype:
+ * O_Dao_FieldInfo also supports special "alias" fieldtype:
  * @field fieldname -alias relationfieldname.other_relation[.relation[...]]
- * It returns Dao_Query with objects linked with current ActiveRecord with several steps.
+ * It returns O_Dao_Query with objects linked with current ActiveRecord with several steps.
  * E.g. A linked with B, B linked with C, so C is linked with A and this relation is available by calling
  * @example $A->{"B.C"} (this is named "mapped query" and handled by "B" fieldinfo object) or with
  * @field BC -alias B.C,
  * @example $A->BC
  *
  * Also FieldInfo provides signals support for fields changes:
- * @see Dao_Signals
+ * @see O_Dao_Signals
  *
  * @author Dmitry Kourinski
  */
-class Dao_FieldInfo {
+class O_Dao_FieldInfo {
 	/**
 	 * External (database) name of this field
 	 *
@@ -85,7 +85,7 @@ class Dao_FieldInfo {
 	/**
 	 * Object of inverse field
 	 *
-	 * @var Dao_FieldInfo
+	 * @var O_Dao_FieldInfo
 	 */
 	private $relationInverseField;
 	/**
@@ -97,11 +97,11 @@ class Dao_FieldInfo {
 	/**
 	 * Object of relation -- OneToMany, ManyToMany, etc.
 	 *
-	 * @var Dao_Relation_BaseToMany
+	 * @var O_Dao_Relation_BaseToMany
 	 */
 	private $relationObject;
 	/**
-	 * Classname of current Dao_ActiveRecord
+	 * Classname of current O_Dao_ActiveRecord
 	 *
 	 * @var string
 	 */
@@ -109,7 +109,7 @@ class Dao_FieldInfo {
 	/**
 	 * Cached relation objects
 	 *
-	 * @var Dao_Relation_BaseToMany[]
+	 * @var O_Dao_Relation_BaseToMany[]
 	 */
 	private $relation = Array ();
 	/**
@@ -129,14 +129,14 @@ class Dao_FieldInfo {
 	/**
 	 * Query for alias
 	 *
-	 * @var Dao_Query
+	 * @var O_Dao_Query
 	 */
 	private $aliasQuery;
 
 	/**
 	 * Creates FieldInfo object
 	 *
-	 * @param string $class Dao_ActiveRecord classname
+	 * @param string $class O_Dao_ActiveRecord classname
 	 * @param string $name Persistent field name
 	 * @param string $type SQL type of field, if specified
 	 * @param array $params
@@ -184,7 +184,7 @@ class Dao_FieldInfo {
 	/**
 	 * Sets the class
 	 *
-	 * @see Dao_TableInfo::__construct()
+	 * @see O_Dao_TableInfo::__construct()
 	 * @access package
 	 * @param string $class
 	 */
@@ -207,10 +207,10 @@ class Dao_FieldInfo {
 	/**
 	 * Adds field to CREATE query
 	 *
-	 * @param Db_Query $query
+	 * @param O_Db_Query $query
 	 * @access private
 	 */
-	public function addFieldTypeToQuery( Db_Query $query )
+	public function addFieldTypeToQuery( O_Db_Query $query )
 	{
 		if ($this->relationMany || $this->alias)
 			return;
@@ -230,11 +230,11 @@ class Dao_FieldInfo {
 		static $is_added = false;
 		if ($is_added)
 			return null;
-		$q = new Dao_Query( $this->class );
+		$q = new O_Dao_Query( $this->class );
 		$this->addFieldTypeToQuery( $q );
 		$r = $q->alter( "ADD" );
-		Dao_ActiveRecord::saveAndReload( $this->class );
-		Dao_Query::disablePreparing( $this->class );
+		O_Dao_ActiveRecord::saveAndReload( $this->class );
+		O_Dao_Query::disablePreparing( $this->class );
 		$is_added = true;
 		return $r;
 	}
@@ -243,18 +243,18 @@ class Dao_FieldInfo {
 	 * Create relation with other object(s).
 	 *
 	 * @param int $obj_id
-	 * @return Dao_Relation_BaseToMany
+	 * @return O_Dao_Relation_BaseToMany
 	 */
 	private function getRelation( $obj_id )
 	{
-		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof Dao_Relation_BaseToMany) {
+		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->relationMany) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new Dao_Relation_ManyToMany( $this->relationTarget,
+				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->relationTarget,
 						$this->relationInverse, $obj_id, $this->class, $this->name );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new Dao_Relation_OneToMany( $this->relationTarget,
+				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->relationTarget,
 						$this->relationInverse, $obj_id, $this->class, $this->name );
 			}
 		}
@@ -275,12 +275,12 @@ class Dao_FieldInfo {
 	/**
 	 * FieldInfo of reverse field
 	 *
-	 * @return Dao_FieldInfo
+	 * @return O_Dao_FieldInfo
 	 */
 	private function getInverse()
 	{
 		if (!$this->relationInverseField)
-			$this->relationInverseField = Dao_TableInfo::get( $this->relationTarget )->getFieldInfo(
+			$this->relationInverseField = O_Dao_TableInfo::get( $this->relationTarget )->getFieldInfo(
 					$this->relationInverse );
 		return $this->relationInverseField;
 	}
@@ -298,20 +298,20 @@ class Dao_FieldInfo {
 	/**
 	 * Sets the value with all tests provided
 	 *
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 * @throws Exception
 	 * @return bool
 	 * @access private
 	 */
-	public function setValue( Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
+	public function setValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
 					$obj, $obj->{$this->name} );
 			// New value is set
-			Dao_Signals::fire( Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, $obj,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, $obj,
 					$fieldValue );
 			// TODO: maybe signal should be fired when field is saved to database, not just set?
 		}
@@ -352,12 +352,12 @@ class Dao_FieldInfo {
 	/**
 	 * Returns the field value, even if it's a relation or aliased query
 	 *
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 * @return mixed
 	 * @access private
 	 */
-	public function getValue( Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
+	public function getValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
 		// Value as is
 		if ($this->isAtomic) {
@@ -370,14 +370,14 @@ class Dao_FieldInfo {
 		if ($this->alias) {
 			if (!$this->aliasQuery) {
 				list ($name, $subreq) = explode( ".", $this->alias, 2 );
-				$this->aliasTestField = Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery(
+				$this->aliasTestField = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery(
 						$this->aliasQuery, $subreq );
 				// @todo document this -alias feature
-				if (isset( $this->params[ "where" ] ) && $this->aliasQuery instanceof Dao_Query) {
+				if (isset( $this->params[ "where" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
 					$this->aliasQuery->where( $this->params[ "where" ] );
 				}
 			}
-			if (!$this->aliasQuery instanceof Dao_Query) {
+			if (!$this->aliasQuery instanceof O_Dao_Query) {
 				throw new Exception( "Wrong mapped query produced by $name.$subreq map." );
 			}
 			$q = clone $this->aliasQuery;
@@ -391,19 +391,19 @@ class Dao_FieldInfo {
 		if (!$fieldExists) {
 			$this->addFieldToTable();
 		}
-		return Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
+		return O_Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
 	}
 
 	/**
 	 * Returns query by object relations mapping
 	 *
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @param int $fieldValue
 	 * @param string $subreq
-	 * @return Dao_Query
+	 * @return O_Dao_Query
 	 * @access private
 	 */
-	public function getMappedQuery( Dao_ActiveRecord $obj, $fieldValue = null, $subreq = "" )
+	public function getMappedQuery( O_Dao_ActiveRecord $obj, $fieldValue = null, $subreq = "" )
 	{
 		if ($this->isAtomic())
 			throw new Exception( "Cannot create mapped query field by atomic field basis." );
@@ -413,9 +413,9 @@ class Dao_FieldInfo {
 		if ($this->relationMany && $this->getInverse()->relationMany) {
 			$tbl = $this->getRelation( 0 )->getRelationTableName();
 			$query->join( $tbl,
-					$tbl . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField,
+					$tbl . "." . O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField,
 					"CROSS" );
-			$joinOnField = $tbl . "." . Dao_TableInfo::get( $this->class )->getTableName();
+			$joinOnField = $tbl . "." . O_Dao_TableInfo::get( $this->class )->getTableName();
 		}
 		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id );
 		return $query;
@@ -424,17 +424,17 @@ class Dao_FieldInfo {
 	/**
 	 * Prepares query but don't substitute concrete object
 	 *
-	 * @param Dao_Query $query
+	 * @param O_Dao_Query $query
 	 * @param string $subreq
 	 * @return string Field to test
 	 */
-	protected function prepareMappedQuery( Dao_Query &$query = null, $subreq = "" )
+	protected function prepareMappedQuery( O_Dao_Query &$query = null, $subreq = "" )
 	{
 		$fieldInfos = Array ();
 		$subreq = explode( ".", $subreq );
 		$info = $this;
 		foreach ($subreq as $fieldName) {
-			$info = Dao_TableInfo::get( $info->relationTarget )->getFieldInfo( $fieldName );
+			$info = O_Dao_TableInfo::get( $info->relationTarget )->getFieldInfo( $fieldName );
 			if ($info->isAtomic())
 				throw new Exception( "Cannot use atomic field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
@@ -454,22 +454,22 @@ class Dao_FieldInfo {
 	/**
 	 * Prepares query step for getting mapped query
 	 *
-	 * @param Dao_Query $query
-	 * @param Dao_FieldInfo $nextInfo
+	 * @param O_Dao_Query $query
+	 * @param O_Dao_FieldInfo $nextInfo
 	 * @param string $joinOnField From previous request
 	 * @param int $i Current iteration
 	 * @return string
 	 */
-	private function modifyMappedQuery( Dao_Query &$query = null, $joinOnField = null, Dao_FieldInfo $nextInfo = null, $i = 0 )
+	private function modifyMappedQuery( O_Dao_Query &$query = null, $joinOnField = null, O_Dao_FieldInfo $nextInfo = null, $i = 0 )
 	{
 		if (!$query) {
-			$query = new Dao_Query( $this->relationTarget );
-			$joinOnField = Dao_TableInfo::get( $this->relationTarget )->getTableName() . ".id";
+			$query = new O_Dao_Query( $this->relationTarget );
+			$joinOnField = O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . ".id";
 		}
 
 		$isOneToMany = $nextInfo->relationMany && !$nextInfo->getInverse()->relationMany;
 
-		$currTable = Dao_TableInfo::get( $this->class )->getTableName();
+		$currTable = O_Dao_TableInfo::get( $this->class )->getTableName();
 		$currAlias = $currTable . ($i ? "_" . $i : "");
 
 		//many-to-many: relation is a special table
@@ -478,7 +478,7 @@ class Dao_FieldInfo {
 			$als = $tbl . ($i ? "_" . $i : "");
 
 			$query->join( $tbl . " " . $als,
-					$als . "." . Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField,
+					$als . "." . O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField,
 					"CROSS" );
 
 			if ($isOneToMany) {
@@ -501,15 +501,15 @@ class Dao_FieldInfo {
 	/**
 	 * Handles deletion of object -- or just of relation
 	 *
-	 * @param Dao_ActiveRecord $obj
+	 * @param O_Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
 	 * @access private
 	 */
-	public function deleteThis( Dao_ActiveRecord $obj, $fieldValue = null )
+	public function deleteThis( O_Dao_ActiveRecord $obj, $fieldValue = null )
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			Dao_Signals::fire( Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
 					$obj, $obj->{$this->name} );
 		}
 		if ($this->isAtomic || $this->alias) {
@@ -521,7 +521,7 @@ class Dao_FieldInfo {
 			$this->getRelation( $obj->id )->removeAll( $this->relationOwns );
 		} else {
 			// Action needed if target is set and must be deleted, or if inverse field must be cleaned
-			$relative = Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
+			$relative = O_Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
 			if ($relative) {
 				// If has one, the database field exists
 				if ($this->getInverse() && !$this->getInverse()->relationMany) {

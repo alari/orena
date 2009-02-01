@@ -49,7 +49,7 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 	{
 		$obj = new Test_Models_Core( );
 		
-		$this->assertEquals( "Dao_Relation_OneToMany", get_class( $obj->subs ) );
+		$this->assertEquals( "O_Dao_Relation_OneToMany", get_class( $obj->subs ) );
 		
 		$obj->subs[] = new Test_Models_Sub( );
 		$obj->subs[] = new Test_Models_Sub( );
@@ -79,7 +79,7 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 	{
 		$obj = new Test_Models_Core( );
 		
-		$this->assertEquals( "Dao_Relation_ManyToMany", get_class( $obj->manysubs ) );
+		$this->assertEquals( "O_Dao_Relation_ManyToMany", get_class( $obj->manysubs ) );
 		
 		$obj->manysubs[] = new Test_Models_Sub( );
 		$obj->manysubs[] = new Test_Models_Sub( );
@@ -134,7 +134,7 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		
 		$this->assertEquals( $obj->id, $sub->core->id, "Inverse object" );
 		
-		$this->assertEquals( "Dao_Query", get_class( $obj->{"subs.core"} ), "Query create" );
+		$this->assertEquals( "O_Dao_Query", get_class( $obj->{"subs.core"} ), "Query create" );
 		
 		$this->assertEquals( get_class( $obj ), get_class( $obj->{"subs.core"}->getOne() ), 
 				"Getting one object -- core from core" );
@@ -162,7 +162,7 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		$obj->subs[] = $sub;
 		$obj->manysubs[] = $sub;
 		
-		$this->assertEquals( "Dao_Query", get_class( $obj->myalias ) );
+		$this->assertEquals( "O_Dao_Query", get_class( $obj->myalias ) );
 		$this->assertEquals( get_class( $obj ), get_class( $obj->myalias->getOne() ) );
 		$this->assertEquals( $obj->id, $obj->myalias->getOne()->id );
 	}
@@ -174,7 +174,7 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		$obj->save();
 		
 		$v = $obj->plugin_field;
-		$q = new Dao_Query( get_class( $obj ) );
+		$q = new O_Dao_Query( get_class( $obj ) );
 		$q->field( "plugin_field" )->alter( "DROP" );
 		
 		$this->assertEquals( "test plugin field", $v );
