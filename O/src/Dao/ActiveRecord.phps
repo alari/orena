@@ -135,7 +135,7 @@ abstract class O_Dao_ActiveRecord {
 	{
 		$query = new O_Dao_Query( $this );
 		if ($query->test( "id", $this->fields[ "id" ] )->field( $name, $value, true )->update()) {
-			$this->fields[ $name ] = $value;
+			$this->fields[ $name ] = $query->clearFields()->field($name)->select()->fetch(PDO::FETCH_OBJ)->$name;
 			return true;
 		}
 		return false;

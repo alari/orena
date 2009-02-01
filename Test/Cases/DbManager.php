@@ -1,6 +1,5 @@
 <?php
 
-require_once 'Db/Manager.phps';
 
 require_once 'PHPUnit/Framework/TestCase.php';
 
@@ -8,7 +7,7 @@ require_once 'PHPUnit/Framework/TestCase.php';
  * O_Db_Manager test case.
  */
 class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
-	
+
 	/**
 	 * @var O_Db_Manager
 	 */
@@ -20,7 +19,7 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	protected function setUp()
 	{
 		parent::setUp();
-	
+
 	}
 
 	/**
@@ -37,7 +36,7 @@ class Test_Cases_DbManager extends PHPUnit_Framework_TestCase {
 	public function testGetConnection()
 	{
 		$this->assertEquals( "PDO", get_class( O_Db_Manager::getConnection() ) );
-		$this->assertEquals( "PDOStatement", 
+		$this->assertEquals( "PDOStatement",
 				get_class( O_Db_Manager::getConnection()->query( "SELECT UNIX_TIMESTAMP()" ) ) );
 	}
 }

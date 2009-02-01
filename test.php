@@ -1,10 +1,8 @@
 <?php
-ini_set("include_path", ini_get("include_path").PATH_SEPARATOR."./O/src");
-function __autoload($class){
-	$filename = str_replace("_", "/", $class).".php";
-	if(substr($filename, 0, 2) == "O/") $filename = substr($filename, 2);
-	include_once is_file($filename) ? $filename : $filename."s";
-}
+require_once './O/src/ClassManager.phps';
+
+O_ClassManager::registerPrefix("Test", "./Test");
+O_ClassManager::registerPrefix("PHPUnit", "./PHPUnit");
 
 O_Registry::set( "fw/html/static_root", "./O/static/" );
 
