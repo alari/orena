@@ -88,8 +88,9 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 * Displays all objects from getAll() in a loop
 	 *
 	 * @param O_Html_Layout $layout
+	 * @see O_Dao_Renderer::showLoop()
 	 */
-	public function display( O_Html_Layout $layout = null )
+	public function show( O_Html_Layout $layout = null )
 	{
 		O_Dao_Renderer::showLoop( $this, $layout );
 	}

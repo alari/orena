@@ -24,7 +24,7 @@ abstract class O_Html_Template {
 	 *
 	 * @return O_Html_Layout
 	 */
-	public function getLayout()
+	public function layout()
 	{
 		if (!$this->layoutObject) {
 			$class = $this->layoutClass;
@@ -48,7 +48,14 @@ abstract class O_Html_Template {
 	 */
 	public function display()
 	{
-		$this->getLayout()->display();
+		try {
+			$this->layout()->display();
+		}
+		catch (Exception $e) {
+			echo "<pre>";
+			echo $e;
+			echo "</pre>";
+		}
 	}
 
 }

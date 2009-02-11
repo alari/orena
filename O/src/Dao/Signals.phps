@@ -15,7 +15,7 @@ class O_Dao_Signals {
 	 * @var array
 	 */
 	private static $listeners = Array ();
-
+	
 	const EVENT_REMOVE = "remove";
 	const EVENT_SET = "set";
 	const EVENT_CREATE = "create";
@@ -38,7 +38,7 @@ class O_Dao_Signals {
 		if (!count( $signals ))
 			$signals = array ("-");
 		foreach ($signals as $s) {
-			if (!isset( self::$listeners[ $event ][ $s ][ $class ] ) || !in_array( $callback,
+			if (!isset( self::$listeners[ $event ][ $s ][ $class ] ) || !in_array( $callback, 
 					self::$listeners[ $event ][ $s ][ $class ] ))
 				self::$listeners[ $event ][ $s ][ $class ][] = $callback;
 		}
@@ -71,15 +71,15 @@ class O_Dao_Signals {
 	static public function getListeners( $event, $signal, $class )
 	{
 		$listeners = Array ();
-
+		
 		$events = Array ("-");
 		if ($event && $event != "-")
 			$events[] = (string)$event;
-
+		
 		$classes = Array ("-");
 		if ($class && $class != "-")
 			$classes[] = (string)$class;
-
+		
 		$signals = Array ("-");
 		if ($signal) {
 			$signal = explode( " ", $signal );
@@ -87,7 +87,7 @@ class O_Dao_Signals {
 				if (!in_array( $s, $signals ))
 					$signals[] = $s;
 		}
-
+		
 		foreach ($events as $e) {
 			foreach ($signals as $s) {
 				foreach ($classes as $c) {
@@ -97,7 +97,7 @@ class O_Dao_Signals {
 				}
 			}
 		}
-
+		
 		$listeners = array_unique( $listeners );
 		$null = array_search( null, $listeners );
 		if ($null)
@@ -119,7 +119,7 @@ class O_Dao_Signals {
 			self::$listeners = Array ();
 			return;
 		}
-
+		
 		$signals = Array ();
 		if ($signal) {
 			$signal = explode( " ", $signal );
@@ -127,7 +127,7 @@ class O_Dao_Signals {
 				if (!in_array( $s, $signals ))
 					$signals[] = $s;
 		}
-
+		
 		foreach (self::$listeners as $e => &$listeners_ev) {
 			if ($event && $e != $event)
 				continue;

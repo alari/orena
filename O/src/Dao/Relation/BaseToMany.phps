@@ -9,6 +9,7 @@
  * @author Dmitry Kourinski
  */
 abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countable {
+
 	/**
 	 * Removes linked object from relation.
 	 *

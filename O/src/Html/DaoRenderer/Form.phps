@@ -253,6 +253,9 @@ class O_Html_DaoRenderer_Form {
 			return;
 		}
 		
+		if (!is_callable( $callback ))
+			throw new Exception( "Worng field renderer callback: $callback." );
+		
 		call_user_func_array( $callback, 
 				array ($this->record, $this->class, $fieldName, $title, $subparams, $errorMessage, $this->isAjax, 
 						$this->layout) );

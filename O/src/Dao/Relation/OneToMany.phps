@@ -29,7 +29,7 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 		$this->baseId = $baseId;
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
-
+		
 		$tbl = O_Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->test( $tbl . "." . $targetField, $baseId );
 	}
@@ -42,7 +42,7 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new O_Dao_Query( $this->targetClass );
-		return $q->test( O_Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField,
+		return $q->test( O_Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, 
 				$this->baseId );
 	}
 
@@ -70,16 +70,16 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 			return false;
 		if (!$this->offsetExists( $object->id ))
 			return false;
-
+		
 		$object->setField( $this->targetField, 0 );
-
+		
 		if ($delete)
 			$object->delete();
 		else
 			$object->save();
-
+		
 		$this->reload();
-
+		
 		return true;
 	}
 

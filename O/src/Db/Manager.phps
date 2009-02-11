@@ -10,15 +10,19 @@ class O_Db_Manager {
 	/**
 	 * Creates a new connection to database server
 	 *
-	 * @param array $conf engine, host, database, user, pass, port
+	 * @param array $conf engine, host, database, user, password, port
 	 * @param int $conn_id 1 is default connection
 	 * @see PDO::__construct()
 	 */
 	static public function connect( Array $conf, $conn_id = 1 )
 	{
-		return self::$connections[ $conn_id ] = new PDO(
-				$conf[ "engine" ] . ":host=" . $conf[ "host" ] . ";port=" . $conf[ "port" ] . ";dbname=" . $conf[ "dbname" ],
-				$conf[ "user" ], $conf[ "password" ] );
+		$dsn = $conf[ "engine" ] . ":";
+		$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
+		$pass = isset( $conf[ "password" ] ) ? $conf[ "password" ] : "";
+		foreach ($conf as $k => $v)
+			if ($k != "engine" && $k != "user" && $k != "password")
+				$dsn .= $k . '=' . $v . ';';
+		return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
 	}
 
 	/**

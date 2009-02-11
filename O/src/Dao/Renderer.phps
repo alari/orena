@@ -52,14 +52,14 @@ class O_Dao_Renderer {
 	 * @param string $formTitle
 	 * @see O_Html_DaoRenderer_Form
 	 */
-	static public function create( $class, $action, O_Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
+	static public function create( $class, $action, O_Html_Layout $layout = null, $errorsArray = Array(), $formTitle = "", $isAjax = false )
 	{
 		$renderer = new O_Html_DaoRenderer_Form( $action, $layout );
 		$renderer->setActiveRecordClass( $class );
 		if ($formTitle)
 			$renderer->setTitle( $formTitle );
 		$renderer->setAjaxMode( $isAjax );
-		$renderer->setErrorsArray( $errorsArray );
+		$renderer->setErrorsArray( (array)$errorsArray );
 		$renderer->display();
 	}
 
@@ -74,14 +74,14 @@ class O_Dao_Renderer {
 	 * @param string $formTitle
 	 * @see O_Html_DaoRenderer_Form
 	 */
-	static public function edit( O_Dao_ActiveRecord $record, $action, O_Html_Layout $layout = null, $isAjax = false, Array $errorsArray = Array(), $formTitle = "" )
+	static public function edit( O_Dao_ActiveRecord $record, $action, O_Html_Layout $layout = null, $errorsArray = Array(), $formTitle = "", $isAjax = false )
 	{
 		$renderer = new O_Html_DaoRenderer_Form( $action, $layout );
 		$renderer->setActiveRecord( $record );
 		if ($formTitle)
 			$renderer->setTitle( $formTitle );
 		$renderer->setAjaxMode( $isAjax );
-		$renderer->setErrorsArray( $errorsArray );
+		$renderer->setErrorsArray( (array)$errorsArray );
 		$renderer->display();
 	}
 }

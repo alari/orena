@@ -23,7 +23,8 @@ class O_ClassManager {
 	 */
 	static public function registerPrefix( $prefix, $source_folder, $extension = self::DEFAULT_EXTENSION )
 	{
-		if($source_folder[strlen($source_folder)-1] != "/") $source_folder.="/";
+		if ($source_folder[ strlen( $source_folder ) - 1 ] != "/")
+			$source_folder .= "/";
 		O_Registry::set( "app/classmanager/prefix/$prefix/folder", $source_folder );
 		O_Registry::set( "app/classmanager/prefix/$prefix/ext", $extension );
 	}
@@ -38,21 +39,21 @@ class O_ClassManager {
 		$file = "";
 		foreach (O_Registry::get( "app/classmanager/prefix" ) as $prefix => $params) {
 			if (strpos( $class, $prefix ) === 0) {
-				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'),
+				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'), 
 						substr( $class, strlen( $prefix ) + 1 ) ) . "." . $params[ "ext" ];
 				break;
 			}
 		}
-		if(!$file) {
-			$file = str_replace(array ('\\', '_'), array ('/', '/'), $class).".".self::DEFAULT_EXTENSION;
+		if (!$file) {
+			$file = str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
 		if (is_readable( $file )) {
 			include_once $file;
-			O_Registry::set("app/classmanager/loaded/$class", $file);
+			O_Registry::set( "app/classmanager/loaded/$class", $file );
 		}
 	}
 }
 
 // Register autoloader and Orena Framework source files
 spl_autoload_register( "O_ClassManager::load" );
-O_ClassManager::registerPrefix("O", dirname(__FILE__), "phps");
+O_ClassManager::registerPrefix( "O", dirname( __FILE__ ), "phps" );

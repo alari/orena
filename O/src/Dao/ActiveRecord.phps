@@ -19,7 +19,7 @@
  *
  * @author Dmitry Kourinski
  */
-abstract class O_Dao_ActiveRecord {
+abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	/**
 	 * All O_Dao_ActiveRecord objects loaded during current HTTP request.
 	 *
@@ -33,7 +33,7 @@ abstract class O_Dao_ActiveRecord {
 	 * @var Array
 	 */
 	private static $injected_methods = Array ();
-
+	
 	/**
 	 * Array of SQL field values of a database record
 	 *
@@ -72,8 +72,8 @@ abstract class O_Dao_ActiveRecord {
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
 		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
-					$this, $this->fields[ "id" ] );
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), 
+					$class, $this, $this->fields[ "id" ] );
 		}
 	}
 
@@ -89,12 +89,12 @@ abstract class O_Dao_ActiveRecord {
 			return $this->fields[ "id" ];
 		if (strpos( $name, "." )) {
 			list ($name, $subreq) = explode( ".", $name, 2 );
-			return $this->getFieldInfo( $name )->getMappedQuery( $this,
+			return $this->getFieldInfo( $name )->getMappedQuery( $this, 
 					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
-
-		return $this->getFieldInfo( $name )->getValue( $this,
-				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null,
+		
+		return $this->getFieldInfo( $name )->getValue( $this, 
+				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, 
 				array_key_exists( $name, $this->fields ) );
 	}
 
@@ -108,7 +108,7 @@ abstract class O_Dao_ActiveRecord {
 	{
 		if ($name == "id")
 			return;
-
+		
 		$this->getFieldInfo( $name )->setValue( $this, $value, array_key_exists( $name, $this->fields ) );
 	}
 
@@ -135,7 +135,7 @@ abstract class O_Dao_ActiveRecord {
 	{
 		$query = new O_Dao_Query( $this );
 		if ($query->test( "id", $this->fields[ "id" ] )->field( $name, $value, true )->update()) {
-			$this->fields[ $name ] = $query->clearFields()->field($name)->select()->fetch(PDO::FETCH_OBJ)->$name;
+			$this->fields[ $name ] = $query->clearFields()->field( $name )->select()->fetch( PDO::FETCH_OBJ )->$name;
 			return true;
 		}
 		return false;
@@ -152,7 +152,7 @@ abstract class O_Dao_ActiveRecord {
 		$fieldInfo = O_Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new Exception( "Unknown field: $name." );
-
+		
 		return $fieldInfo;
 	}
 
@@ -165,21 +165,21 @@ abstract class O_Dao_ActiveRecord {
 	{
 		if (!count( $this->changed ))
 			return true;
-
+		
 		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
-
+		
 		foreach ($this->changed as $name => $value) {
 			$query->field( $name, $value );
 		}
-
+		
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
 				$this->fields[ $name ] = $value;
 			$this->changed = array ();
 			return true;
 		}
-
+		
 		return false;
 	}
 
@@ -211,7 +211,7 @@ abstract class O_Dao_ActiveRecord {
 	{
 		if (isset( self::$objs[ $class ][ $id ] ))
 			return self::$objs[ $class ][ $id ];
-
+		
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new O_Dao_Query( $class );
@@ -233,14 +233,14 @@ abstract class O_Dao_ActiveRecord {
 		$fields = O_Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
 			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
-
+		
 		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
-
+		
 		$class = get_class( $this );
 		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_DELETE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class,
-					$this, $this->fields[ "id" ] );
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_DELETE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), 
+					$class, $this, $this->fields[ "id" ] );
 		}
 	}
 
@@ -304,6 +304,68 @@ abstract class O_Dao_ActiveRecord {
 			return call_user_func_array( self::$injected_methods[ get_class( $this ) ][ $name ], $arguments );
 		}
 		return "";
+	}
+
+	/**
+	 * Shows ActiveRecord as HTML via O_Dao_Renderer
+	 *
+	 * @param O_Html_Layout $layout
+	 * @see O_Dao_Renderer::show()
+	 */
+	public function show( O_Html_Layout $layout = null )
+	{
+		O_Dao_Renderer::show( $this, $layout );
+	}
+
+	/**
+	 * Checks if a field exists
+	 *
+	 * @param string $offset
+	 * @return bool
+	 * @access private
+	 */
+	public function offsetExists( $offset )
+	{
+		return isset( $this->fields[ $offset ] );
+	}
+
+	/**
+	 * Returns as-is value of the sql field
+	 *
+	 * @param string $offset
+	 * @return string|int
+	 * @access private
+	 */
+	public function offsetGet( $offset )
+	{
+		if (!$this->offsetExists( $offset ))
+			return false;
+		return $this->fields[ $offset ];
+	}
+
+	/**
+	 * Does nothing
+	 *
+	 * @param string $offset
+	 * @param mixed $value
+	 * @throws Exception
+	 * @access private
+	 */
+	public function offsetSet( $offset, $value )
+	{
+		throw new Exception( "Cannot assign a value to ActiveRecord sql-field directly." );
+	}
+
+	/**
+	 * Does nothing
+	 *
+	 * @param string $offset
+	 * @throws Exception
+	 * @access private
+	 */
+	public function offsetUnset( $offset )
+	{
+		throw new Exception( "Cannot unset value of an ActiveRecord sql-field." );
 	}
 
 }

@@ -121,8 +121,8 @@ class Test_Cases_DaoSignals extends PHPUnit_Framework_TestCase {
 		O_Dao_Signals::unbind( __CLASS__ . "::listener_ec" );
 		$expected = Array (__CLASS__ . "::listener");
 		
-		$this->assertEquals( $expected, O_Dao_Signals::getListeners( O_Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ), 
-				"By event" );
+		$this->assertEquals( $expected, 
+				O_Dao_Signals::getListeners( O_Dao_Signals::EVENT_SET, null, "Test_Models_Sub" ), "By event" );
 		
 		O_Dao_Signals::unbind( null, O_Dao_Signals::EVENT_SET );
 		$expected = Array (__CLASS__ . "::listener", __CLASS__ . "::listener_signal");
