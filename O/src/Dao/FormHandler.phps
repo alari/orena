@@ -5,6 +5,11 @@
  * @see O_Dao_Renderer::edit()
  * @see O_Dao_Renderer::create()
  *
+ * Calls $class::check_$fieldName callbacks with new value as a first argument,
+ * current -- as second (default is null). If method throws
+ * @see O_Dao_Exceptions_FieldCheck
+ * exception, it's message will be displayed as a field error.
+ *
  * @author Dmitry Kourinski
  */
 class O_Dao_FormHandler {
@@ -43,10 +48,10 @@ class O_Dao_FormHandler {
 	static public function process( $class, $create = null )
 	{
 		if ($create === null) {
-			$create = O_Registry::get( "app/env/request/params/id" ) ? false : true;
+			$create = O_Registry::get( "app/env/params/id" ) ? false : true;
 		}
 		if (!$create) {
-			$record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/request/params/id" ), $class );
+			$record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $class );
 			if (!$record instanceof $class)
 				throw new Exception( "Record not found" );
 		}
@@ -54,7 +59,8 @@ class O_Dao_FormHandler {
 		$errorsArray = Array ();
 		$fieldValues = Array ();
 		foreach ($tableInfo->getFields() as $fieldName => $fieldInfo) {
-			self::handleField( $class, $fieldName, $fieldInfo, $errorsArray, $fieldValues );
+			$currentValue = isset( $record ) ? $record->$fieldName : null;
+			self::handleField( $class, $currentValue, $fieldName, $fieldInfo, $errorsArray, $fieldValues );
 		}
 		// If there were errors, reverting object, return errors array
 		if (count( $errorsArray )) {
@@ -80,16 +86,16 @@ class O_Dao_FormHandler {
 	 * @param array $errors
 	 * @param array $values
 	 */
-	static protected function handleField( $class, $fieldName, O_Dao_FieldInfo $fieldInfo, &$errors, &$values )
+	static protected function handleField( $class, $currentValue, $fieldName, O_Dao_FieldInfo $fieldInfo, &$errors, &$values )
 	{
 		if (!$fieldInfo->getParam( "edit" ))
 			return;
-		$value = O_Registry::get( "app/env/request/params/" . $fieldName );
+		$value = O_Registry::get( "app/env/params/" . $fieldName );
 		try {
 			// Calling field checker, if it's exists
 			$callback = "$class::check_" . $fieldName;
 			if (is_callable( $callback ))
-				call_user_func( $callback, $value );
+				call_user_func_array( $callback, array ($value, $currentValue) );
 		}
 		catch (O_Dao_Exceptions_FieldCheck $e) {
 			// Adding to errors array

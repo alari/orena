@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Application>
+	<Registry key="test/add" value="add1" type="add"></Registry>
+	<Registry key="test/add" value="add2" type="add"></Registry>
+	<Registry key="html/static_root" value="/Apps/Test/static/"></Registry>
+	<If mode="development">
+		<Registry key="test/if" value="mode=dev"></Registry>
+		</If>
+	<Host pattern="e(x)p">
+		<Registry key="test/host" pocket="1"></Registry></Host>
+	<Host pattern="explain">
+		<Registry key="test/host" value="error!"></Registry></Host>
+	<Url pattern="/([a-z]+)/test(/.*)?">
+		<Registry key="test/url/prefix" pocket="1"></Registry>
+		<Url pattern="/([a-z]+)/test/me(/.*)?">
+			<Command name="TestMe"></Command>
+			<Registry key="test/me" pocket="2"></Registry>
+		</Url><Command name="TestCore"></Command></Url></Application>

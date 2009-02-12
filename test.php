@@ -1,10 +1,12 @@
 <?php
-require_once './O/src/ClassManager.phps';
+require_once './O/src/EntryPoint.phps';
+
+O_EntryPoint::prepareEnvironment();
+O_EntryPoint::processFwConfig();
+//exit;
 
 O_ClassManager::registerPrefix("Test", "./Test");
 O_ClassManager::registerPrefix("PHPUnit", "./PHPUnit");
-
-O_Registry::set( "fw/html/static_root", "./O/static/" );
 
 O_Db_Manager::connect(array(
 	"host"=>"localhost",

@@ -4,8 +4,8 @@ require_once 'Registry.phps';
 /**
  * Handles class autoloading, implements "selection is initialization" paradigm.
  *
- * Class manager stores information about class paths and extensions in "app/classmanager/prefix" registry key,
- * loaded classes can be found in "app/classmanager/loaded" key.
+ * Class manager stores information about class paths and extensions in "fw/classmanager/prefix" registry key,
+ * loaded classes can be found in "fw/classmanager/loaded" key.
  *
  * @see O_Registry
  *
@@ -25,8 +25,8 @@ class O_ClassManager {
 	{
 		if ($source_folder[ strlen( $source_folder ) - 1 ] != "/")
 			$source_folder .= "/";
-		O_Registry::set( "app/classmanager/prefix/$prefix/folder", $source_folder );
-		O_Registry::set( "app/classmanager/prefix/$prefix/ext", $extension );
+		O_Registry::set( "fw/classmanager/prefix/$prefix/folder", $source_folder );
+		O_Registry::set( "fw/classmanager/prefix/$prefix/ext", $extension );
 	}
 
 	/**
@@ -37,9 +37,9 @@ class O_ClassManager {
 	static public function load( $class )
 	{
 		$file = "";
-		foreach (O_Registry::get( "app/classmanager/prefix" ) as $prefix => $params) {
+		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $prefix => $params) {
 			if (strpos( $class, $prefix ) === 0) {
-				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'), 
+				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'),
 						substr( $class, strlen( $prefix ) + 1 ) ) . "." . $params[ "ext" ];
 				break;
 			}
@@ -49,7 +49,7 @@ class O_ClassManager {
 		}
 		if (is_readable( $file )) {
 			include_once $file;
-			O_Registry::set( "app/classmanager/loaded/$class", $file );
+			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 		}
 	}
 }

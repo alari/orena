@@ -19,7 +19,7 @@ class Test_Templates_Main extends O_Html_Template {
 		$q->where( "intfield is not null" )->limit( 2 )->show( $this->layout() );
 
 		if($_SERVER['REQUEST_METHOD'] == "POST") {
-			O_Registry::set("app/env/request/params", $_POST);
+			O_Registry::set("app/env/params", $_POST);
 			$arr = O_Dao_FormHandler::edit("Test_Models_Core");
 		} else {
 			$arr=array("errors"=>array());

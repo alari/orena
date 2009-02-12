@@ -7,7 +7,7 @@ class O_Registry {
 	 * @var Array
 	 */
 	public static $registry = Array ();
-	
+
 	/**
 	 * Inheritance dependencies between registry keys
 	 *
@@ -34,7 +34,7 @@ class O_Registry {
 			for ($j = count( $keys ); $j > 0; $j--) {
 				$_key = join( "/", array_slice( $keys, 0, $j ) );
 				if (isset( self::$inheritance[ $_key ] )) {
-					$key = self::$inheritance[ $_key ] . ($j < count( $keys ) ? "/" . join( "/", 
+					$key = self::$inheritance[ $_key ] . ($j < count( $keys ) ? "/" . join( "/",
 							array_slice( $keys, $j ) ) : "");
 					return self::get( $key );
 				} else
@@ -98,7 +98,10 @@ class O_Registry {
 				}
 			}
 		}
-		$registry[] = $value;
+		if($add)
+			$registry[] = $value;
+		else
+			$registry = $value;
 	}
 
 	/**
