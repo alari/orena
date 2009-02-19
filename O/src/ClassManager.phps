@@ -8,6 +8,7 @@ require_once 'Registry.phps';
  * loaded classes can be found in "fw/classmanager/loaded" key.
  *
  * @see O_Registry
+ * @todo set up and document simple interface to add class prefixes by Registry config
  *
  * @author Dmitry Kourinski
  */

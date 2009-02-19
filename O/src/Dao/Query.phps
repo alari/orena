@@ -87,6 +87,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function getAll( $forceCacheReload = false )
 	{
+		// TODO: add whatever-to-one relations preloading
 		if (!$forceCacheReload && count( $this->objects ))
 			return $this->objects;
 		$r = $this->select()->fetchAll();

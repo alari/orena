@@ -154,6 +154,8 @@ class O_EntryPoint {
 	 */
 	static public function makeResponse()
 	{
+		// TODO: use plugin in classnames building
+
 		// Create O_Command and process it
 		$cmd_name = O_Registry::get( "app/command_name" );
 		$cmd_class = O_Registry::get( "app/class_prefix" ) . "_Cmd_" . $cmd_name;
@@ -226,6 +228,7 @@ class O_EntryPoint {
 				}
 			break;
 			// Sets "app/command_name" registry key, continues processing
+			// TODO: add command plugin name
 			case "Command" :
 				O_Registry::set( "app/command_name", (string)$node[ "name" ] );
 			break;
