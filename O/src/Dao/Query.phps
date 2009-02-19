@@ -39,6 +39,18 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	}
 
 	/**
+	 * Shortcut for constructor
+	 *
+	 * @param string $class
+	 * @param string $alias
+	 * @return O_Dao_Query
+	 */
+	static public function get($class, $alias=null) {
+		return new self($class, $alias);
+	}
+
+
+	/**
 	 * Sets the class and table to select objects
 	 *
 	 * @param string $class

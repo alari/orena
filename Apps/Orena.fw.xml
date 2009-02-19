@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Config>
-	<Registry key="html/static_root" value="/O/static/"></Registry></Config>
+	<Registry key="html/static_root" value="/O/static/"></Registry>
+	<Registry key="session/name" value="osid"></Registry></Config>

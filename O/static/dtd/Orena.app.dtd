@@ -1,0 +1,27 @@
+<!ENTITY % app.nodes
+        'If*, Url*, Command?, Host*, Registry*'>
+       
+	
+<!ELEMENT Url (%app.nodes;)>
+<!ATTLIST Url
+	pattern CDATA #REQUIRED>
+	
+<!ELEMENT Command (#PCDATA)>
+<!ATTLIST Command
+	name CDATA #REQUIRED>
+	
+<!ELEMENT Host (%app.nodes;)>
+<!ATTLIST Host
+	pattern CDATA #REQUIRED>
+	
+<!ELEMENT Registry (#PCDATA)>
+<!ATTLIST Registry
+	key CDATA #REQUIRED
+	value CDATA #IMPLIED
+	pocket CDATA #IMPLIED>
+        
+<!ELEMENT Application (%app.nodes;)>
+
+<!ELEMENT If (%app.nodes;)>
+<!ATTLIST If
+	mode CDATA #REQUIRED>

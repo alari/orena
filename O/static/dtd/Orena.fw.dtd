@@ -1,0 +1,6 @@
+<!ELEMENT Config (Registry+)>
+
+<!ELEMENT Registry (#PCDATA)>
+<!ATTLIST Registry
+	name CDATA #REQUIRED 
+	value CDATA #REQUIRED>

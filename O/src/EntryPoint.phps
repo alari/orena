@@ -123,6 +123,10 @@ class O_EntryPoint {
 		foreach ($xml_current as $node) {
 			self::processAppConfigPart( $node );
 		}
+
+		// Processing class uses
+		$uses = O_Registry::get("app/uses");
+		if(is_array($uses)) foreach($uses as $class) class_exists($class);
 	}
 
 	/**
@@ -174,7 +178,7 @@ class O_EntryPoint {
 		}
 
 		// Else process 404 error
-		// TODO: add logic to hendle 404 error
+		// TODO: add logic to handle 404 error
 		echo "Error 404";
 		return false;
 
