@@ -7,14 +7,16 @@ class O_Db_Manager {
 	 */
 	private static $connections = Array ();
 
+	const CONN_DEFAULT = "default";
+
 	/**
 	 * Creates a new connection to database server
 	 *
 	 * @param array $conf engine, host, database, user, password, port
-	 * @param int $conn_id 1 is default connection
+	 * @param string $conn_id CONN_DEFAULT is default connection
 	 * @see PDO::__construct()
 	 */
-	static public function connect( Array $conf, $conn_id = 1 )
+	static public function connect( Array $conf, $conn_id = self::CONN_DEFAULT )
 	{
 		$dsn = $conf[ "engine" ] . ":";
 		$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
@@ -28,11 +30,15 @@ class O_Db_Manager {
 	/**
 	 * Returns the specified connection with database
 	 *
-	 * @param int $conn_id
+	 * @param string $conn_id
 	 * @return PDO or null
 	 */
-	static public function getConnection( $conn_id = 1 )
+	static public function getConnection( $conn_id = self::CONN_DEFAULT )
 	{
+		if(!isset(self::$connections[ $conn_id ])) {
+			$conf = O_Registry::get("app/db/".$conn_id);
+			if(isset($conf["engine"])) self::connect($conf);
+		}
 		return isset( self::$connections[ $conn_id ] ) ? self::$connections[ $conn_id ] : null;
 	}
 

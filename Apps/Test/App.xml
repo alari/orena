@@ -16,4 +16,9 @@
 		<Url pattern="/([a-z]+)/test/me(/.*)?">
 			<Command name="TestMe"></Command>
 			<Registry key="test/me" pocket="2"></Registry>
-		</Url><Command name="TestCore"></Command></Url></Application>
+		</Url><Command name="TestCore"></Command></Url>
+	<Command name="Main"></Command>
+	<Registry key="dao/Test_Models_Core/plugins" type="add" value="Test_Models_CorePlugin"></Registry>
+	<Registry key="db/default/engine" value="mysql"></Registry>
+	<Registry key="db/default/host" value="localhost"></Registry>
+	<Registry key="db/default/dbname" value="Orena"></Registry></Application>
