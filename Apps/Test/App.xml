@@ -3,7 +3,7 @@
 	<Registry key="test/add" value="add1" type="add"></Registry>
 	<Registry key="test/add" value="add2" type="add"></Registry>
 	<Registry key="html/static_root" value="/Apps/Test/static/"></Registry>
-	<Registry key="-uses" type="add" value="O_Http_Session"></Registry>
+	<Registry key="uses" type="add" value="O_Http_Session"></Registry>
 	<If mode="development">
 		<Registry key="test/if" value="mode=dev"></Registry>
 		</If>

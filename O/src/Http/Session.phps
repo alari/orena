@@ -5,6 +5,8 @@
  * @field data text
  * @field started int
  * @field time int
+ * @index ses_id -unique
+ * @index time
  */
 class O_Http_Session extends O_Dao_ActiveRecord {
 
@@ -22,7 +24,7 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 		$obj = isset(self::$objs[$id]) ? self::$objs[$id] : O_Dao_Query::get(__CLASS__)->test("ses_id", $id)->getOne();
 		if(!$obj) {
 			$obj = new self;
-			$obj->ses_id = $id;
+			$obj->ses_id = $id ? $id : session_id();
 			$obj->started = time();
 			$obj->time = time();
 			$obj->save();
