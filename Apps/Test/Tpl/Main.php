@@ -5,8 +5,6 @@ class Test_Tpl_Main extends O_Html_Template {
 	{
 		$this->layoutClass = "O_Html_MainLayout";
 		$this->layout()->title = "Orena Framework Test Suite Running";
-
-		O_ClassManager::registerPrefix("PHPUnit", "./PHPUnit");
 	}
 
 	public function displayContents()
