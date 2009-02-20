@@ -31,6 +31,7 @@ class O_Html_DaoRenderer_Show {
 	private $record;
 	/**
 	 * Mode of display -- "loop" or "show"
+	 * TODO: add ability to use other words as suffixes for "-show-" key
 	 *
 	 * @var string
 	 */
@@ -56,7 +57,7 @@ class O_Html_DaoRenderer_Show {
 	 */
 	public function display()
 	{
-		// TODO: add usable classes for renderer
+		// TODO: add usable classes for renderer, store them in "fw/renderer" registry key
 		$tableInfo = O_Dao_TableInfo::get( get_class( $this->record ) );
 		?>
 <div class="oo-renderer">
@@ -79,16 +80,16 @@ class O_Html_DaoRenderer_Show {
 	{
 		$fieldInfo = O_Dao_TableInfo::get( $this->record )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( $this->mode );
-		
+
 		if (!$param)
 			return;
-		
+
 		$title = $fieldInfo->getParam( "title" );
 		if (!$title)
 			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-		
+
 		$subparams = "";
-		
+
 		if ($param === 1) {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic()) {
@@ -101,14 +102,14 @@ class O_Html_DaoRenderer_Show {
 				$callback = "simple";
 			}
 		} else {
-			
+
 			if (strpos( $param, " " )) {
 				list ($callback, $subparams) = explode( " ", $param, 2 );
 			} else {
 				$callback = $param;
 			}
 		}
-		
+
 		if (!strpos( $callback, "::" )) {
 			$callback = "shower" . ucfirst( $callback );
 			if (!method_exists( $this, $callback ))
@@ -116,7 +117,7 @@ class O_Html_DaoRenderer_Show {
 			$this->$callback( $fieldValue, $title, $subparams );
 			return;
 		}
-		
+
 		call_user_func_array( $callback, array ($this->record, $fieldName, $title, $subparams, $this->layout) );
 	}
 

@@ -9,6 +9,7 @@ require_once 'Registry.phps';
  *
  * @see O_Registry
  * @todo set up and document simple interface to add class prefixes by Registry config
+ * @todo realize "selection is initialization" paradigm
  *
  * @author Dmitry Kourinski
  */

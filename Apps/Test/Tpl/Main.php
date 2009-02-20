@@ -29,10 +29,6 @@ class Test_Tpl_Main extends O_Html_Template {
 
 		O_Dao_Renderer::edit(O_Dao_ActiveRecord::getById( 59, "Test_Models_Core" ), "/test.php", $this->layout(), @$arr["errors"], "Edit it");
 
-		echo "<pre>";
-		print_r(O_Registry::get("app"));
-		echo "</pre>";
-
 		if(!isset($_SESSION["my_test"])) {
 			$_SESSION["my_test"] = 1;
 		}

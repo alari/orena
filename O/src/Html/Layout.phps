@@ -7,14 +7,14 @@ class O_Html_Layout {
 	 * @var O_Html_Template
 	 */
 	protected $tpl;
-	
+
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-	
+
 	/**
 	 * Array of metatags
 	 *
@@ -57,7 +57,7 @@ class O_Html_Layout {
 	 * @var Array
 	 */
 	protected $headLinks = Array ();
-	
+
 	/**
 	 * HTTP response code
 	 *
@@ -90,6 +90,11 @@ class O_Html_Layout {
 		Header( "HTTP/1.1 " . $this->responseCode . " " . $this->responseMessage );
 		if ($this->contentType)
 			Header( "Content-type: " . $this->contentType );
+
+		// TODO find the way to avoid output bufferization
+		ob_start();
+		$this->displayBody();
+		$body = ob_get_clean();
 		?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -99,7 +104,7 @@ class O_Html_Layout {
 	</head>
 <body>
 		<?
-		$this->displayBody()?>
+		echo $body;?>
 	</body>
 </html>
 <?
@@ -239,11 +244,13 @@ class O_Html_Layout {
 	 * Returns full URL to static file
 	 *
 	 * @param string $url
+	 * @param bool $fw If set to true, framework static root is used
+	 * @return string
 	 */
-	public function staticUrl( $url )
+	public function staticUrl( $url, $fw=false )
 	{
 		if ($url[ 0 ] != "/" && $url[ 0 ] != "." && strpos( $url, "http://" ) !== 0)
-			return O_Registry::get( "app/html/static_root" ) . $url;
+			return O_Registry::get( ($fw?"fw":"app")."/html/static_root" ) . $url;
 		return $url;
 	}
 

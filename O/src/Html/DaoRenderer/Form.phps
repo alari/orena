@@ -168,9 +168,9 @@ class O_Html_DaoRenderer_Form {
 		$ref = new ReflectionClass( $this->class );
 		if (!$ref->isSubclassOf( "O_Dao_ActiveRecord" ))
 			throw new Exception( "Cannot render classes that are not subclasses of O_Dao_ActiveRecord." );
-		
+
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
-		
+
 		// TODO: add ajax support after choosing JS framework
 		?>
 <form method="POST" enctype="application/x-www-form-urlencoded"
@@ -180,11 +180,11 @@ class O_Html_DaoRenderer_Form {
 		if ($this->formTitle) {
 			?><legend><?=$this->formTitle?></legend><?
 		}
-		
+
 		foreach (array_keys( $tableInfo->getFields() ) as $fieldName) {
 			$this->displayField( $fieldName, $this->record ? $this->record->$fieldName : null );
 		}
-		
+
 		if ($this->record) {
 			?>
 
@@ -218,14 +218,14 @@ class O_Html_DaoRenderer_Form {
 	{
 		$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
 		$param = $fieldInfo->getParam( "edit" );
-		
+
 		if (!$param)
 			return;
-		
+
 		$title = $fieldInfo->getParam( "title" );
 		if (!$title)
 			$title = ucfirst( str_replace( "_", " ", $fieldName ) );
-		
+
 		if ($param === 1) {
 			// Auto-generate renderer by field type
 			if (!$fieldInfo->isAtomic())
@@ -234,7 +234,7 @@ class O_Html_DaoRenderer_Form {
 			// TODO: add logic to autogenerate callback for atomic fields
 			return;
 		} else {
-			
+
 			$subparams = "";
 			if (strpos( $param, " " )) {
 				list ($callback, $subparams) = explode( " ", $param, 2 );
@@ -242,9 +242,9 @@ class O_Html_DaoRenderer_Form {
 				$callback = $param;
 			}
 		}
-		
+
 		$errorMessage = isset( $this->errorsArray[ $fieldName ] ) ? $this->errorsArray[ $fieldName ] : null;
-		
+
 		if (!strpos( $callback, "::" )) {
 			$callback = "editor" . ucfirst( $callback );
 			if (!method_exists( $this, $callback ))
@@ -252,12 +252,12 @@ class O_Html_DaoRenderer_Form {
 			$this->$callback( $fieldName, $fieldValue, $title, $subparams, $errorMessage );
 			return;
 		}
-		
+
 		if (!is_callable( $callback ))
 			throw new Exception( "Worng field renderer callback: $callback." );
-		
-		call_user_func_array( $callback, 
-				array ($this->record, $this->class, $fieldName, $title, $subparams, $errorMessage, $this->isAjax, 
+
+		call_user_func_array( $callback,
+				array ($this->record, $this->class, $fieldName, $title, $subparams, $errorMessage, $this->isAjax,
 						$this->layout) );
 	}
 
@@ -319,13 +319,17 @@ class O_Html_DaoRenderer_Form {
 	private function editorWysiwyg( $fieldName, $fieldValue, $title, $subparams, $errorMessage )
 	{
 		if ($this->layout) {
-			$this->layout->addJavaScriptSrc( O_Registry::get( "fw/html/static_root" ) . "fckeditor/fckeditor.js" );
-			// TODO: add wysiwyg initiator after choosing JS framework
+			$this->layout->addJavaScriptSrc( $this->layout->staticUrl("fckeditor/fckeditor.js",1) );
+			O_Js_Middleware::getFramework()->addDomreadyCode("
+var oFCKeditor = new FCKeditor( 'oo-r-w-$fieldName' );
+oFCKeditor.BasePath = '".$this->layout->staticUrl('fckeditor/',1)."';
+oFCKeditor.ToolbarSet = 'Basic';
+oFCKeditor.ReplaceTextarea();", $this->layout);
 		}
 		?>
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
-<?=$title?>:</div>
+<?=$title?>:</div>!
 <?
 		if ($errorMessage) {
 			?>
