@@ -17,7 +17,7 @@
  * However, most users will only need to interface with the HTMLPurifier
  * and HTMLPurifier_Config.
  */
-
+require_once 'HTMLPurifier/Bootstrap.php';
 /*
     HTML Purifier 3.3.0 - Standards Compliant HTML Filtering
     Copyright (C) 2006-2008 Edward Z. Yang

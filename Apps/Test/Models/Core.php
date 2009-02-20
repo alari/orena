@@ -3,7 +3,8 @@
  * @table core_model -signal
  * @field textfield text -edit wysiwyg \
  * 		-title Текстовое поле -signal test \
- * 		-show area
+ * 		-show area \
+ * 		-check htmlPurifier
  * @field intfield int -signal -show simple -loop simple
  * @field subs -owns many Test_Models_Sub -inverse core
  * @field manysubs -owns many Test_Models_Sub -inverse cores

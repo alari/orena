@@ -88,12 +88,36 @@ class O_Dao_FormHandler {
 	 */
 	static protected function handleField( $class, $currentValue, $fieldName, O_Dao_FieldInfo $fieldInfo, &$errors, &$values )
 	{
-		if (!$fieldInfo->getParam( "edit" ))
+		$editParam =$fieldInfo->getParam( "edit" );
+		if (!$editParam)
 			return;
+
 		$value = O_Registry::get( "app/env/params/" . $fieldName );
+
+		// Relations are sent as ID's
+		if($fieldInfo->isRelationOne()) {
+			$value = O_Dao_ActiveRecord::getById($value, $fieldInfo->getRelationTarget());
+		}
+		if($fieldInfo->isRelationMany()) {
+			if(!is_array($value)) {
+				$errors[$fieldName] = "Error with relation.";
+				return;
+			}
+			$tmp = array();
+			foreach($value as $v) {
+				$tmp[$v] = O_Dao_ActiveRecord::getById($v, $fieldInfo->getRelationTarget());
+			}
+			$value = $tmp[$v];
+		}
+
 		try {
+			if($fieldInfo->getParam("check")) {
+				$callback = $fieldInfo->getParam("check");
+				if(!strpos($callback, "::")) $callback = __CLASS__."::check_".$callback;
+			} else {
+				$callback = $class."::check_" . $fieldName;
+			}
 			// Calling field checker, if it's exists
-			$callback = "$class::check_" . $fieldName;
 			if (is_callable( $callback ))
 				call_user_func_array( $callback, array ($value, $currentValue) );
 		}
@@ -102,7 +126,19 @@ class O_Dao_FormHandler {
 			$errors[ $fieldName ] = $e->getMessage();
 			return;
 		}
+		$editParam = explode(" ", $editParam, 2);
+
 		$values[ $fieldName ] = $value;
 	}
 
+	/**
+	 * Built-in value-checker for wysiwyg-like htmls
+	 *
+	 * @param string $value
+	 * @return string
+	 */
+	static public function check_htmlPurifier(&$value) {
+		$purifier = new HTMLPurifier;
+		$value = $purifier->purify($value);
+	}
 }
