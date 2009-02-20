@@ -5,6 +5,7 @@
  * @copyright Dmitry Kourinski
  */
 interface O_Js_iFramework {
+
 	/**
 	 * Adds JS code to be executed when DOM is ready
 	 *
@@ -12,6 +13,6 @@ interface O_Js_iFramework {
 	 * @param O_Html_Layout $layout
 	 * @return string If layout is given, code is added in its head
 	 */
-	public function addDomreadyCode($code, O_Html_Layout $layout=null);
+	public function addDomreadyCode( $code, O_Html_Layout $layout = null );
 
 }

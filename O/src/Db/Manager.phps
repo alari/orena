@@ -6,7 +6,7 @@ class O_Db_Manager {
 	 * @var PDO
 	 */
 	private static $connections = Array ();
-
+	
 	const CONN_DEFAULT = "default";
 
 	/**
@@ -35,9 +35,10 @@ class O_Db_Manager {
 	 */
 	static public function getConnection( $conn_id = self::CONN_DEFAULT )
 	{
-		if(!isset(self::$connections[ $conn_id ])) {
-			$conf = O_Registry::get("app/db/".$conn_id);
-			if(isset($conf["engine"])) self::connect($conf);
+		if (!isset( self::$connections[ $conn_id ] )) {
+			$conf = O_Registry::get( "app/db/" . $conn_id );
+			if (isset( $conf[ "engine" ] ))
+				self::connect( $conf );
 		}
 		return isset( self::$connections[ $conn_id ] ) ? self::$connections[ $conn_id ] : null;
 	}

@@ -18,7 +18,7 @@
  * @index time
  */
 class O_Http_Session extends O_Dao_ActiveRecord {
-
+	
 	/**
 	 * Cached objects with session ID as array keys
 	 *
@@ -126,8 +126,8 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 }
 
 // Set framework session class as sessions handler
-session_set_save_handler( Array ("O_Http_Session", "open"), Array ("O_Http_Session", "close"),
-		Array ("O_Http_Session", "read"), Array ("O_Http_Session", "write"), Array ("O_Http_Session", "destroy"),
+session_set_save_handler( Array ("O_Http_Session", "open"), Array ("O_Http_Session", "close"), 
+		Array ("O_Http_Session", "read"), Array ("O_Http_Session", "write"), Array ("O_Http_Session", "destroy"), 
 		Array ("O_Http_Session", "gc") );
 // Set special session name
 session_name( O_Registry::get( "app/session/name" ) );

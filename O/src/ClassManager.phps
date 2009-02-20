@@ -41,7 +41,7 @@ class O_ClassManager {
 		$file = "";
 		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $prefix => $params) {
 			if (strpos( $class, $prefix ) === 0) {
-				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'),
+				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'), 
 						substr( $class, strlen( $prefix ) + 1 ) ) . "." . $params[ "ext" ];
 				break;
 			}
@@ -50,7 +50,7 @@ class O_ClassManager {
 			$file = str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
 		if ($f = @fopen( $file, "r", true )) {
-			fclose($f);
+			fclose( $f );
 			include_once $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 		}
@@ -60,4 +60,4 @@ class O_ClassManager {
 // Register autoloader and Orena Framework source files
 spl_autoload_register( "O_ClassManager::load" );
 O_ClassManager::registerPrefix( "O", dirname( __FILE__ ), "phps" );
-set_include_path(dirname(__FILE__)."/../inc".PATH_SEPARATOR.get_include_path());
+set_include_path( dirname( __FILE__ ) . "/../inc" . PATH_SEPARATOR . get_include_path() );
