@@ -314,9 +314,9 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 * @param O_Html_Layout $layout
 	 * @see O_Dao_Renderer::show()
 	 */
-	public function show( O_Html_Layout $layout = null )
+	public function show( O_Html_Layout $layout = null, $type = O_Dao_Renderer::TYPE_DEF )
 	{
-		O_Dao_Renderer::show( $this, $layout );
+		O_Dao_Renderer::show( $this, $layout, $type );
 	}
 
 	/**

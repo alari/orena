@@ -6,19 +6,25 @@
 	<Registry key="uses" type="add" value="O_Http_Session"></Registry>
 	<If mode="development">
 		<Registry key="test/if" value="mode=dev"></Registry>
-		</If>
+	</If>
 	<Host pattern="e(x)p">
-		<Registry key="test/host" pocket="1"></Registry></Host>
+		<Registry key="test/host" pocket="1"></Registry>
+	</Host>
 	<Host pattern="explain">
-		<Registry key="test/host" value="error!"></Registry></Host>
+		<Registry key="test/host" value="error!"></Registry>
+	</Host>
 	<Url pattern="/([a-z]+)/test(/.*)?">
 		<Registry key="test/url/prefix" pocket="1"></Registry>
 		<Url pattern="/([a-z]+)/test/me(/.*)?">
 			<Command name="TestMe"></Command>
 			<Registry key="test/me" pocket="2"></Registry>
-		</Url><Command name="TestCore"></Command></Url>
+		</Url>
+		<Command name="TestCore"></Command>
+	</Url>
 	<Command name="Main"></Command>
-	<Registry key="dao/Test_Models_Core/plugins" type="add" value="Test_Models_CorePlugin"></Registry>
+	<Registry key="dao/Test_Models_Core/plugins" type="add"
+		value="Test_Models_CorePlugin"></Registry>
 	<Registry key="db/default/engine" value="mysql"></Registry>
 	<Registry key="db/default/host" value="localhost"></Registry>
-	<Registry key="db/default/dbname" value="Orena"></Registry></Application>
+	<Registry key="db/default/dbname" value="Orena"></Registry>
+</Application>

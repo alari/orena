@@ -103,9 +103,9 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 * @param O_Html_Layout $layout
 	 * @see O_Dao_Renderer::showLoop()
 	 */
-	public function show( O_Html_Layout $layout = null )
+	public function show( O_Html_Layout $layout = null, $type = O_Dao_Renderer::TYPE_LOOP )
 	{
-		O_Dao_Renderer::showLoop( $this, $layout );
+		O_Dao_Renderer::showLoop( $this, $layout, $type );
 	}
 
 	/**

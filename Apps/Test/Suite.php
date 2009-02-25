@@ -11,17 +11,17 @@ class Test_Suite extends PHPUnit_Framework_TestSuite {
 	public function __construct()
 	{
 		$this->setName( 'Test_Suite' );
-
+		
 		$this->addTestSuite( 'Test_Cases_DaoObject' );
-
+		
 		$this->addTestSuite( 'Test_Cases_DbManager' );
-
+		
 		$this->addTestSuite( 'Test_Cases_DaoTableInfo' );
-
+		
 		$this->addTestSuite( 'Test_Cases_DaoSignals' );
-
+		
 		$this->addTestSuite( 'Test_Cases_Registry' );
-
+	
 	}
 
 	/**
