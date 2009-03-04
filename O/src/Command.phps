@@ -8,7 +8,7 @@ abstract class O_Command {
 		}
 		catch (Exception $e) {
 			// TODO: add correct errors middleware
-			echo "Command error / ", $e;
+			echo "Command error<br/><pre>", $e, "</pre>";
 			return;
 		}
 		if ($result instanceof O_Http_Response) {
@@ -40,9 +40,16 @@ abstract class O_Command {
 		return O_Registry::get( "app/env/request/params" );
 	}
 
+	/**
+	 * Finds and returns template for current command
+	 *
+	 * @param string $tpl
+	 * @return O_Html_Template
+	 * @throws Exception
+	 */
 	public function getTemplate( $tpl = null )
 	{
-		preg_match( "#([_a-z]+_)Cmd(_[_a-z])#i", get_class( $this ), $matches );
+		preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches );
 		$class = $matches[ 1 ] . "Tpl" . ($tpl ? $tpl : $matches[ 2 ]);
 		if (!class_exists( $class ))
 			throw new Exception( "Cannot find template class for current command." );

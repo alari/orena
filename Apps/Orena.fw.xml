@@ -2,4 +2,6 @@
 <Config>
 	<Registry key="html/static_root" value="/O/static/"></Registry>
 	<Registry key="session/name" value="osid"></Registry>
-	<Registry key="js/framework" value="Mootools"></Registry></Config>
+	<Registry key="js/framework" value="Mootools"></Registry>
+	<Registry key="js/fckeditor/config_path" value="/O/static/fckcustom.js"></Registry>
+	<Registry key="js/fckeditor/toolbar_set" value="Sample"></Registry></Config>

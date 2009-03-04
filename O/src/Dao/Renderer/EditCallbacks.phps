@@ -2,9 +2,23 @@
 
 class O_Dao_Renderer_EditCallbacks {
 
-	static public function simple( $fieldValue, $fieldTitle, $params, $error )
+	static public function simple( $fieldName, $fieldValue, $title, $params, $layout, $error )
 	{
-		echo $value;
+?>
+<div class="oo-renderer-field">
+<div class="oo-renderer-title">
+<?=$title?>:</div>
+<?
+		if ($error) {
+			?>
+<div class="oo-renderer-error">
+<?=$error?>
+</div>
+<?
+		}
+		?>
+<input type="text" name="<?=$fieldName?>" value="<?=htmlspecialchars($fieldValue)?>"/></div>
+<?
 	}
 
 	/**
@@ -18,12 +32,17 @@ class O_Dao_Renderer_EditCallbacks {
 	{
 		if ($layout) {
 			$layout->addJavaScriptSrc( $layout->staticUrl( "fckeditor/fckeditor.js", 1 ) );
-			O_Js_Middleware::getFramework()->addDomreadyCode( 
+			// TODO add additional config file, get toolbar from params with somethink as the default
+			//
+			$customConfig = O_Registry::get("app/js/fckeditor/config_path");
+			$toolbarSet = O_Registry::get("app/js/fckeditor/toolbar_set");
+			O_Js_Middleware::getFramework()->addDomreadyCode(
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-$fieldName' );
-oFCKeditor.BasePath = '" . $layout->staticUrl( 'fckeditor/', 1 ) . "';
-oFCKeditor.ToolbarSet = 'Basic';
-oFCKeditor.ReplaceTextarea();", $layout );
+oFCKeditor.BasePath = '" . $layout->staticUrl( 'fckeditor/', 1 ) . "';"
+.($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "'.$customConfig.'";' :"")
+.($toolbarSet ? "oFCKeditor.ToolbarSet = '".$toolbarSet."';" : "")
+."oFCKeditor.ReplaceTextarea();", $layout );
 		}
 		?>
 <div class="oo-renderer-field">
@@ -54,4 +73,29 @@ oFCKeditor.ReplaceTextarea();", $layout );
 	{
 		echo '<div id="oo-renderer-area">', htmlspecialchars( $fieldValue ), "</div>";
 	}
+
+	static public function selectRelation($fieldName, $fieldValue, $title, $params, $layout, $error) {
+		$displayField = $params["displayField"];
+		$size = 1;
+		$multiply = $params["multiply"];
+		if($multiply) $size = 3;
+	?>
+<div class="oo-renderer-field">
+<div class="oo-renderer-title">
+<?=$title?>:</div>
+<?
+		if ($error) {
+			?>
+<div class="oo-renderer-error">
+<?=$error?>
+</div>
+<?
+		}
+		?>
+<select class="oo-renderer-selectRelation" name="<?=($fieldName.($multiply?"[]":""))?>" size="<?=$size?>">
+<?foreach($params["query"] as $obj){?><option value="<?=$obj->id?>"><?=$obj->$displayField?></option><?}?>
+</select></div>
+<?
+	}
+
 }

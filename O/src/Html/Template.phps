@@ -58,4 +58,24 @@ abstract class O_Html_Template {
 		}
 	}
 
+	/**
+	 * Returns command url
+	 *
+	 * @param string $url
+	 * @return string
+	 */
+	public function url($url) {
+		return $this->layout()->url($url);
+	}
+
+	/**
+	 * Returns url to static file
+	 *
+	 * @param string $url
+	 * @param bool $fw
+	 * @return string
+	 */
+	public function staticUrl($url, $fw=false) {
+		return $this->layout()->staticUrl($url, $fw);
+	}
 }

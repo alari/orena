@@ -32,20 +32,20 @@ class O_EntryPoint {
 	static public function processRequest()
 	{
 		// TODO: add try-catch envelop for all this
-		
+
 
 		// Preparing environment
 		self::prepareEnvironment();
-		
+
 		// At first we parse framework registry config
 		self::processFwConfig();
-		
+
 		// Then we handle applications to select what to run
 		self::selectApp();
-		
+
 		// Parsing application registry
 		self::processAppConfig();
-		
+
 		// Prepare and echo response
 		return self::makeResponse();
 	}
@@ -65,13 +65,15 @@ class O_EntryPoint {
 		if (strpos( $url, "?" ))
 			$url = substr( $url, 0, strpos( $url, "?" ) );
 		O_Registry::set( "app/env/request_url", $url );
-		
+
 		// Saving HTTP_HOST value
 		O_Registry::set( "app/env/http_host", $_SERVER[ 'REQUEST_URI' ] );
-		
+		// Request method
+		O_Registry::set( "app/env/request_method", $_SERVER['REQUEST_METHOD'] );
+
 		// Setting registry inheritance
 		O_Registry::setInheritance( "fw", "app" );
-		
+
 		// Adding request params to app/env/request registry
 		O_Registry::set( "app/env/params", array_merge( $_POST, $_GET ) );
 	}
@@ -96,8 +98,8 @@ class O_EntryPoint {
 			if ($app->getName() == "App") {
 				$app_name = self::processAppSelection( $app );
 				if ($app_name) {
-					O_Registry::set( "app/env/process_url", 
-							substr( O_Registry::get( "app/env/request_url" ), 
+					O_Registry::set( "app/env/process_url",
+							substr( O_Registry::get( "app/env/request_url" ),
 									strlen( O_Registry::get( "app/env/base_url" ) ) ) );
 					break;
 				}
@@ -119,12 +121,12 @@ class O_EntryPoint {
 		$app_name = O_Registry::get( "app/name" );
 		if (!is_file( "./Apps/" . $app_name . "/App.xml" ))
 			throw new Exception( "Can't find application config file." );
-		
+
 		$xml_current = simplexml_load_file( "./Apps/" . $app_name . "/App.xml" );
 		foreach ($xml_current as $node) {
 			self::processAppConfigPart( $node );
 		}
-		
+
 		// Processing class uses
 		$uses = O_Registry::get( "app/uses" );
 		if (is_array( $uses ))
@@ -158,12 +160,12 @@ class O_EntryPoint {
 	static public function makeResponse()
 	{
 		// TODO: use plugin in classnames building
-		
+
 
 		// Create O_Command and process it
 		$cmd_name = O_Registry::get( "app/command_name" );
 		$cmd_class = O_Registry::get( "app/class_prefix" ) . "_Cmd_" . $cmd_name;
-		
+
 		if (class_exists( $cmd_class, true )) {
 			$cmd = new $cmd_class( );
 			if ($cmd instanceof O_Command) {
@@ -172,7 +174,7 @@ class O_EntryPoint {
 				return true;
 			}
 		}
-		
+
 		// Else create O_Html_Template
 		$tpl_class = O_Registry::get( "app/class_prefix" ) . "_Tpl_" . $cmd_name;
 		if (class_exists( $tpl_class, true )) {
@@ -182,12 +184,12 @@ class O_EntryPoint {
 				return true;
 			}
 		}
-		
+
 		// Else process 404 error
 		// TODO: add logic to handle 404 error
 		echo "Error 404";
 		return false;
-	
+
 	}
 
 	/**
@@ -227,13 +229,15 @@ class O_EntryPoint {
 				$url = O_Registry::get( "app/env/process_url" );
 				$pattern = (string)$node[ "pattern" ];
 				if (preg_match( "#^$pattern$#i", $url, $pockets )) {
-					foreach ($node as $n)
+					foreach ($node as $n) {
 						self::processAppConfigPart( $n, $pockets );
+					}
 				}
 			break;
 			// Sets "app/command_name" registry key, continues processing
 			// TODO: add command plugin name
 			case "Command" :
+				if(O_Registry::get( "app/command_name")) break;
 				O_Registry::set( "app/command_name", (string)$node[ "name" ] );
 			break;
 			default :
@@ -256,14 +260,14 @@ class O_EntryPoint {
 		$app_ext = (string)$app[ "ext" ];
 		if (!$app_ext)
 			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
-		
+
 		if (!$app_name || !$app_prefix)
 			throw new Exception( "Application without name or class prefix cannot be processed." );
-		
+
 		foreach ($app as $cond) {
 			if ($cond->getName() == "Condition") {
 				if (self::processAppSelectionCondition( $cond )) {
-					O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name );
+					O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name, $app_ext );
 					O_Registry::set( "app/class_prefix", $app_prefix );
 					O_Registry::set( "app/name", $app_name );
 					O_Registry::set( "app/mode", (string)$cond[ "mode" ] );
@@ -288,7 +292,7 @@ class O_EntryPoint {
 	{
 		if ((string)$cond[ "pattern" ] == "any")
 			return true;
-		
+
 		foreach ($cond as $condPart) {
 			switch ($condPart->getName()) {
 				// Checks if url starts with "base" attribute or matches "pattern"
@@ -303,12 +307,12 @@ class O_EntryPoint {
 					}
 					$pattern = (string)$condPart[ "pattern" ];
 					if (!$pattern) {
-						throw new Exception( 
+						throw new Exception(
 								"App-selecting Url condition must have 'base' or 'pattern' attribute." );
 					}
 					if (preg_match( "#^$pattern$#i", O_Registry::get( "app/env/request_url" ) ))
 						continue;
-					
+
 					return false;
 				break;
 				// Checks if hostname is equal with "value" attribute or matches "pattern"

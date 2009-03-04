@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Applications>
-	<App name="Te0" prefix="Va0">
-		<Condition mode="production">
-			<Url base="/nu/"></Url></Condition></App>
+	<App name="Example" prefix="Ex" ext="phps">
+		<Condition mode="development">
+			<Url base="/example/"></Url></Condition></App>
 	<App name="Test" prefix="Test">
 		<Condition mode="development" pattern="any"></Condition></App></Applications>

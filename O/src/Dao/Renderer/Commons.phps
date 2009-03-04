@@ -1,6 +1,6 @@
 <?php
 abstract class O_Dao_Renderer_Commons {
-	
+
 	protected $record;
 	protected $class;
 	protected $layout;
@@ -24,6 +24,15 @@ abstract class O_Dao_Renderer_Commons {
 		$this->record = $record;
 		$this->class = get_class( $record );
 	}
+
+	public function getActiveRecord() {
+		return $this->record;
+	}
+
+	public function removeActiveRecord() {
+		$this->record = null;
+	}
+
 
 	public function injectHtmlBefore( $fieldName, $code )
 	{
@@ -62,21 +71,21 @@ abstract class O_Dao_Renderer_Commons {
 	{
 		if ($params === 1)
 			return "";
-		
+
 		$subparams = "";
 		if (strpos( $params, " " )) {
 			list ($callback, $subparams) = explode( " ", $params, 2 );
 		} else {
 			$callback = $params;
 		}
-		
+
 		if (!strpos( $callback, "::" )) {
 			$callback = $callback_type . "::" . $callback;
 		}
-		
+
 		if (!is_callable( $callback ))
 			return "";
-		
+
 		return array ("callback" => $callback, "params" => $subparams);
 	}
 
@@ -84,15 +93,15 @@ abstract class O_Dao_Renderer_Commons {
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 		$params = "";
-		
+
 		if ($this->type) {
 			$params = $tableInfo->getParam( $key . "-" . $this->type . ":callback" );
 		}
-		
+
 		if (!$params) {
 			$params = $tableInfo->getParam( $key . ":callback" );
 		}
-		
+
 		return $this->getCallbackByParams( $params, $callback_type );
 	}
 }
