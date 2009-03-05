@@ -1,20 +1,22 @@
 <?php
 class Ex_Cmd_Post extends O_Command {
-	public function process() {
+
+	public function process()
+	{
 		$tpl = $this->getTemplate();
-		$tpl->post = O_Dao_ActiveRecord::getById(O_Registry::get("app/posts/id"), "Ex_Mdl_Post");
-
-		$form = new O_Dao_Renderer_FormProcessor;
-		$form->setClass("Ex_Mdl_Comment");
+		$tpl->post = O_Dao_ActiveRecord::getById( O_Registry::get( "app/posts/id" ), "Ex_Mdl_Post" );
+		
+		$form = new O_Dao_Renderer_FormProcessor( );
+		$form->setClass( "Ex_Mdl_Comment" );
 		$form->setCreateMode();
-
-		if($form->handle()) {
+		
+		if ($form->handle()) {
 			$record = $form->getActiveRecord();
 			$record->time = time();
 			$tpl->post->comments[] = $record;
 			$tpl->post->save();
 			$record->save();
-
+			
 			$form->removeActiveRecord();
 		}
 		$tpl->form = $form;

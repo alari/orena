@@ -1,6 +1,6 @@
 <?php
 class Ex_Tpl_Post extends O_Html_Template {
-
+	
 	public $post;
 	public $form;
 
@@ -12,17 +12,16 @@ class Ex_Tpl_Post extends O_Html_Template {
 
 	public function displayContents()
 	{
-		$this->layout()->title = "Post: ".$this->post->title;
-?>
-<div>
-<a href="<?=$this->url("")?>">К списку постов</a>
-|
-<a href="<?=$this->url("post/form/".$this->post->id)?>">Редактировать пост</a>
+		$this->layout()->title = "Post: " . $this->post->title;
+		?>
+<div><a href="<?=$this->url( "" )?>">К списку постов</a> | <a
+	href="<?=$this->url( "post/form/" . $this->post->id )?>">Редактировать пост</a>
 </div>
 <?
-		$this->post->show($this->layout());
-
-		if($this->form) $this->form->show($this->layout());
+		$this->post->show( $this->layout() );
+		
+		if ($this->form)
+			$this->form->show( $this->layout() );
 	}
 
 }

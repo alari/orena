@@ -8,10 +8,12 @@
 	</Url>
 	<Url pattern="post/form(/([0-9]+))?">
 		<Registry key="posts/id" pocket="2"></Registry>
-		<Command name="Form"></Command></Url>
+		<Command name="Form"></Command>
+	</Url>
 	<Url pattern="post/([0-9]+)">
 		<Registry key="posts/id" pocket="1"></Registry>
-		<Command name="Post"></Command></Url>
+		<Command name="Post"></Command>
+	</Url>
 	<Command name="Main"></Command>
 	<Registry key="db/default/engine" value="mysql"></Registry>
 	<Registry key="db/default/host" value="localhost"></Registry>

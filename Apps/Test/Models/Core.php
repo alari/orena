@@ -6,12 +6,12 @@
  * 		-show-def wysiwyg \
  * 		-check htmlPurifier
  * @field intfield int -signal -show simple -loop simple
- * @field subs -owns many Test_Models_Sub -inverse core
+ * @field subs -owns many {test/sub_class} -inverse core
  * @field manysubs -owns many Test_Models_Sub -inverse cores
  * @field myalias -alias subs.core
  * @field test_alter int default 1 -e-dit Test_Fragments_CustomEditor::render
  * @field one_sub -has one Test_Models_Sub -inverse one_core
- * @field core_direct -has one Test_Models_Core -inverse core_inverse
+ * @field core_direct -has one {test/core_class} -inverse core_inverse
  * @field core_inverse -has one Test_Models_Core -inverse core_direct
  */
 class Test_Models_Core extends O_Dao_ActiveRecord {

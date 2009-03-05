@@ -6,7 +6,7 @@
  *
  */
 class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
-
+	
 	/**
 	 * Array of hidden fields
 	 *
@@ -43,7 +43,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * @var unknown_type
 	 */
 	protected $createMode = 0;
-
+	
 	/**
 	 * Array of field errors
 	 *
@@ -63,7 +63,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 */
 	public function __construct()
 	{
-		$this->actionUrl = O_UrlBuilder::get(O_Registry::get( "app/env/process_url" ));
+		$this->actionUrl = O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id", $multiply = false )
 	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField,
+		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField, 
 														"multiply" => $multiply);
 	}
 
@@ -150,10 +150,11 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 *
 	 * @param O_Html_Layout $layout
 	 */
-	public function show(O_Html_Layout $layout=null)
+	public function show( O_Html_Layout $layout = null )
 	{
-		if($layout) $this->setLayout($layout);
-
+		if ($layout)
+			$this->setLayout( $layout );
+		
 		?><form method="POST" enctype="application/x-www-form-urlencoded"
 	action="<?=$this->actionUrl?>">
 <fieldset class="oo-renderer"><label>Test editing</label>
@@ -172,21 +173,21 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			} else {
 				$params = $callback[ "params" ];
 				$callback = $callback[ "callback" ];
-
-				if(isset( $this->relationQueries[ $name ] )){
+				
+				if (isset( $this->relationQueries[ $name ] )) {
 					$_params = $this->relationQueries[ $name ];
-					$_params["params"] = $params;
+					$_params[ "params" ] = $params;
 					$params = $_params;
 				}
 			}
-
+			
 			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
 			// Make HTML injections, display field value via callback
 			// TODO: add field title to display
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
-			call_user_func_array( $callback,
-					array ($name, $value, $name . "_title", $params, $this->layout,
+			call_user_func_array( $callback, 
+					array ($name, $value, $name . "_title", $params, $this->layout, 
 								isset( $this->errors[ $name ] ) ? $this->errors[ $name ] : null) );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];
@@ -196,7 +197,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		}
 		if ($this->record)
 			echo "<input type=\"hidden\" name=\"id\" value=\"{$this->record->id}\"/>";
-
+		
 		?>
 
 <input type="submit" /></fieldset>
@@ -213,7 +214,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
-
+			
 			try {
 				// It's not an atomic field but a relation
 				if ($fieldInfo->getRelationTarget()) {
@@ -242,25 +243,25 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 						if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
 							throw new O_Dao_Renderer_FieldCheckException( "Not a valid value for relation." );
 						}
-						$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ],
+						$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
 								$fieldInfo->getRelationTarget() );
 					}
 				}
-
+				
 				// Callback checker
 				$callback = $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_CHECK );
 				if ($callback) {
 					$params = $callback[ "params" ];
 					$callback = $callback[ "callback" ];
-
-					call_user_func_array( $callback,
+					
+					call_user_func_array( $callback, 
 							array ($this->values[ $name ], $this->record ? $this->record->$name : null, $params) );
 				}
-
+				
 				// Required value test
 				if (!$this->values[ $name ] && $fieldInfo->getParam( "required" )) {
-					throw new O_Dao_Renderer_FieldCheckException(
-							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
+					throw new O_Dao_Renderer_FieldCheckException( 
+							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam( 
 									"required" ) );
 				}
 			}
@@ -280,7 +281,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		// Process only POST requests
 		if (O_Registry::get( "app/env/request_method" ) != "POST")
 			return false;
-
+			
 		// Load record, if needed
 		if (!$this->record && !$this->createMode) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
@@ -289,21 +290,21 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				return false;
 			}
 		}
-
+		
 		// Check and prepare values, found errors if they are
 		$this->checkValues();
-
+		
 		// Stop processing without saving, if errors occured
 		if (count( $this->errors )) {
 			return false; // TODO produce error response
 		}
-
+		
 		// Create record in database
 		if ($this->createMode && !$this->record) {
 			$class = $this->class;
 			$this->record = new $class( );
 		}
-
+		
 		// Setting values for ActiveRecord
 		foreach ($this->values as $name => $value) {
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
@@ -325,7 +326,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				}
 			}
 		}
-
+		
 		// Succeed
 		return $this->record->save();
 	}
@@ -334,9 +335,10 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * Removes ActiveRecord, clears form
 	 *
 	 */
-	public function removeActiveRecord() {
-		$this->values = Array();
-		$this->errors = Array();
+	public function removeActiveRecord()
+	{
+		$this->values = Array ();
+		$this->errors = Array ();
 		parent::removeActiveRecord();
 	}
 

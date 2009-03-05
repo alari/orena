@@ -1,6 +1,6 @@
 <?php
 class Ex_Tpl_Form extends O_Html_Template {
-
+	
 	public $form;
 
 	public function __construct()
@@ -11,7 +11,7 @@ class Ex_Tpl_Form extends O_Html_Template {
 
 	public function displayContents()
 	{
-		$this->form->show($this->layout());
+		$this->form->show( $this->layout() );
 	}
 
 }

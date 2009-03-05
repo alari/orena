@@ -1,6 +1,6 @@
 <?php
 class Ex_Tpl_Main extends O_Html_Template {
-
+	
 	public $posts;
 
 	public function __construct()
@@ -11,12 +11,10 @@ class Ex_Tpl_Main extends O_Html_Template {
 
 	public function displayContents()
 	{
-?>
-<div>
-<a href="<?=$this->url("post/form")?>">Добавить пост</a>
-</div>
+		?>
+<div><a href="<?=$this->url( "post/form" )?>">Добавить пост</a></div>
 <?
-		if($this->posts) {
+		if ($this->posts) {
 			$this->posts->show();
 		}
 	}

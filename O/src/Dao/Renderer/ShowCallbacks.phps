@@ -45,37 +45,40 @@ class O_Dao_Renderer_ShowCallbacks {
 	 */
 	static public function loop( O_Dao_Query $fieldValue, $params, $layout )
 	{
-		echo $fieldValue->show($layout);
+		echo $fieldValue->show( $layout );
 	}
 
 	static public function count( O_Dao_Query $fieldValue, $params, $layout )
 	{
-		echo $params.": ".count($fieldValue), "<br/>";
+		echo $params . ": " . count( $fieldValue ), "<br/>";
 	}
 
-	static public function linkInContainer($fieldValue, $params, $layout, $record) {
-		$fieldValue = "<a href=\"".$record->url()."\">$fieldValue</a>";
-		self::container($fieldValue, $params, $layout);
+	static public function linkInContainer( $fieldValue, $params, $layout, $record )
+	{
+		$fieldValue = "<a href=\"" . $record->url() . "\">$fieldValue</a>";
+		self::container( $fieldValue, $params, $layout );
 	}
-
 
 	static public function container( $fieldValue, $params, $layout )
 	{
 		$class = null;
 		$tag = $params;
-		if(strpos($params, " ")) list($tag, $class) = explode(" ", $params, 2);
-		if(!$tag) $tag = "span";
-		echo "<$tag".($class ? " class=\"$class\"" : "").">", $fieldValue, "</$tag>";
+		if (strpos( $params, " " ))
+			list ($tag, $class) = explode( " ", $params, 2 );
+		if (!$tag)
+			$tag = "span";
+		echo "<$tag" . ($class ? " class=\"$class\"" : "") . ">", $fieldValue, "</$tag>";
 	}
 
-	static public function date($fieldValue, $params) {
-		if(!$params) $params = "d.m.Y H:i:s";
-		echo date($params, $fieldValue), "<br/>";
+	static public function date( $fieldValue, $params )
+	{
+		if (!$params)
+			$params = "d.m.Y H:i:s";
+		echo date( $params, $fieldValue ), "<br/>";
 	}
-
 
 	static public function activeRecord( O_Dao_ActiveRecord $fieldValue, $params, $layout )
 	{
-		$fieldValue->show($layout, $params ? $params : O_Dao_Renderer::TYPE_DEF);
+		$fieldValue->show( $layout, $params ? $params : O_Dao_Renderer::TYPE_DEF );
 	}
 }

@@ -4,4 +4,10 @@
 	<Registry key="session/name" value="osid"></Registry>
 	<Registry key="js/framework" value="Mootools"></Registry>
 	<Registry key="js/fckeditor/config_path" value="/O/static/fckcustom.js"></Registry>
-	<Registry key="js/fckeditor/toolbar_set" value="Sample"></Registry></Config>
+	<Registry key="js/fckeditor/toolbar_set" value="Sample"></Registry>
+	<Registry key="session/class_name" value="O_Http_Session"></Registry>
+	<Registry key="session/user_callback" value="user"></Registry>
+	<Registry key="acl/user_class" value="O_Acl_User"></Registry>
+	<Registry key="acl/role_class" value="O_Acl_Role"></Registry>
+	<Registry key="acl/action_class" value="O_Acl_Action"></Registry>
+	<Registry key="acl/visitor_class" value="O_Acl_Visitor"></Registry></Config>

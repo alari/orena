@@ -12,6 +12,8 @@
  *
  * "owns" key means "on delete cascade". Inverse field must be specified for any base-to-many relation.
  * It will be one to many or many to many due to inverse field description.
+ * Target_Classname could be in {some/registry/key} format. If it's so, target classname will be get from
+ * "app/some/registry/key" registry.
  *
  * Base to one relations returns target object as value. Base to many returns instance of
  * @see O_Dao_Relation_OneToMany
@@ -164,6 +166,12 @@ class O_Dao_FieldInfo {
 			$this->isAtomic = false;
 			
 			list ($quantity, $this->relationTarget) = explode( " ", $params[ $relation ], 2 );
+			// Get relation classname from registry, if needed!
+			if ($this->relationTarget[ 0 ] == "{" && $this->relationTarget[ strlen( 
+					$this->relationTarget ) - 1 ] == "}") {
+				$this->relationTarget = O_Registry::get( "app/" . substr( $this->relationTarget, 1, -1 ) );
+			}
+			// Get inverse fieldname
 			$this->relationInverse = isset( $params[ "inverse" ] ) ? $params[ "inverse" ] : null;
 			
 			if ($quantity == "many") {

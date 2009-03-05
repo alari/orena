@@ -27,4 +27,6 @@
 	<Registry key="db/default/engine" value="mysql"></Registry>
 	<Registry key="db/default/host" value="localhost"></Registry>
 	<Registry key="db/default/dbname" value="Orena"></Registry>
+	<Registry key="test/core_class" value="Test_Models_Core"></Registry>
+	<Registry key="test/sub_class" value="Test_Models_Sub"></Registry>
 </Application>

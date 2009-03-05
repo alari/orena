@@ -17,7 +17,9 @@
  * 		-title Комментарии
  */
 class Ex_Mdl_Post extends O_Dao_ActiveRecord {
-	public function url() {
-		return str_replace("//", "/", O_Registry::get("app/env/base_url")."/post/".$this->id);
+
+	public function url()
+	{
+		return str_replace( "//", "/", O_Registry::get( "app/env/base_url" ) . "/post/" . $this->id );
 	}
 }

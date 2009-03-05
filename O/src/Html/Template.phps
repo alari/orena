@@ -64,8 +64,9 @@ abstract class O_Html_Template {
 	 * @param string $url
 	 * @return string
 	 */
-	public function url($url) {
-		return $this->layout()->url($url);
+	public function url( $url )
+	{
+		return $this->layout()->url( $url );
 	}
 
 	/**
@@ -75,7 +76,8 @@ abstract class O_Html_Template {
 	 * @param bool $fw
 	 * @return string
 	 */
-	public function staticUrl($url, $fw=false) {
-		return $this->layout()->staticUrl($url, $fw);
+	public function staticUrl( $url, $fw = false )
+	{
+		return $this->layout()->staticUrl( $url, $fw );
 	}
 }
