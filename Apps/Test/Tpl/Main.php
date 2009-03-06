@@ -9,6 +9,36 @@ class Test_Tpl_Main extends O_Html_Template {
 
 	public function displayContents()
 	{
+		$status = "";
+		if (isset( $_POST[ 'openid_action' ] ) && $_POST[ 'openid_action' ] == "login" && !empty(
+				$_POST[ 'openid_identifier' ] )) {
+
+			$consumer = new O_OpenId_Consumer( );
+			if (!$consumer->login( $_POST[ 'openid_identifier' ] )) {
+				$status = "OpenID login failed.";
+			}
+		} elseif (isset( $_GET[ 'openid_mode' ] )) {
+			if ($_GET[ 'openid_mode' ] == "id_res") {
+				$consumer = new O_OpenId_Consumer( );
+				if ($consumer->verify( $_GET, $id )) {
+					$status = "VALID " . htmlspecialchars( $id );// On production: redirect here
+				} else {
+					$status = "INVALID " . htmlspecialchars( $id );
+				}
+			} else if ($_GET[ 'openid_mode' ] == "cancel") {
+				$status = "CANCELLED";
+			}
+		}
+		?>
+
+<form method="post">
+<fieldset><legend>OpenID Login // <?=$status?></legend> <input type="text"
+	name="openid_identifier" value="" /> <input type="submit"
+	name="openid_action" value="login" /></fieldset>
+</form>
+
+<?
+
 		echo "<pre>";
 		PHPUnit_TextUI_TestRunner::run( Test_Suite::suite() );
 		echo "</pre><br/>";
@@ -33,6 +63,8 @@ class Test_Tpl_Main extends O_Html_Template {
 			$_SESSION[ "my_test" ] = 1;
 		}
 		echo $_SESSION[ "my_test" ]++;
+
+		echo "<hr/>";
 	}
 
 }
