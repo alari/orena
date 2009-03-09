@@ -1,15 +1,19 @@
 <?php
 /**
  * @todo think if we really do need DAO classes for storage
- *
+ * @todo assoCiation
  */
 class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	/**
-	 * Simgleton pattern
+	 * Singleton pattern
 	 *
 	 * @var O_OpenId_Consumer_Storage
 	 */
 	private static $singleton;
+
+	const TABLE_NONCE = "o_openid_nonce";
+	const TABLE_ASSOC = "o_openid_assoc";
+	const TABLE_DISCOVERY = "o_openid_discovery";
 
 	/**
 	 * Returns instance of storage
@@ -21,6 +25,33 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 		if (!self::$singleton)
 			self::$singleton = new self( );
 		return self::$singleton;
+	}
+
+	/**
+	 * Creates database tables if they don't exist
+	 *
+	 */
+	protected function __construct()
+	{
+		$nonce = O_Db_Query::get( self::TABLE_NONCE );
+		if (!$nonce->tableExists()) {
+			$nonce->field( "nonce", "varchar(255) not null" )->index( "nonce", "unique" )->field( "created",
+					"int not null" )->create();
+		}
+
+		$assoc = O_Db_Query::get( self::TABLE_ASSOC );
+		if (!$assoc->tableExists()) {
+			$assoc->field( "url", "varchar(255) not null" )->field( "handle", "varchar(255) not null" )->field(
+					"mac_func", "varchar(16) not null" )->field( "secret", "varchar(255) not null" )->field(
+					"expires", "int not null" )->index( "url", "unique" )->create();
+		}
+
+		$discovery = O_Db_Query::get( self::TABLE_DISCOVERY );
+		if (!$discovery->tableExists()) {
+			$discovery->field( "disc_id", "varchar(255) not null" )->field( "real_id", "varchar(255) not null" )->field(
+					"server", "varchar(255) not null" )->field( "version", "float default 0" )->field( "expires",
+					"int not null" )->index( "disc_id", "unique" )->create();
+		}
 	}
 
 	/**
@@ -36,7 +67,8 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	public function addAssociation( $url, $handle, $macFunc, $secret, $expires )
 	{
 		$secret = base64_encode( $secret );
-		new O_OpenId_Consumer_Assotiation( $url, $handle, $macFunc, $secret, $expires );
+		O_Db_Query::get( self::TABLE_ASSOC )->field( "url", $url )->field( "handle", $handle )->field( "mac_func",
+				$macFunc )->field( "secret", $secret )->field( "expires", $expires )->insert();
 	}
 
 	/**
@@ -53,13 +85,13 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function getAssociation( $url, &$handle, &$macFunc, &$secret, &$expires )
 	{
-		O_Dao_Query::get( "O_OpenId_Consumer_Assotiation" )->test( "expires", time(), O_Dao_Query::LT )->delete();
-		$assoc = O_Dao_Query::get( "O_OpenId_Consumer_Assotiation" )->test( "url", $url )->getOne();
+		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
+		$assoc = O_Db_Query::get( self::TABLE_ASSOC )->test( "url", $url )->select()->fetch();
 		if ($assoc) {
-			$handle = $assoc->handle;
-			$macFunc = $assoc->mac_func;
-			$secret = base64_decode( $assoc->secret );
-			$expires = $assoc->expires;
+			$handle = $assoc[ "handle" ];
+			$macFunc = $assoc[ "mac_func" ];
+			$secret = base64_decode( $assoc[ "secret" ] );
+			$expires = $assoc[ "expires" ];
 			return true;
 		}
 		return false;
@@ -80,13 +112,13 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	public function getAssociationByHandle( $handle, &$url, &$macFunc, &$secret, &$expires )
 	{
 
-		O_Dao_Query::get( "O_OpenId_Consumer_Assotiation" )->test( "expires", time(), O_Dao_Query::LT )->delete();
-		$assoc = O_Dao_Query::get( "O_OpenId_Consumer_Assotiation" )->test( "handle", $handle )->getOne();
+		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
+		$assoc = O_Db_Query::get( self::TABLE_ASSOC )->test( "handle", $handle )->select()->fetch();
 		if ($assoc) {
-			$url = $assoc->url;
-			$macFunc = $assoc->mac_func;
-			$secret = base64_decode( $assoc->secret );
-			$expires = $assoc->expires;
+			$url = $assoc[ "url" ];
+			$macFunc = $assoc[ "mac_func" ];
+			$secret = base64_decode( $assoc[ "secret" ] );
+			$expires = $assoc[ "expires" ];
 			return true;
 		}
 		return false;
@@ -100,7 +132,7 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function delAssociation( $url )
 	{
-		O_Dao_Query::get( "O_OpenId_Consumer_Assotiation" )->test( "url", $url )->delete();
+		O_Db_Query::get( self::TABLE_ASSOC )->test( "url", $url )->delete();
 	}
 
 	/**
@@ -113,8 +145,10 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 * @param long $expires expiration UNIX time
 	 * @return void
 	 */
-	public function addDiscoveryInfo( $id, $realId, $server, $version, $expires ){
-		new O_OpenId_Consumer_Discovery( $id, $realId, $server, $version, $expires );
+	public function addDiscoveryInfo( $id, $realId, $server, $version, $expires )
+	{
+		O_Db_Query::get( self::TABLE_DISCOVERY )->field( "disc_id", $id )->field( "real_id", $realId )->field(
+				"server", $server )->field( "version", $version )->field( "expires", $expires )->insert();
 	}
 
 	/**
@@ -130,13 +164,13 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function getDiscoveryInfo( $id, &$realId, &$server, &$version, &$expires )
 	{
-		O_Dao_Query::get( "O_OpenId_Consumer_Discovery" )->test( "expires", time(), O_Dao_Query::LT )->delete();
-		$disc = O_Dao_Query::get( "O_OpenId_Consumer_Discovery" )->test( "disc_id", $id )->getOne();
+		O_Db_Query::get( self::TABLE_DISCOVERY )->test( "expires", time(), O_Db_Query::LT )->delete();
+		$disc = O_Db_Query::get( self::TABLE_DISCOVERY )->test( "disc_id", $id )->select()->fetch();
 		if ($disc) {
-			$realId = $disc->real_id;
-			$server = $disc->server;
-			$version = $disc->version;
-			$expires = $disc->expires;
+			$realId = $disc[ "real_id" ];
+			$server = $disc[ "server" ];
+			$version = $disc[ "version" ];
+			$expires = $disc[ "expires" ];
 			return true;
 		}
 		return false;
@@ -150,7 +184,7 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function delDiscoveryInfo( $id )
 	{
-		O_Dao_Query::get( "O_OpenId_Consumer_Discovery" )->test( "disc_id", $id )->delete();
+		O_Db_Query::get( self::TABLE_DISCOVERY )->test( "disc_id", $id )->delete();
 		return true;
 	}
 
@@ -164,7 +198,7 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	public function isUniqueNonce( $provider, $nonce )
 	{
 		try {
-			new O_OpenId_Consumer_Nonce( $nonce );
+			O_Db_Query::get( self::TABLE_NONCE )->field( "nonce", $nonce )->field( "created", time() )->insert();
 		}
 		catch (PDOException $e) {
 			return false;
@@ -179,6 +213,6 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function purgeNonces( $date = null )
 	{
-		O_Dao_Query::get( "O_OpenId_Consumer_Nonce" )->test( "created", strtotime( $date ) + 8600000, O_Dao_Query::LT )->delete();
+		O_Db_Query::get( self::TABLE_NONCE )->test( "created", strtotime( $date ), O_Db_Query::LT )->delete();
 	}
 }

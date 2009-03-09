@@ -167,7 +167,7 @@ class O_Db_Query {
 	 *
 	 * @param string $table Main table to manipulate with
 	 * @param string $alias Table alias
-	 * @param int $db_conn Internal database connection ID
+	 * @param string $db_conn Internal database connection ID
 	 */
 	public function __construct( $table = null, $alias = null, $db_conn = O_Db_Manager::CONN_DEFAULT )
 	{
@@ -175,6 +175,39 @@ class O_Db_Query {
 			$this->from[] = $table . ($alias ? " " . $alias : "");
 		}
 		$this->db_conn = $db_conn;
+	}
+
+	/**
+	 * Shortcut for constructor
+	 *
+	 * @param string $class
+	 * @param string $alias
+	 * @param string $db_conn Internal database connection ID
+	 * @return O_Db_Query
+	 */
+	static public function get( $table, $alias = null, $db_conn = O_Db_Manager::CONN_DEFAULT )
+	{
+		return new self( $table, $alias, $db_conn );
+	}
+
+	/**
+	 * Checks if table exists in database
+	 *
+	 * @return bool
+	 */
+	public function tableExists()
+	{
+		if (!isset($this->from[0]))
+		{
+			throw new Exception("No table specified for query.");
+		}
+		$table_name = $this->from[0];
+		if(strpos($table_name, " ")) $table_name = substr($table_name, 0, strpos($table_name, " "));
+		$stmt = O_Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $table_name . "'" );
+		if (!$stmt)
+			return false;
+		$stmt->execute();
+		return (bool)count( $stmt->fetchAll() );
 	}
 
 	/**
