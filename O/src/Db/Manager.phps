@@ -6,7 +6,7 @@ class O_Db_Manager {
 	 * @var PDO
 	 */
 	private static $connections = Array ();
-
+	
 	const CONN_DEFAULT = "default";
 
 	/**
@@ -24,7 +24,7 @@ class O_Db_Manager {
 		foreach ($conf as $k => $v)
 			if ($k != "engine" && $k != "user" && $k != "password")
 				$dsn .= $k . '=' . $v . ';';
-
+		
 		return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
 	}
 

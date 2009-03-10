@@ -104,6 +104,16 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 	}
 
 	/**
+	 * Removes logged user from session
+	 *
+	 * @param string $id
+	 */
+	static public function delUser( $id = null )
+	{
+		self::get( $id )->user = null;
+	}
+
+	/**
 	 * User callback
 	 *
 	 * @return O_Acl_iUser

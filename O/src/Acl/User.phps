@@ -15,6 +15,11 @@ class O_Acl_User implements O_Acl_iUser {
 	 */
 	public function can( $action, O_Dao_ActiveRecord $resourse = null )
 	{
+		// Role overrides resourse context
+		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
+			return $access;
+		}
+		
 		// Getting context role for resourse
 		if ($resourse) {
 			$registry = O_Registry::get( "app/acl/context/" . get_class( $resourse ) );
@@ -43,10 +48,7 @@ class O_Acl_User implements O_Acl_iUser {
 				}
 			}
 		}
-		// No resourse or no special rules for it
-		if ($this->role)
-			return $this->role->can( $action );
-			
+		
 		// No rules available et al
 		return null;
 	}
