@@ -187,7 +187,7 @@ class O_EntryPoint {
 		
 		// Else process 404 error
 		// TODO: add logic to handle 404 error
-		echo "Error 404";
+		echo "<h1>Error 404</h1>";
 		return false;
 	
 	}

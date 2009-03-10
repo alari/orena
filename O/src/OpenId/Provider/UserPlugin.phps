@@ -1,6 +1,6 @@
 <?php
 /**
- * @field trusted_sutes -owns many O_OpenId_Provider_TrustedSite -inverse user
+ * @field trusted_sites -owns many O_OpenId_Provider_TrustedSite -inverse user
  * @field openid_identity varchar(64)
  * @field openid_pwd varchar(32)
  * @index openid_identity -unique
@@ -29,6 +29,7 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	static public function getByIdentity( $id )
 	{
+		Zend_OpenId::normalize( $id );
 		if (!isset( self::$objs[ $id ] )) {
 			$class = O_Registry::get( "app/acl/user_class" );
 			self::$objs[ $id ] = O_Dao_Query::get( $class )->test( "openid_identity", $id )->getOne();
@@ -55,7 +56,7 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	public function getLoggedInUser()
 	{
 		$user = O_Http_Session::getUser();
-		return $user ? $user->openid_identity : null;
+		return $user instanceof O_Dao_ActiveRecord ? $user->openid_identity : null;
 	}
 
 	/**

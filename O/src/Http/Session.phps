@@ -18,7 +18,7 @@
  * @field started int
  * @field time int
  * @field views int default 0
- * @field user -has one {acl/user_class}
+ * @field user -has one {acl/user_class} -inverse session
  * @index ses_id -unique
  * @index time
  */
@@ -120,7 +120,8 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 	 */
 	public function user()
 	{
-		return $this->user ? $this->user : call_user_func( array (O_Registry::get( "app/acl/visitor_class" ), "get") );
+		return $this->user ? $this->user : call_user_func( 
+				array (O_Registry::get( "app/acl/visitor_class" ), "getInstance") );
 	}
 
 	/**

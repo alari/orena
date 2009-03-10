@@ -4,7 +4,7 @@
  * @field role -has one {acl/role_class} -inverse users
  * @field session -owns one {session/class_name} -inverse user
  */
-class O_Acl_User implements O_Acl_iUser {
+class O_Acl_User extends O_Dao_ActiveRecord implements O_Acl_iUser {
 
 	/**
 	 * Returns bool for access rule, null if no rule specified

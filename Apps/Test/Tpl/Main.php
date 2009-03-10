@@ -9,13 +9,21 @@ class Test_Tpl_Main extends O_Html_Template {
 
 	public function displayContents()
 	{
+		function throwit($code, $msg){
+			throw new Exception($msg, $code);
+		}
+		#set_error_handler("throwit", E_ALL);
+
+		$this->layout()->addHeadLink("openid.server", "http://{$_SERVER['HTTP_HOST']}/openid/");
+
 		$status = "";
 		if (isset( $_POST[ 'openid_action' ] ) && $_POST[ 'openid_action' ] == "login" && !empty(
 				$_POST[ 'openid_identifier' ] )) {
 
 			$consumer = new O_OpenId_Consumer( );
 			if (!$consumer->login( $_POST[ 'openid_identifier' ] )) {
-				$status = "OpenID login failed.";
+				$status = "OpenID login failed. // ";
+				echo $consumer->getError();
 			}
 		} elseif (isset( $_GET[ 'openid_mode' ] )) {
 			if ($_GET[ 'openid_mode' ] == "id_res") {

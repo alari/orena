@@ -16,7 +16,7 @@ class O_OpenId_Provider extends Zend_OpenId_Provider {
 	 */
 	public function __construct( $loginUrl = null, $trustUrl = null, $sessionTtl = 3600 )
 	{
-		parent::__construct( $loginUrl, $trustUrl, O_OpenId_Provider_UserPlugin::getInstance(),
+		parent::__construct( $loginUrl, $trustUrl, O_OpenId_Provider_UserPlugin::getInstance(), 
 				O_OpenId_Provider_Storage::getInstance(), $sessionTtl );
 	}
 

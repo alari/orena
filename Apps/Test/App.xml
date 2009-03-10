@@ -3,6 +3,7 @@
 	<Registry key="test/add" value="add1" type="add"></Registry>
 	<Registry key="test/add" value="add2" type="add"></Registry>
 	<Registry key="html/static_root" value="/Apps/Test/static/"></Registry>
+	<Registry key="dao/O_Acl_User/plugins" type="add" value="O_OpenId_Provider_UserPlugin"></Registry>
 	<Registry key="uses" type="add" value="O_Http_Session"></Registry>
 	<If mode="development">
 		<Registry key="test/if" value="mode=dev"></Registry>
@@ -20,6 +21,9 @@
 			<Registry key="test/me" pocket="2"></Registry>
 		</Url>
 		<Command name="TestCore"></Command>
+	</Url>
+	<Url pattern="/openid/">
+		<Command name="OpenIdServer"></Command>
 	</Url>
 	<Command name="Main"></Command>
 	<Registry key="dao/Test_Models_Core/plugins" type="add"
