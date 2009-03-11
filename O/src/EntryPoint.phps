@@ -229,6 +229,11 @@ class O_EntryPoint {
 				$url = O_Registry::get( "app/env/process_url" );
 				$pattern = (string)$node[ "pattern" ];
 				if (preg_match( "#^$pattern$#i", $url, $pockets )) {
+					// Set command for URL, if available
+					$command = (string)$node[ "command" ];
+					if ($command && !O_Registry::get( "app/command_name" )) {
+						O_Registry::set( "app/command_name", $command );
+					}
 					foreach ($node as $n) {
 						self::processAppConfigPart( $n, $pockets );
 					}

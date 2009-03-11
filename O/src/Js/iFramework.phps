@@ -15,4 +15,10 @@ interface O_Js_iFramework {
 	 */
 	public function addDomreadyCode( $code, O_Html_Layout $layout = null );
 
+	/**
+	 * Adds framework sources to layout
+	 *
+	 * @param O_Html_Layout $layout
+	 */
+	public function addSrc( O_Html_Layout $layout );
 }

@@ -4,7 +4,8 @@
 	
 <!ELEMENT Url (%app.nodes;)>
 <!ATTLIST Url
-	pattern CDATA #REQUIRED>
+	pattern CDATA #REQUIRED
+	command CDATA #IMPLIED>
 	
 <!ELEMENT Command (#PCDATA)>
 <!ATTLIST Command

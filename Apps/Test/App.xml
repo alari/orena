@@ -25,6 +25,7 @@
 	<Url pattern="/openid/">
 		<Command name="OpenIdServer"></Command>
 	</Url>
+	<Url pattern="/ajax/" command="Ajax"></Url>
 	<Command name="Main"></Command>
 	<Registry key="dao/Test_Models_Core/plugins" type="add"
 		value="Test_Models_CorePlugin"></Registry>

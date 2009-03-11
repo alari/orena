@@ -70,9 +70,23 @@ oFCKeditor.BasePath = '" . $layout->staticUrl( 'fckeditor/', 1 ) . "';" .
 	 * @param string $title
 	 * @param string $subparams
 	 */
-	static public function area( $fieldValue, $fieldTitle, $params, $error )
+	static public function area( $fieldName, $fieldValue, $title, $params, $layout, $error )
 	{
-		echo '<div id="oo-renderer-area">', htmlspecialchars( $fieldValue ), "</div>";
+		?>
+<div class="oo-renderer-field">
+<div class="oo-renderer-title">
+<?=$title?>:</div>
+<?
+		if ($error) {
+			?>
+<div class="oo-renderer-error">
+<?=$error?>
+</div>
+<?
+		}
+		?>
+<textarea class="oo-renderer-field-area" name="<?=$fieldName?>"><?=$fieldValue?></textarea></div>
+<?
 	}
 
 	static public function selectRelation( $fieldName, $fieldValue, $title, $params, $layout, $error )

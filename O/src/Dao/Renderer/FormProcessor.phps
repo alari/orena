@@ -1,11 +1,67 @@
 <?php
 /**
+ * Table:
+ * -edit:title
+ * -edit:create-title
+ * -edit:submit
+ * -edit:create-submit
+ * -edit:reset
+ * -edit:create-reset
+ *
+ * Field:
  * -edit callback
  * -check callback
  * -required error-string
+ * -edit:title title
+ * -title title
  *
  */
 class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
+	
+	/**
+	 * Instances counter -- to give an unique id to each form
+	 *
+	 * @var int
+	 */
+	private static $instancesCount = 0;
+	
+	/**
+	 * Form title
+	 *
+	 * @var string
+	 */
+	protected $formTitle;
+	/**
+	 * Value of submit button
+	 *
+	 * @var string
+	 */
+	protected $submitButtonValue;
+	/**
+	 * Value of reset button, or false to disable it
+	 *
+	 * @var string
+	 */
+	protected $resetButtonValue = null;
+	/**
+	 * Type for shower.
+	 *
+	 * @see O_Dao_Renderer_FormProcessor::responseAjax()
+	 * @var string
+	 */
+	protected $showType = O_Dao_Renderer::TYPE_DEF;
+	/**
+	 * Was the form handled or not
+	 *
+	 * @var bool
+	 */
+	private $handled = false;
+	/**
+	 * Result of form handling
+	 *
+	 * @var bool
+	 */
+	protected $handleResult;
 	
 	/**
 	 * Array of hidden fields
@@ -19,12 +75,6 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * @var string
 	 */
 	protected $actionUrl;
-	/**
-	 * Url to redirect user on success
-	 *
-	 * @var string
-	 */
-	protected $successUrl;
 	/**
 	 * Form is processing via ajax or not
 	 *
@@ -64,19 +114,19 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	public function __construct()
 	{
 		$this->actionUrl = O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) );
+		$this->instanceId = "oo-form-" . (++self::$instancesCount);
 	}
 
 	/**
 	 * Sets an ActiveRecord class to process
 	 *
-	 * @param unknown_type $class
+	 * @param string $class
 	 */
 	public function setClass( $class )
 	{
-		$this->class = $class;
-		if (!$this->record instanceof $class) {
-			$this->record = null;
-		}
+		parent::setClass( $class );
+		if ($this->record)
+			$this->instanceId .= "-" . $this->record->id;
 	}
 
 	/**
@@ -92,9 +142,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * Tries to handle form via AJAX
 	 *
 	 * @param bool $isAjax
-	 * @todo implement ajax functionality
 	 */
-	public function setAjax( $isAjax = true )
+	public function setAjaxMode( $isAjax = true )
 	{
 		$this->isAjax = (bool)$isAjax;
 	}
@@ -107,17 +156,6 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	public function setActionUrl( $url )
 	{
 		$this->actionUrl = $url;
-	}
-
-	/**
-	 * URL to perform redirection on success
-	 *
-	 * @param string $url
-	 * @todo is it usable?
-	 */
-	public function setSuccessUrl( $url )
-	{
-		$this->successUrl = $url;
 	}
 
 	/**
@@ -146,6 +184,64 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	}
 
 	/**
+	 * Sets reset button value
+	 *
+	 * @param bool $value Set to false to disable the button
+	 */
+	public function setResetButtonValue( $value )
+	{
+		$this->resetButtonValue = $value;
+	}
+
+	/**
+	 * Sets submit button value
+	 *
+	 * @param string $value
+	 */
+	public function setSubmitButtonValue( $value )
+	{
+		$this->submitButtonValue = $value;
+	}
+
+	/**
+	 * Sets form title
+	 *
+	 * @param string $title
+	 */
+	public function setFormTitle( $title )
+	{
+		$this->formTitle = $title;
+	}
+
+	/**
+	 * Sets show type (used in responseAjax())
+	 *
+	 * @param string $type
+	 */
+	public function setShowType( $type )
+	{
+		$this->showType = $type;
+	}
+
+	/**
+	 * Returns form text for create or edit form
+	 *
+	 * @param string $key
+	 * @param string $default
+	 * @return string
+	 */
+	protected function getFormText( $key, $default )
+	{
+		$tableInfo = O_Dao_TableInfo::get( $this->class );
+		$value = $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":" . $key );
+		if ($this->createMode && $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":create-" . $key )) {
+			return $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":create-" . $key );
+		} elseif ($value)
+			return $value;
+		return $default;
+	}
+
+	/**
 	 * Displays form as HTML
 	 *
 	 * @param O_Html_Layout $layout
@@ -154,13 +250,29 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	{
 		if ($layout)
 			$this->setLayout( $layout );
+			
+		// Form title
+		if (!$this->formTitle) {
+			$this->formTitle = $this->getFormText( "title", "Form" );
+		}
+		// Submit button text
+		if (!$this->submitButtonValue) {
+			$this->submitButtonValue = $this->getFormText( "submit", "Save changes" );
+		}
+		// Reset button text
+		if (is_null( $this->resetButtonValue )) {
+			$this->resetButtonValue = $this->getFormText( "reset", null );
+		}
 		
-		?><form method="POST" enctype="application/x-www-form-urlencoded"
-	action="<?=$this->actionUrl?>">
-<fieldset class="oo-renderer"><label>Test editing</label>
+		?>
+<div>
+<form method="POST" enctype="application/x-www-form-urlencoded"
+	action="<?=$this->actionUrl?>" id="<?=$this->instanceId?>">
+<fieldset class="oo-renderer"><label><?=$this->formTitle?></label>
 
 <?
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
+			// Find a callback for field renderer
 			$callback = $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_EDIT );
 			if (!$callback) {
 				if (isset( $this->relationQueries[ $name ] )) {
@@ -181,17 +293,25 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				}
 			}
 			
+			// Prepare field value and title
 			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
+			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
+			$title = $fieldInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":title" );
+			if (!$title)
+				$title = $fieldInfo->getParam( "title" );
+			if (!$title)
+				$title = $name;
+				
 			// Make HTML injections, display field value via callback
-			// TODO: add field title to display
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
 			call_user_func_array( $callback, 
-					array ($name, $value, $name . "_title", $params, $this->layout, 
+					array ($name, $value, $title, $params, $this->layout, 
 								isset( $this->errors[ $name ] ) ? $this->errors[ $name ] : null) );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];
 		}
+		// Hidden fields
 		foreach ($this->hiddenFields as $name => $value) {
 			echo "<input type=\"hidden\" name=\"$name\" value=\"$value\"/>";
 		}
@@ -200,8 +320,49 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		
 		?>
 
-<input type="submit" /></fieldset>
+<input type="submit"
+	value="<?=htmlspecialchars( $this->submitButtonValue )?>" />
+<?
+		if ($this->resetButtonValue) {
+			?><input type="reset"
+	value="<?=htmlspecialchars( $this->resetButtonValue )?>" /><?
+		}
+		?></fieldset>
 </form>
+</div>
+
+<?
+		if ($this->isAjax) {
+			O_Js_Middleware::getFramework()->addSrc( $layout );
+			//FIXME: move javascript to framework instance!
+			//TODO: add classnames to registry
+			?>
+<script type="text/javascript">
+ $('<?=$this->instanceId?>').getElement('input[type=submit]').addEvent("click", function(e){
+	 e.stop();
+ 	$(this).disabled = true;
+ 	new Request.JSON({url:$('<?=$this->instanceId?>').getAttribute('action'), onSuccess:function(response){
+		if(response.status == 'SUCCEED') {
+			$('<?=$this->instanceId?>').getParent().set('html', response.show);
+		} else {
+			$('<?=$this->instanceId?>').getElements('.oo-renderer-error').dispose();
+			for(field in response.errors) {
+				e = $('<?=$this->instanceId?>').getElement('[name='+field+']');
+				if(!e) e = $('<?=$this->instanceId?>').getElement('input[type=submit]');
+				err = new Element('span', {class:'oo-renderer-error'});
+				err.set('html', response.errors[field]);
+				err.inject(e, 'after');
+			}
+			$('<?=$this->instanceId?>').getElement('input[type=submit]').disabled = false;
+		}
+ 	 }}).post($('<?=$this->instanceId?>'));
+ });
+ </script>
+<?
+		}
+		?>
+
+
 <?
 	}
 
@@ -278,16 +439,21 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 */
 	public function handle()
 	{
+		// handle only once
+		if ($this->handled)
+			return $this->handleResult;
+		$this->handled = true;
+		
 		// Process only POST requests
 		if (O_Registry::get( "app/env/request_method" ) != "POST")
-			return false;
+			return $this->handleResult = false;
 			
 		// Load record, if needed
 		if (!$this->record && !$this->createMode) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
 			if (!$this->record) {
 				$this->errors[ "_" ] = "Record not found.";
-				return false;
+				return $this->handleResult = false;
 			}
 		}
 		
@@ -296,7 +462,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		
 		// Stop processing without saving, if errors occured
 		if (count( $this->errors )) {
-			return false; // TODO produce error response
+			return $this->handleResult = false;
 		}
 		
 		// Create record in database
@@ -328,7 +494,47 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		}
 		
 		// Succeed
-		return $this->record->save();
+		return $this->handleResult = $this->record->save();
+	}
+
+	/**
+	 * Print response to be handled as an ajax response
+	 *
+	 */
+	public function responseAjax()
+	{
+		$response = Array ("status" => "");
+		if ($this->handle()) {
+			$response[ "status" ] = "SUCCEED";
+			ob_start();
+			$this->record->show( $this->layout, $this->showType );
+			$response[ "show" ] = ob_get_clean();
+		} else {
+			$response[ "status" ] = "FAILED";
+			$response[ "errors" ] = $this->errors;
+		}
+		echo json_encode( $response );
+	}
+
+	/**
+	 * Returns error message for given field
+	 *
+	 * @param string $field
+	 * @return string
+	 */
+	public function getError( $field )
+	{
+		return array_key_exists( $field, $this->errors ) ? $this->errors[ $field ] : null;
+	}
+
+	/**
+	 * Returns array of errors for fields
+	 *
+	 * @return array
+	 */
+	public function getErrors()
+	{
+		return $this->errors;
 	}
 
 	/**
@@ -339,6 +545,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	{
 		$this->values = Array ();
 		$this->errors = Array ();
+		$this->handled = false;
 		parent::removeActiveRecord();
 	}
 

@@ -16,7 +16,7 @@ class O_UrlBuilder {
 	{
 		$r = O_Registry::get( "app/env/base_url" );
 		if ($r[ strlen( $r ) - 1 ] != "/") {
-			O_Registry::set( "app/env/base_url", $r . "/" );
+			O_Registry::set( "app/env/base_url", $r = $r . "/" );
 		}
 		if (!$url)
 			return $r;

@@ -25,4 +25,16 @@ class O_Js_Mootools implements O_Js_iFramework {
 		}
 		return $code;
 	}
+
+	/**
+	 * Adds framework sources to layout
+	 *
+	 * @param O_Html_Layout $layout
+	 */
+	public function addSrc( O_Html_Layout $layout )
+	{
+		$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
+		$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
+	}
+
 }
