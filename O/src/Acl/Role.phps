@@ -1,23 +1,23 @@
 <?php
 /**
  * @table o_acl_role
- * @field parent -has one {acl/role_class} -inverse childs
- * @field childs -has many {acl/role_class} -inverse parent
+ * @field parent -has one {classnames/acl_role} -inverse childs
+ * @field childs -has many {classnames/acl_role} -inverse parent
  * @field name varchar(64) not null
- * @field users -has many {acl/user_class} -inverse role
- * @field actions -has many {acl/action_class} -inverse roles
+ * @field users -has many {classnames/user} -inverse role
+ * @field actions -has many {classnames/acl_action} -inverse roles
  * @field visitor_role tinyint default 0
  * @index name
  */
 class O_Acl_Role extends O_Dao_ActiveRecord {
-	
+
 	/**
 	 * Cached visitor role
 	 *
 	 * @var O_Acl_Role
 	 */
 	protected static $visitor_role = null;
-	
+
 	/**
 	 * Roles by its names
 	 *

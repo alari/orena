@@ -5,10 +5,10 @@
  * To use it, just use the class and $_SESSION superglobal variable.
  *
  * app/session/name -- name of variable to store sid in
- * app/session/class_name -- subclass of O_Http_Session with special session functionality
+ * app/classnames/session -- subclass of O_Base_Session with special session functionality
  * app/session/user_callback -- method to get user from session active record
- * app/acl/user_class -- classname of user class
- * app/acl/visitor_class -- classname of visitor singleton
+ * app/classnames/user -- classname of user class
+ * app/classnames/visitor -- classname of visitor singleton
  *
  * @copyright Dmitry Kourinski
  *
@@ -18,12 +18,12 @@
  * @field started int
  * @field time int
  * @field views int default 0
- * @field user -has one {acl/user_class} -inverse session
+ * @field user -has one {classnames/user} -inverse session
  * @index ses_id -unique
  * @index time
  */
-class O_Http_Session extends O_Dao_ActiveRecord {
-	
+class O_Base_Session extends O_Dao_ActiveRecord {
+
 	/**
 	 * Cached objects with session ID as array keys
 	 *
@@ -41,7 +41,7 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 	{
 		if (!$id)
 			$id = session_id();
-		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( self::getClassName() )->test( 
+		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( self::getClassName() )->test(
 				"ses_id", $id )->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
@@ -66,19 +66,6 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 		$obj = self::get( $id );
 		$callback = O_Registry::get( "app/session/user_callback" );
 		return $callback ? $obj->$callback() : null;
-	}
-
-	/**
-	 * Checks current user access
-	 *
-	 * @param string $action
-	 * @param O_Dao_ActiveRecord $resourse
-	 * @param string $id
-	 * @return bool or null
-	 */
-	static public function can( $action, O_Dao_ActiveRecord $resourse = null, $id = null )
-	{
-		return self::getUser( $id ) instanceof O_Acl_iUser && self::getUser( $id )->can( $action, $resourse );
 	}
 
 	/**
@@ -120,8 +107,8 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 	 */
 	public function user()
 	{
-		return $this->user ? $this->user : call_user_func( 
-				array (O_Registry::get( "app/acl/visitor_class" ), "getInstance") );
+		return $this->user ? $this->user : call_user_func(
+				array (O_Registry::get( "app/classnames/visitor" ), "getInstance") );
 	}
 
 	/**
@@ -209,10 +196,10 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 		static $ses_class;
 		if ($ses_class == null) {
 			$ses_class = O_Registry::get( "app/session/class_name" );
-			
+
 			if (!$ses_class)
 				$ses_class = __CLASS__;
-		
+
 		}
 		return $ses_class;
 	}
@@ -221,7 +208,7 @@ class O_Http_Session extends O_Dao_ActiveRecord {
 
 // Set framework session class as sessions handler
 $ses_class = O_Http_Session::getClassName();
-session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"), 
+session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"),
 		Array ($ses_class, "write"), Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
 // Set special session name
 session_name( O_Registry::get( "app/session/name" ) );

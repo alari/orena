@@ -3,12 +3,12 @@
  * @table o_acl_action
  * @field name varchar(64) not null
  * @field type enum('allow','deny') default 'allow'
- * @field roles -has many {acl/role_class} -inverse actions
+ * @field roles -has many {classnames/acl_action} -inverse actions
  * @index name
  */
 class O_Acl_Action extends O_Dao_ActiveRecord {
 	private static $objs = array ();
-	
+
 	const TYPE_ALLOW = "allow";
 	const TYPE_DENY = "deny";
 

@@ -1,9 +1,9 @@
 <?php
 /**
  * @field trusted_sites -owns many O_OpenId_Provider_TrustedSite -inverse user
- * @field openid_identity varchar(64)
- * @field openid_pwd varchar(32)
- * @index openid_identity -unique
+ * @field identity varchar(64)
+ * @field pwd_hash varchar(32)
+ * @index identity -unique
  */
 class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements O_Dao_iPlugin {
 	private static $instance;
@@ -31,8 +31,8 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	{
 		Zend_OpenId::normalize( $id );
 		if (!isset( self::$objs[ $id ] )) {
-			$class = O_Registry::get( "app/acl/user_class" );
-			self::$objs[ $id ] = O_Dao_Query::get( $class )->test( "openid_identity", $id )->getOne();
+			$class = O_Registry::get( "app/classnames/user" );
+			self::$objs[ $id ] = O_Dao_Query::get( $class )->test( "identity", $id )->getOne();
 		}
 		return self::$objs[ $id ];
 	}

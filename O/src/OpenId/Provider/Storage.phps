@@ -1,13 +1,13 @@
 <?php
 class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
-	
+
 	/**
 	 * Storage singleton
 	 *
 	 * @var O_OpenId_Provider_Storage
 	 */
 	private static $instance;
-	
+
 	const TABLE_ASSOC = "o_openid_assoc_provider";
 
 	/**
@@ -31,7 +31,7 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 	{
 		$assoc = O_Db_Query::get( self::TABLE_ASSOC );
 		if (!$assoc->tableExists()) {
-			$assoc->field( "handle", "varchar(255) not null" )->field( "mac_func", "varchar(16) not null" )->field( 
+			$assoc->field( "handle", "varchar(255) not null" )->field( "mac_func", "varchar(16) not null" )->field(
 					"secret", "varchar(255) not null" )->field( "expires", "int not null" )->create();
 		}
 	}
@@ -48,7 +48,7 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 	public function addAssociation( $handle, $macFunc, $secret, $expires )
 	{
 		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
-		O_Db_Query::get( self::TABLE_ASSOC )->field( "handle", $handle )->field( "mac_func", $macFunc )->field( 
+		O_Db_Query::get( self::TABLE_ASSOC )->field( "handle", $handle )->field( "mac_func", $macFunc )->field(
 				"secret", $secret )->field( "expires", $expires )->insert();
 	}
 
@@ -89,8 +89,8 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 	public function addUser( $id, $password )
 	{
 		$user = O_OpenId_Provider_UserPlugin::getByIdentity( $id );
-		if ($user && $user->openid_pwd != $password) {
-			$user->openid_pwd = $password;
+		if ($user && $user->pwd_hash != $password) {
+			$user->pwd_hash = $password;
 			$user->save();
 			return true;
 		}
@@ -109,7 +109,7 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 		$user = O_OpenId_Provider_UserPlugin::getByIdentity( $id );
 		if (!$user)
 			return false;
-		return $user->openid_pwd == $password;
+		return $user->pwd_hash == $password;
 	}
 
 	/**
