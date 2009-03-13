@@ -159,12 +159,15 @@ class O_EntryPoint {
 	 */
 	static public function makeResponse()
 	{
-		// TODO: use plugin in classnames building
-
-
 		// Create O_Command and process it
 		$cmd_name = O_Registry::get( "app/command_name" );
-		$cmd_class = O_Registry::get( "app/class_prefix" ) . "_Cmd_" . $cmd_name;
+		if (!$cmd_name)
+			$cmd_name = "Default";
+
+		$plugin_name = O_Registry::get( "app/plugin_name" );
+		$plugin_name = $plugin_name ? "_" . $plugin_name : "";
+
+		$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
 
 		if (class_exists( $cmd_class, true )) {
 			$cmd = new $cmd_class( );
@@ -176,7 +179,7 @@ class O_EntryPoint {
 		}
 
 		// Else create O_Html_Template
-		$tpl_class = O_Registry::get( "app/class_prefix" ) . "_Tpl_" . $cmd_name;
+		$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
 		if (class_exists( $tpl_class, true )) {
 			$tpl = new $tpl_class( );
 			if ($tpl instanceof O_Html_Template) {
@@ -209,12 +212,15 @@ class O_EntryPoint {
 			case "Registry" :
 				self::processRegistry( $node, "app", $pockets );
 			break;
-			// Condition based only on mode name
+			// Condition based on mode name and plugin name
 			case "If" :
-				if ((string)$node[ "mode" ] == O_Registry::get( "app/mode" )) {
-					foreach ($node as $n)
-						self::processAppConfigPart( $n, $pockets );
-				}
+				if ((string)$node[ "mode" ] && (string)$node[ "mode" ] != O_Registry::get( "app/mode" ))
+					break;
+				if ((string)$node[ "plugin" ] && (string)$node[ "plugin" ] != O_Registry::get( "app/plugin_name" ))
+					break;
+				foreach ($node as $n)
+					self::processAppConfigPart( $n, $pockets );
+
 			break;
 			// Parses hostname with pattern, processes child nodes if matches
 			case "Host" :
@@ -240,12 +246,16 @@ class O_EntryPoint {
 				}
 			break;
 			// Sets "app/command_name" registry key, continues processing
-			// TODO: add command plugin name
 			case "Command" :
 				if (O_Registry::get( "app/command_name" ))
 					break;
+				if ((string)$node[ "plugin" ])
+					O_Registry::set( "app/plugin_name", (string)$node[ "plugin" ] );
 				O_Registry::set( "app/command_name", (string)$node[ "name" ] );
 			break;
+			// Set plugin into "app/plugin_name" registry
+			case "Plugin" :
+				O_Registry::set( "app/plugin_name", (string)$node[ "name" ] );
 			default :
 				throw new Exception( "Unknown node in application configuration file." );
 		}
@@ -324,7 +334,8 @@ class O_EntryPoint {
 				// Checks if hostname is equal with "value" attribute or matches "pattern"
 				case "Host" :
 					$value = (string)$condPart[ "value" ];
-					if ($value && (O_Registry::get( "app/env/http_host" ) == $value || O_Registry::get( "app/env/http_host" ) == "www.".$value))
+					if ($value && (O_Registry::get( "app/env/http_host" ) == $value || O_Registry::get(
+							"app/env/http_host" ) == "www." . $value))
 						continue;
 					$pattern = (string)$condPart[ "pattern" ];
 					if ($pattern && preg_match( $pattern, O_Registry::get( "app/env/http_host" ) ))

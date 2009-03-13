@@ -195,9 +195,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	{
 		static $ses_class;
 		if ($ses_class == null) {
-			$ses_class = O_Registry::get( "app/session/class_name" );
+			$ses_class = O_Registry::get( "app/classnames/session" );
 
-			if (!$ses_class)
+			if (!$ses_class || !class_exists( $ses_class ))
 				$ses_class = __CLASS__;
 
 		}
@@ -207,7 +207,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 }
 
 // Set framework session class as sessions handler
-$ses_class = O_Http_Session::getClassName();
+$ses_class = O_Base_Session::getClassName();
 session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"),
 		Array ($ses_class, "write"), Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
 // Set special session name

@@ -1,21 +1,25 @@
 <!ENTITY % app.nodes
-        'If*, Url*, Command?, Host*, Registry*'>
+        'If*, Url*, Command?, Host*, Registry*, Plugin?'>
        
+<!ELEMENT Plugin EMPTY>
+<!ATTLIST Plugin
+	name CDATA #REQUIRED>
 	
 <!ELEMENT Url (%app.nodes;)>
 <!ATTLIST Url
 	pattern CDATA #REQUIRED
 	command CDATA #IMPLIED>
 	
-<!ELEMENT Command (#PCDATA)>
+<!ELEMENT Command EMPTY>
 <!ATTLIST Command
-	name CDATA #REQUIRED>
+	name CDATA #REQUIRED
+	plugin CDATA #IMPLIED>
 	
 <!ELEMENT Host (%app.nodes;)>
 <!ATTLIST Host
 	pattern CDATA #REQUIRED>
 	
-<!ELEMENT Registry (#PCDATA)>
+<!ELEMENT Registry EMPTY>
 <!ATTLIST Registry
 	key CDATA #REQUIRED
 	value CDATA #IMPLIED
