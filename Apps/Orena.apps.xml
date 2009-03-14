@@ -3,11 +3,19 @@
 	<App name="Example" prefix="Ex" ext="phps">
 		<Condition mode="development">
 			<Url base="/example/"></Url>
-			<Host value="exp"></Host></Condition></App>
-	
+			<Host value="exp"></Host>
+		</Condition>
+	</App>
+
 	<App name="Test" prefix="Test">
 		<Condition mode="development">
-			<Host value="exp"></Host></Condition></App><App ext="phps" name="Ring" prefix="R">
+			<Host value="exp"></Host>
+		</Condition>
+	</App>
+	<App ext="phps" name="Ring" prefix="R">
 		<Condition mode="development">
-			<Host value="circle"></Host></Condition>
-		<Condition mode="production" pattern="any"></Condition></App></Applications>
+			<Host pattern="([^\.]*)"></Host>
+		</Condition>
+		<Condition mode="production" pattern="any"></Condition>
+	</App>
+</Applications>

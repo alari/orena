@@ -678,8 +678,9 @@ class O_Db_Query {
 	 * Prepares INSERT query string and params
 	 *
 	 * @return string
+	 * @access private
 	 */
-	protected function prepareInsert()
+	public function prepareInsert()
 	{
 		$this->params = array ();
 		

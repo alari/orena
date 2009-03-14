@@ -12,18 +12,27 @@ class O_UrlBuilder {
 	 * @param string $url
 	 * @return string
 	 */
-	static public function get( $url )
+	static public function get( $url, Array $params = Array() )
 	{
 		$r = O_Registry::get( "app/env/base_url" );
 		if ($r[ strlen( $r ) - 1 ] != "/") {
 			O_Registry::set( "app/env/base_url", $r = $r . "/" );
 		}
-		if (!$url)
-			return $r;
-		if ($url[ 0 ] == "/") {
-			return $r . substr( $url, 1 );
+		if (!$url) {
+			$url = $r;
+		} elseif ($url[ 0 ] == "/") {
+			$url = $r . substr( $url, 1 );
+		} else {
+			$url = $r . $url;
 		}
-		return $r . $url;
+		if (count( $params )) {
+			$query_string = "";
+			foreach ($params as $k => $v) {
+				$query_string .= ($query_string ? "&" : "") . urlencode( $k ) . "=" . urlencode( $v );
+			}
+			$url .= "?" . $query_string;
+		}
+		return $url;
 	}
 
 	/**

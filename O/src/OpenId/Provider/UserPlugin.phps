@@ -29,12 +29,22 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	static public function getByIdentity( $id )
 	{
-		Zend_OpenId::normalize( $id );
+		self::normalize( $id );
 		if (!isset( self::$objs[ $id ] )) {
 			$class = O_Registry::get( "app/classnames/user" );
 			self::$objs[ $id ] = O_Dao_Query::get( $class )->test( "identity", $id )->getOne();
 		}
 		return self::$objs[ $id ];
+	}
+
+	/**
+	 * Normalizes openid identifier
+	 *
+	 * @param string $id
+	 */
+	static public function normalize( &$id )
+	{
+		Zend_OpenId::normalize( $id );
 	}
 
 	/**
@@ -45,7 +55,7 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	public function setLoggedInUser( $id )
 	{
-		O_Http_Session::setUser( self::getByIdentity( $id ) );
+		call_user_func( array (O_Registry::get( "app/classnames/session" ), "setUser"), self::getByIdentity( $id ) );
 	}
 
 	/**
@@ -55,8 +65,8 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	public function getLoggedInUser()
 	{
-		$user = O_Http_Session::getUser();
-		return $user instanceof O_Dao_ActiveRecord ? $user->openid_identity : null;
+		$user = call_user_func( array (O_Registry::get( "app/classnames/session" ), "getUser") );
+		return $user instanceof O_Dao_ActiveRecord ? $user->identity : null;
 	}
 
 	/**
@@ -66,6 +76,6 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	public function delLoggedInUser()
 	{
-		O_Http_Session::delUser();
+		call_user_func( array (O_Registry::get( "app/classnames/session" ), "delUser") );
 	}
 }

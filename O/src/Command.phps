@@ -26,7 +26,7 @@ abstract class O_Command {
 	public function redirect( $href )
 	{
 		// TODO: add redirect shortcut
-		$resp = new O_Http_Redirect( );
+		Header( "Location: $href" );
 	}
 
 	public function getParam( $name, $defaultValue = null )

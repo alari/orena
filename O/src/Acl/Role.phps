@@ -10,14 +10,14 @@
  * @index name
  */
 class O_Acl_Role extends O_Dao_ActiveRecord {
-
+	
 	/**
 	 * Cached visitor role
 	 *
 	 * @var O_Acl_Role
 	 */
 	protected static $visitor_role = null;
-
+	
 	/**
 	 * Roles by its names
 	 *
@@ -105,6 +105,17 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	}
 
 	/**
+	 * Creates new role
+	 *
+	 * @param string $name
+	 */
+	public function __construct( $name )
+	{
+		$this->name = $name;
+		parent::__construct();
+	}
+
+	/**
 	 * Returns role by its name, creates it on demand
 	 *
 	 * @param string $name
@@ -115,9 +126,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 		if (!isset( self::$objs[ $name ] )) {
 			self::$objs[ $name ] = O_Dao_Query::get( __CLASS__ )->test( "name", $name )->getOne();
 			if (!self::$objs[ $name ]) {
-				self::$objs[ $name ] = new self( );
-				self::$objs[ $name ]->name = $name;
-				self::$objs[ $name ]->save();
+				self::$objs[ $name ] = new self( $name );
 			}
 		}
 		return self::$objs[ $name ];

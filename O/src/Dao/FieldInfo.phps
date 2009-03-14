@@ -391,15 +391,21 @@ class O_Dao_FieldInfo {
 			throw new Exception( "Cannot assign base-to-many relation." );
 		}
 		// Base-to-one
-		if (get_class( $fieldValue ) == $this->relationTarget) {
+		if (get_class( $fieldValue ) == $this->relationTarget || is_null( $fieldValue )) {
 			if (!$fieldExists) {
 				$this->addFieldToTable();
 			}
-			$obj->setField( $this->name, $fieldValue->id );
+			$oldValue = $obj->{$this->name};
+			$obj->setField( $this->name, $fieldValue ? $fieldValue->id : 0 );
 			// One-to-one is symmetric
 			if (!$this->getInverse()->relationMany) {
+				
 				$inverseName = $this->getInverse()->name;
-				if (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id) {
+				if ($oldValue) {
+					$oldValue->$inverseName = null;
+					$oldValue->save();
+				}
+				if ($fieldValue && (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id)) {
 					$fieldValue->{$this->getInverse()->name} = $obj;
 					$fieldValue->save();
 				}

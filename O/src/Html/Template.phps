@@ -34,6 +34,17 @@ abstract class O_Html_Template {
 	}
 
 	/**
+	 * Sets layout class, reloads layout
+	 *
+	 * @param string $classname
+	 */
+	public function setLayoutClass( $classname )
+	{
+		$this->layoutClass = $classname;
+		$this->layoutObject = null;
+	}
+
+	/**
 	 * Unsets current layout object so it will be reinitiated
 	 *
 	 */

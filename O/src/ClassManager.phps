@@ -32,6 +32,17 @@ class O_ClassManager {
 	}
 
 	/**
+	 * Registers callback to be called when class will be loaded
+	 *
+	 * @param callback $callback
+	 * @param string $class
+	 */
+	static public function registerClassLoadedCallback( $callback, $class )
+	{
+		O_Registry::add( "fw/classmanager/callback/$class", $callback );
+	}
+
+	/**
 	 * Includes class source file -- autoload implementation
 	 *
 	 * @param string $class
@@ -49,11 +60,24 @@ class O_ClassManager {
 		if (!$file) {
 			$file = str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
-		if ($f = @fopen( $file, "r", true )) {
+		try {
+			$f = @fopen( $file, "r", true );
+		}
+		catch (Exception $e) {
+			$f = 0;
+		}
+		if ($f) {
 			fclose( $f );
 			include_once $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
+			if (class_exists( $class )) {
+				$callbacks = O_Registry::get( "fw/classmanager/callback/$class" );
+				if (count( $callbacks ))
+					foreach ($callbacks as $callback)
+						call_user_func( $callback );
+			}
 		}
+	
 	}
 }
 

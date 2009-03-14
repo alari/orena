@@ -61,7 +61,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		try {
 			$this->fields[ "id" ] = $query->insert();
 			if (!$this->fields[ "id" ])
-				throw new Exception( );
+				throw new Exception( "Not inserted" );
 		}
 		catch (Exception $e) {
 			$tableInfo = O_Dao_TableInfo::get( $this );

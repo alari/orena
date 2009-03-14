@@ -8,9 +8,24 @@
  */
 class O_Acl_Action extends O_Dao_ActiveRecord {
 	private static $objs = array ();
-
+	
 	const TYPE_ALLOW = "allow";
 	const TYPE_DENY = "deny";
+
+	/**
+	 * Creates new action
+	 *
+	 * @param string $name
+	 * @param const $type
+	 * @access private
+	 */
+	public function __construct( $name, $type )
+	{
+		$this->name = $name;
+		$this->type = $type;
+		parent::__construct();
+		;
+	}
 
 	/**
 	 * Returns object by its rule
@@ -24,10 +39,7 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 		if (!isset( self::$objs[ $name ][ $type ] )) {
 			self::$objs[ $name ][ $type ] = O_Dao_Query::get( __CLASS__ )->test( "name", $name )->test( "type", $type )->getOne();
 			if (!self::$objs[ $name ][ $type ]) {
-				self::$objs[ $name ][ $type ] = new self( );
-				self::$objs[ $name ][ $type ]->name = $name;
-				self::$objs[ $name ][ $type ]->type = $type;
-				self::$objs[ $name ][ $type ]->save();
+				self::$objs[ $name ][ $type ] = new self( $name, $type );
 			}
 		}
 		return self::$objs[ $name ][ $type ];

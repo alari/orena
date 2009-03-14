@@ -23,7 +23,7 @@
  * @index time
  */
 class O_Base_Session extends O_Dao_ActiveRecord {
-
+	
 	/**
 	 * Cached objects with session ID as array keys
 	 *
@@ -41,7 +41,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	{
 		if (!$id)
 			$id = session_id();
-		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( self::getClassName() )->test(
+		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( self::getClassName() )->test( 
 				"ses_id", $id )->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
@@ -107,7 +107,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	public function user()
 	{
-		return $this->user ? $this->user : call_user_func(
+		return $this->user ? $this->user : call_user_func( 
 				array (O_Registry::get( "app/classnames/visitor" ), "getInstance") );
 	}
 
@@ -193,24 +193,27 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function getClassName()
 	{
-		static $ses_class;
-		if ($ses_class == null) {
-			$ses_class = O_Registry::get( "app/classnames/session" );
+		return O_Registry::get( "app/classnames/session" );
+	}
 
-			if (!$ses_class || !class_exists( $ses_class ))
-				$ses_class = __CLASS__;
-
-		}
-		return $ses_class;
+	/**
+	 * Registers session handler
+	 *
+	 */
+	static public function registerHandler()
+	{
+		// Set framework session class as sessions handler
+		$ses_class = self::getClassName();
+		
+		session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"), 
+				Array ($ses_class, "write"), Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
+		// Set special session name
+		session_name( O_Registry::get( "app/session/name" ) );
+		// Start the session
+		session_start();
 	}
 
 }
 
-// Set framework session class as sessions handler
-$ses_class = O_Base_Session::getClassName();
-session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"),
-		Array ($ses_class, "write"), Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
-// Set special session name
-session_name( O_Registry::get( "app/session/name" ) );
-// Start the session
-session_start();
+O_ClassManager::registerClassLoadedCallback( array ("O_Base_Session", "registerHandler"), 
+		O_Registry::get( "app/classnames/session" ) );
