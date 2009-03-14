@@ -15,8 +15,8 @@ class Ex_Tpl_Post extends O_Html_Template {
 		$this->layout()->title = "Post: " . $this->post->title;
 		?>
 <div><a href="<?=$this->url( "" )?>">К списку постов</a> | <a
-	href="<?=$this->url( "post/form/" . $this->post->id )?>">Редактировать пост</a>
-</div>
+	href="<?=$this->url( "post/form/" . $this->post->id )?>">Редактировать
+пост</a></div>
 <?
 		$this->post->show( $this->layout() );
 		

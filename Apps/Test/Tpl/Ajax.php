@@ -1,6 +1,6 @@
 <?php
 class Test_Tpl_Ajax extends O_Html_Template {
-
+	
 	public $form;
 
 	public function __construct()

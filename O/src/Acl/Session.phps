@@ -1,5 +1,6 @@
 <?php
 class O_Acl_Session extends O_Base_Session {
+
 	/**
 	 * Checks current user access
 	 *

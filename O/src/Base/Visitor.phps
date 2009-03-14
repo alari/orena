@@ -23,7 +23,7 @@ class O_Base_Visitor {
 	static public function getInstance()
 	{
 		if (!self::$singleton) {
-			$class = O_Registry::get("app/classnames/visitor");
+			$class = O_Registry::get( "app/classnames/visitor" );
 			self::$singleton = new $class( );
 		}
 		return self::$singleton;

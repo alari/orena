@@ -6,8 +6,10 @@
 	<Registry key="js/fckeditor/config_path" value="/O/static/fckcustom.js"></Registry>
 	<Registry key="js/fckeditor/toolbar_set" value="Sample"></Registry>
 	<Registry key="classnames/session" value="O_Base_Session"></Registry>
-	<Registry key="classnames/visitor" value="O_Base_Visitor"></Registry><Registry key="classnames/user" value="O_Base_User"></Registry><Registry key="session/user_callback" value="user"></Registry>
-	
+	<Registry key="classnames/visitor" value="O_Base_Visitor"></Registry>
+	<Registry key="classnames/user" value="O_Base_User"></Registry>
+	<Registry key="session/user_callback" value="user"></Registry>
+
 	<Registry key="classnames/acl_role" value="O_Acl_Role"></Registry>
 	<Registry key="classnames/acl_action" value="O_Acl_Action"></Registry>
-	</Config>
+</Config>

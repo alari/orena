@@ -8,12 +8,12 @@ class Test_Cmd_Ajax extends O_Command {
 		$form->setAjaxMode();
 		$form->setCreateMode();
 		$form->setType( "ajax" );
-
+		
 		if (O_Registry::get( "app/env/request_method" ) == "POST") {
 			$form->responseAjax();
 			return;
 		}
-
+		
 		$tpl = $this->getTemplate();
 		$tpl->form = $form;
 		return $tpl;
