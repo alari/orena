@@ -52,7 +52,7 @@ class O_EntryPoint {
 			{
 				throw new Exception( $msg, $code );
 			}
-			set_error_handler( "throwit", E_COMPILE_ERROR );
+			set_error_handler( "throwit", E_ALL );
 		}
 		
 		try {

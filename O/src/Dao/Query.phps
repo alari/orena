@@ -109,6 +109,19 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	}
 
 	/**
+	 * Returns SQL COUNT(), SUM() etc
+	 *
+	 * @param string $field
+	 * @param string $func
+	 * @return int
+	 */
+	public function getFunc( $field = "*", $func = "COUNT" )
+	{
+		$q = clone $this;
+		return $q->clearFields()->field( $func . "($field) AS c" )->select()->fetch( PDO::FETCH_OBJ )->c;
+	}
+
+	/**
 	 * Disables statements preparing for particular class table use
 	 *
 	 * @param string $class

@@ -323,7 +323,8 @@ class O_Html_DaoRenderer_Form {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-$fieldName' );
-oFCKeditor.BasePath = '" . $this->layout->staticUrl( 'fckeditor/', 1 ) . "';
+oFCKeditor.BasePath = '" . $this->layout->staticUrl( 'fckeditor/', 
+							1 ) . "';
 oFCKeditor.ToolbarSet = 'Basic';
 oFCKeditor.ReplaceTextarea();", $this->layout );
 		}

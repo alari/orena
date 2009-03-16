@@ -13,6 +13,7 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	private $baseId;
 	private $baseClass;
 	private $baseField;
+	private $orderBy;
 
 	/**
 	 * Relation instance for concrete object
@@ -21,7 +22,7 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	 * @param string $targetField
 	 * @param int $baseId
 	 */
-	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField )
+	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField, $orderBy )
 	{
 		parent::__construct( $targetClass );
 		$this->targetClass = $targetClass;
@@ -29,9 +30,12 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 		$this->baseId = $baseId;
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
+		$this->orderBy = $orderBy;
 		
 		$tbl = O_Dao_TableInfo::get( $targetClass )->getTableName();
 		$this->test( $tbl . "." . $targetField, $baseId );
+		if ($orderBy)
+			$this->orderBy( $tbl . "." . $orderBy );
 	}
 
 	/**
@@ -42,8 +46,11 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new O_Dao_Query( $this->targetClass );
-		return $q->test( O_Dao_TableInfo::get( $this->targetClass )->getTableName() . "." . $this->targetField, 
-				$this->baseId );
+		$tbl = O_Dao_TableInfo::get( $this->targetClass )->getTableName();
+		$q->test( $tbl . "." . $this->targetField, $this->baseId );
+		if ($this->orderBy)
+			$q->orderBy( $tbl . "." . $this->orderBy );
+		return $q;
 	}
 
 	/**

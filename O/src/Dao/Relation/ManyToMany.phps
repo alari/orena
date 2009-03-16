@@ -15,6 +15,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	private $baseClass;
 	private $baseField;
 	private $baseTbl;
+	private $orderBy;
 	
 	private $relationTbl;
 	
@@ -28,7 +29,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 * @param int $baseId
 	 * @access private
 	 */
-	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField )
+	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField, $orderBy )
 	{
 		$this->targetClass = $targetClass;
 		$this->targetField = $targetField;
@@ -45,6 +46,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		$this->join( $this->relationTbl, 
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
 					 "." . $this->baseTbl . "=" . $baseId, "CROSS" );
+		if ($orderBy)
+			$this->orderBy( $this->targetTbl . "." . $orderBy );
 	}
 
 	/**
@@ -97,9 +100,12 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new O_Dao_Query( $this->targetClass );
-		return $q->join( $this->relationTbl, 
+		$q->join( $this->relationTbl, 
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
 					 "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
+		if ($this->orderBy)
+			$q->orderBy( $this->targetTbl . "." . $this->orderBy );
+		return $q;
 	}
 
 	/**

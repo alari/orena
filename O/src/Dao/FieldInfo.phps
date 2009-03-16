@@ -8,12 +8,13 @@
  * @field fieldname sql type
  *
  * Base to one or base to many relation:
- * @field fieldname -(has|owns) (one|many) Target_Classname -inverse other_fieldname
+ * @field fieldname -(has|owns) (one|many) Target_Classname -inverse other_fieldname [-order-by field]
  *
  * "owns" key means "on delete cascade". Inverse field must be specified for any base-to-many relation.
  * It will be one to many or many to many due to inverse field description.
  * Target_Classname could be in {some/registry/key} format. If it's so, target classname will be get from
  * "app/some/registry/key" registry.
+ * Also Target_Classname will be get from class constant if it's in ":CONST_NAME" format.
  *
  * Base to one relations returns target object as value. Base to many returns instance of
  * @see O_Dao_Relation_OneToMany
@@ -27,7 +28,7 @@
  * Those methods gets one additional bool parameter. If it's set to true, relative object will be deleted.
  *
  * O_Dao_FieldInfo also supports special "alias" fieldtype:
- * @field fieldname -alias relationfieldname.other_relation[.relation[...]] -where condition
+ * @field fieldname -alias relationfieldname.other_relation[.relation[...]] -where condition -order-by field
  * It returns O_Dao_Query with objects linked with current ActiveRecord with several steps.
  * E.g. A linked with B, B linked with C, so C is linked with A and this relation is available by calling
  * @example $A->{"B.C"} (this is named "mapped query" and handled by "B" fieldinfo object) or with
@@ -80,6 +81,12 @@ class O_Dao_FieldInfo {
 	 * @var string
 	 */
 	private $relationTarget;
+	/**
+	 * Unparsed target
+	 *
+	 * @var string
+	 */
+	private $relationTargetBase;
 	/**
 	 * Name of inverse field of related object
 	 *
@@ -165,11 +172,13 @@ class O_Dao_FieldInfo {
 		if (isset( $relation )) {
 			$this->isAtomic = false;
 			
-			list ($quantity, $this->relationTarget) = explode( " ", $params[ $relation ], 2 );
+			list ($quantity, $this->relationTargetBase) = explode( " ", $params[ $relation ], 2 );
 			// Get relation classname from registry, if needed!
-			if ($this->relationTarget[ 0 ] == "{" && $this->relationTarget[ strlen( 
-					$this->relationTarget ) - 1 ] == "}") {
-				$this->relationTarget = O_Registry::get( "app/" . substr( $this->relationTarget, 1, -1 ) );
+			if ($this->relationTargetBase[ 0 ] == "{" && $this->relationTargetBase[ strlen( 
+					$this->relationTargetBase ) - 1 ] == "}") {
+				$this->relationTarget = O_Registry::get( "app/" . substr( $this->relationTargetBase, 1, -1 ) );
+			} else {
+				$this->relationTarget = $this->relationTargetBase;
 			}
 			// Get inverse fieldname
 			$this->relationInverse = isset( $params[ "inverse" ] ) ? $params[ "inverse" ] : null;
@@ -201,6 +210,11 @@ class O_Dao_FieldInfo {
 	public function setClass( $class )
 	{
 		$this->class = $class;
+		if ($this->relationTargetBase && $this->relationTargetBase[ 0 ] == ":") {
+			$const = $this->class . ":" . $this->relationTargetBase;
+			$this->relationTarget = defined( $const ) ? constant( $const ) : null;
+			$this->relationInverseField = null;
+		}
 	}
 
 	/**
@@ -250,7 +264,7 @@ class O_Dao_FieldInfo {
 	}
 
 	/**
-	 * Create relation with other object(s).
+	 * Create relation with other objects.
 	 *
 	 * @param int $obj_id
 	 * @return O_Dao_Relation_BaseToMany
@@ -261,14 +275,15 @@ class O_Dao_FieldInfo {
 			if ($this->getInverse()->relationMany) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
 				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( 
-						$this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name );
+						$this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name, 
+						$this->getParam( "order-by" ) );
 			} else {
 				// Has many with inverse
 				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->relationTarget, 
-						$this->relationInverse, $obj_id, $this->class, $this->name );
+						$this->relationInverse, $obj_id, $this->class, $this->name, $this->getParam( "order-by" ) );
 			}
 		}
-		return $this->relation[ $obj_id ];
+		return clone $this->relation[ $obj_id ];
 	}
 
 	/**
@@ -442,6 +457,9 @@ class O_Dao_FieldInfo {
 				if (isset( $this->params[ "where" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
 					$this->aliasQuery->where( $this->params[ "where" ] );
 				}
+				if (isset( $this->params[ "order-by" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
+					$this->aliasQuery->orderBy( $this->params[ "order-by" ] );
+				}
 			}
 			if (!$this->aliasQuery instanceof O_Dao_Query) {
 				throw new Exception( "Wrong mapped query is produced by $name.$subreq map." );
@@ -599,4 +617,5 @@ class O_Dao_FieldInfo {
 			}
 		}
 	}
+
 }
