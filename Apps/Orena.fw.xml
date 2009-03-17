@@ -12,4 +12,8 @@
 
 	<Registry key="classnames/acl_role" value="O_Acl_Role"></Registry>
 	<Registry key="classnames/acl_action" value="O_Acl_Action"></Registry>
+	<Registry key="paginator/range" value="4"></Registry>
+	<Registry key="paginator/tails_range" value="1"></Registry>
+	<Registry key="paginator/perpage" value="15"></Registry>
+	<Registry key="paginator/page" value="1"></Registry>
 </Config>

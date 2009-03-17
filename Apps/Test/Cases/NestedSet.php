@@ -3,7 +3,7 @@
  * Test_Models_Node test case.
  */
 class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
-	
+
 	/**
 	 * @var Test_Models_Root
 	 */
@@ -12,10 +12,10 @@ class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
 
 	public function testFill()
 	{
-		
+
 		self::$root = new Test_Models_Root( );
 		$this->nodes = Array ();
-		
+
 		$this->fill( 1, 24, 0 );
 		$this->fill( 2, 7, 1 );
 		$this->fill( 3, 4, 2 );
@@ -88,10 +88,10 @@ class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
 		$parent = new Test_Models_Node( $root );
 		$child = new Test_Models_Node( $root );
 		$parent->injectTop( $child );
-		
+
 		$child->reload();
 		$parent->reload();
-		
+
 		$this->assertEquals( 0, $parent->level, "Parent level" );
 		$this->assertEquals( 1, $child->level, "Child level" );
 		$this->assertEquals( 1, $parent->left_key, "Left key of root" );
@@ -103,7 +103,6 @@ class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
 	public function testBuildTree()
 	{
 		$this->node( 1 )->injectTop( $this->node( 2 ) );
-		$this->node( 2 )->injectTop( $this->node( 3 ) );
 		$this->node( 2 )->injectBottom( $this->node( 5 ) );
 		$this->node( 2 )->injectAfter( $this->node( 20 ) );
 		$this->node( 20 )->injectBefore( $this->node( 8 ) );
@@ -113,7 +112,8 @@ class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
 		$this->node( 13 )->injectTop( $this->node( 14 ) );
 		$this->node( 13 )->injectBottom( $this->node( 16 ) );
 		$this->node( 20 )->injectTop( $this->node( 21 ) );
-		
+		$this->node( 2 )->injectTop( $this->node( 3 ) );
+
 		foreach (self::$nodes as $left => $arr) {
 			list ($node, $right, $level) = $arr;
 			$node->reload();
@@ -129,10 +129,10 @@ class Test_Cases_NestedSet extends PHPUnit_Framework_TestCase {
 	protected function tearDown()
 	{
 		// TODO Auto-generated Test_Cases_NestedSet::tearDown()
-		
+
 
 		$this->Test_Models_Node = null;
-		
+
 		parent::tearDown();
 	}
 

@@ -122,6 +122,19 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	}
 
 	/**
+	 * Shortcut for paginator constructor
+	 *
+	 * @param callback $url_callback
+	 * @param int $perpage
+	 * @param string $page_registry
+	 * @return O_Dao_Paginator
+	 */
+	public function getPaginator( $url_callback, $perpage = null, $page_registry = "paginator/page" )
+	{
+		return new O_Dao_Paginator( $this, $url_callback, $perpage, $page_registry );
+	}
+
+	/**
 	 * Disables statements preparing for particular class table use
 	 *
 	 * @param string $class

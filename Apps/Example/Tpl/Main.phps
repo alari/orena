@@ -1,7 +1,12 @@
 <?php
 class Ex_Tpl_Main extends O_Html_Template {
-	
-	public $posts;
+
+	/**
+	 * Pager with posts
+	 *
+	 * @var O_Dao_Paginator
+	 */
+	public $paginator;
 
 	public function __construct()
 	{
@@ -14,8 +19,8 @@ class Ex_Tpl_Main extends O_Html_Template {
 		?>
 <div><a href="<?=$this->url( "post/form" )?>">Добавить пост</a></div>
 <?
-		if ($this->posts) {
-			$this->posts->show();
+		if ($this->paginator) {
+			$this->paginator->show($this->layout());
 		}
 	}
 
