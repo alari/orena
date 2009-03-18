@@ -2,8 +2,9 @@
 <Application>
 	<Registry key="html/static_root" value="/Apps/Example/static/"></Registry>
 	<Registry key="uses" type="add" value="O_Base_Session"></Registry>
-	<Url pattern="page/([0-9]+)">
+	<Url pattern="page/([0-9]+)/([-a-z]+)?">
 		<Registry key="posts/page" pocket="1"></Registry>
+		<Registry key="paginator/order" pocket="2"></Registry>
 		<Command name="Main"></Command>
 	</Url>
 	<Url pattern="post/form(/([0-9]+))?">
@@ -12,6 +13,7 @@
 	</Url>
 	<Url pattern="post/([0-9]+)">
 		<Registry key="posts/id" pocket="1"></Registry>
+		<Registry></Registry>
 		<Command name="Post"></Command>
 	</Url>
 	<Command name="Main"></Command>

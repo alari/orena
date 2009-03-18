@@ -14,10 +14,10 @@ class Ex_Cmd_Post extends O_Command {
 			$record = $form->getActiveRecord();
 			$record->time = time();
 			$tpl->post->comments[] = $record;
-			$tpl->post->save();
 			$record->save();
 			
 			$form->removeActiveRecord();
+			return $this->redirect( $_SERVER[ 'REQUEST_URI' ] );
 		}
 		$tpl->form = $form;
 		return $tpl;

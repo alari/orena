@@ -21,4 +21,15 @@ interface O_Js_iFramework {
 	 * @param O_Html_Layout $layout
 	 */
 	public function addSrc( O_Html_Layout $layout );
+
+	/**
+	 * Returns fragment of javascript to set element contents to result of ajax post request.
+	 *
+	 * @param string $elementId
+	 * @param string $url
+	 * @param array $send_params
+	 * @param O_Html_Layout $layout
+	 * @return string
+	 */
+	public function ajaxHtml( $elementId, $url, array $send_params = array(), O_Html_Layout $layout = null );
 }

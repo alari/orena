@@ -63,7 +63,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	}
 
 	/**
-	 * Возвращает ветку, в которой участвует этот узел, от корня. Работает только с node.
+	 * Returns branch with this node from the root.
 	 *
 	 * @return O_Dao_Query
 	 */
@@ -73,7 +73,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	}
 
 	/**
-	 * Возвращает родительскую ноду, если она есть. Работает только с node.
+	 * Returns parent node, if it exists
 	 *
 	 * @return O_Dao_NestedSet_Node
 	 */
@@ -85,8 +85,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	}
 
 	/**
-	 * Возвращает всех детей до указанной глубины, сортировка по левому ключу.
-	 * Если 0, возвращает всех детей. Может работать без node.
+	 * Returns all children for given depth
 	 *
 	 * @param int $depth
 	 * @return O_Dao_Query
@@ -107,11 +106,11 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	 */
 	public function getLeaves()
 	{
-		return $this->getBranch() -> where( "right_key-left_key=1" );
+		return $this->getBranch()->where( "right_key-left_key=1" );
 	}
 
 	/**
-	 * Считает всех детей на указанную глубину
+	 * Counts all childs for given depth
 	 *
 	 * @param int $depth
 	 * @return int
@@ -142,6 +141,10 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		parent::delete();
 	}
 
+	/**
+	 * Deletes childs keeping current node in tree
+	 *
+	 */
 	public function deleteChilds()
 	{
 		$this->getChilds()->delete();

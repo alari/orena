@@ -16,4 +16,11 @@
 	<Registry key="paginator/tails_range" value="1"></Registry>
 	<Registry key="paginator/perpage" value="15"></Registry>
 	<Registry key="paginator/page" value="1"></Registry>
+	<Registry key="paginator/title" value="Pages"></Registry>
+	<Registry key="paginator/first" value="First"></Registry>
+	<Registry key="paginator/last" value="Last"></Registry>
+	<Registry key="paginator/prev" value="Previous"></Registry>
+	<Registry key="paginator/next" value="Next"></Registry>
+	<Registry key="paginator/css_envelop" value="o-pager"></Registry>
+	<Registry key="paginator/order_title" value="Order by"></Registry>
 </Config>

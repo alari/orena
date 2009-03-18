@@ -37,4 +37,27 @@ class O_Js_Mootools implements O_Js_iFramework {
 		$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
 	}
 
+	/**
+	 * Returns fragment of javascript to set element contents to result of ajax post request.
+	 *
+	 * @param string $elementId
+	 * @param string $url
+	 * @param array $send_params
+	 * @param O_Html_Layout $layout
+	 * @return string
+	 */
+	public function ajaxHtml( $elementId, $url, array $send_params = array(), O_Html_Layout $layout = null )
+	{
+		if ($layout)
+			$this->addSrc( $layout );
+		$params = "";
+		if (count( $send_params )) {
+			foreach ($send_params as $k => $v) {
+				$params .= ($params ? "," : "") . $k . ":'" . htmlspecialchars( $v ) . "'";
+			}
+			$params = "{" . $params . "}";
+		}
+		return "new Request.HTML({url:'$url',method:'POST',update:$('$elementId')}).post($params);";
+	}
+
 }
