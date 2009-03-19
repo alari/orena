@@ -80,6 +80,22 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	}
 
 	/**
+	 * Returns action status for current role (without parents)
+	 *
+	 * @param string $action
+	 * @return const
+	 */
+	public function getActionStatus( $action )
+	{
+		foreach ($this->actions as $act) {
+			if ($act->name == $action) {
+				return $act->type;
+			}
+		}
+		return "clear";
+	}
+
+	/**
 	 * Set current role as visitor's role
 	 *
 	 */

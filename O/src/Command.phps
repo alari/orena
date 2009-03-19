@@ -4,6 +4,8 @@ abstract class O_Command {
 	final public function run()
 	{
 		try {
+			if (method_exists( $this, "isAuthenticated" ) && !$this->isAuthenticated())
+				throw new Exception( "Access denied." );
 			$result = $this->process();
 		}
 		catch (Exception $e) {
@@ -19,6 +21,7 @@ abstract class O_Command {
 			$result->display();
 			return;
 		}
+		echo $result;
 	}
 
 	abstract public function process();
@@ -31,13 +34,13 @@ abstract class O_Command {
 
 	public function getParam( $name, $defaultValue = null )
 	{
-		$v = O_Registry::get( "app/env/request/params/$name" );
+		$v = O_Registry::get( "app/env/params/$name" );
 		return is_null( $v ) ? $defaultValue : $v;
 	}
 
 	public function getParams()
 	{
-		return O_Registry::get( "app/env/request/params" );
+		return O_Registry::get( "app/env/params" );
 	}
 
 	/**

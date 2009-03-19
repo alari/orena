@@ -37,12 +37,12 @@ class O_Dao_Renderer_EditCallbacks {
 			//
 			$customConfig = O_Registry::get( "app/js/fckeditor/config_path" );
 			$toolbarSet = O_Registry::get( "app/js/fckeditor/toolbar_set" );
-			O_Js_Middleware::getFramework()->addDomreadyCode(
+			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-$fieldName' );
 oFCKeditor.BasePath = '" . $layout->staticUrl( 'fckeditor/', 1 ) . "';" .
 						 ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' . $customConfig . '";' : "") .
-						 ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") . "oFCKeditor.ReplaceTextarea();",
+						 ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") . "oFCKeditor.ReplaceTextarea();", 
 						$layout );
 		}
 		?>

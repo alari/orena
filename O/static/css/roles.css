@@ -1,0 +1,10 @@
+#roles-list{width:120px;vertical-align:top}
+#role-edit-cell{vertical-align:top}
+#role-edit-cell fieldset{border-color:gray}
+#role-edit-cell legend{font-weight:bold}
+.role-act-allow{background:lightgreen}
+.role-act-deny{background:red}
+.role-act-clear{background:silver}
+.role-act-allow,.role-act-deny,.role-act-clear{text-align:center;width:18%}
+.role-act{background:lightskyblue}
+.role-act-sub{background:silver;text-align:center}

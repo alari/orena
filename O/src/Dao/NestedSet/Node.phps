@@ -48,7 +48,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	 */
 	public function getRootsQuery()
 	{
-		return O_Dao_Query::get(
+		return O_Dao_Query::get( 
 				O_Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( "root" )->getRelationTarget() );
 	}
 
@@ -93,7 +93,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	public function getChilds( $depth = 0 )
 	{
 		$q = $this->getRootNodes()->where( "left_key>? AND right_key<?", $this->left_key, $this->right_key );
-
+		
 		if ($depth > 0)
 			$q->where( "level<=?", $this->level + $depth );
 		return $q;
@@ -134,7 +134,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 			$this->getChilds()->delete();
 			// move keys
 			$_2N = $this->right_key - $this->left_key + 1;
-			$this->getRootNodes()->field( "right_key", "IF(right_key>$this->left_key,right_key-$_2N,right_key)", true )->field(
+			$this->getRootNodes()->field( "right_key", "IF(right_key>$this->left_key,right_key-$_2N,right_key)", true )->field( 
 					"left_key", "IF(left_key>$this->left_key,left_key-$_2N,left_key)", true )->update();
 		}
 		// delete this
@@ -149,9 +149,9 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	{
 		$this->getChilds()->delete();
 		$_2N = $this->right_key - $this->left_key - 1;
-		$this->getRootNodes()->field( "right_key", "IF(right_key>$this->left_key,right_key-$_2N,right_key)", true )->field(
+		$this->getRootNodes()->field( "right_key", "IF(right_key>$this->left_key,right_key-$_2N,right_key)", true )->field( 
 				"left_key", "IF(left_key>$this->left_key,left_key-$_2N,left_key)", true )->update();
-
+	
 	}
 
 	/**
@@ -168,15 +168,15 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		$oldLeft = $this->left_key;
 		$oldRight = $this->right_key;
 		$oldLevel = $this->level;
-
+		
 		// Set random negative root
 		do {
 			$rand_root = -rand( 1, 1 << 16 );
 		} while (O_Dao_Query::get( get_class( $this ) )->test( "root", $rand_root )->getFunc( "left_key" ));
-
+		
 		if ($oldRight - $oldLeft > 1) {
-			$this->getChilds()->addOr()->test( "id", $this->id )->field( "root", $rand_root )->field( "left_key",
-					"left_key-" . ($oldLeft + 1), true )->field( "right_key", "right_key-" . ($oldRight + 1), true )->field(
+			$this->getChilds()->addOr()->test( "id", $this->id )->field( "root", $rand_root )->field( "left_key", 
+					"left_key-" . ($oldLeft + 1), true )->field( "right_key", "right_key-" . ($oldRight + 1), true )->field( 
 					"level", "level-" . $oldLevel, true )->update();
 		} else {
 			$this->setField( "root", $rand_root );
@@ -185,14 +185,14 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 			$this->level = 0;
 			$this->save();
 		}
-
+		
 		// Move keys in old root
 		if ($oldRootNodes) {
-			$oldRootNodes->field( "right_key", "IF(left_key>$oldLeft,right_key-$_2N,right_key)", true )->field(
+			$oldRootNodes->field( "right_key", "IF(left_key>$oldLeft,right_key-$_2N,right_key)", true )->field( 
 					"left_key", "IF(left_key>$oldLeft,left_key-$_2N,left_key)", true )->update();
 		}
 		$this->reload();
-
+		
 		return O_Dao_Query::get( get_class( $this ) )->test( "root", $rand_root );
 	}
 
@@ -206,7 +206,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	 */
 	public function processInjection( O_Dao_Query $childsQuery, $keyOffset, $levelOffset )
 	{
-		$childsQuery->field( "level", "level+" . $levelOffset, true )->field( "left_key", "left_key+" . $keyOffset,
+		$childsQuery->field( "level", "level+" . $levelOffset, true )->field( "left_key", "left_key+" . $keyOffset, 
 				true )->field( "right_key", "right_key+" . $keyOffset, true )->field( "root", $this[ "root" ] )->update();
 	}
 
@@ -221,20 +221,20 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		// Remove child from its tree
 		$childQuery = $child->revoke();
 		$this->reload();
-
+		
 		$parentLeft = $this->left_key - 1;
-
+		
 		// Update keys in current tree
 		$_2N = $child->right_key - $child->left_key + 1;
-		$this->getRootNodes()->field( "left_key", "IF(left_key>=$this->left_key,left_key+$_2N,left_key)", true )->field(
+		$this->getRootNodes()->field( "left_key", "IF(left_key>=$this->left_key,left_key+$_2N,left_key)", true )->field( 
 				"right_key", "IF(right_key>$this->left_key,right_key+$_2N,right_key)", true )->update();
-
+		
 		// Set root, level and keys for childs
 		$this->processInjection( $childQuery, $parentLeft, $this->level );
 		$child->reload();
 		$this->reload();
 		O_Db_Manager::getConnection()->commit();
-
+	
 	}
 
 	/**
@@ -248,14 +248,14 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		// Remove child from its tree
 		$childQuery = $child->revoke();
 		$this->reload();
-
+		
 		$parentLeft = $this->right_key;
-
+		
 		// Update keys in current tree
 		$_2N = $child->right_key - $child->left_key + 1;
-		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->right_key,left_key+$_2N,left_key)", true )->field(
+		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->right_key,left_key+$_2N,left_key)", true )->field( 
 				"right_key", "IF(right_key>$this->right_key,right_key+$_2N,right_key)", true )->update();
-
+		
 		// Set root, level and keys for childs
 		$this->processInjection( $childQuery, $parentLeft, $this->level );
 		O_Db_Manager::getConnection()->commit();
@@ -272,14 +272,14 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		// Remove child from its tree
 		$childQuery = $child->revoke();
 		$this->reload();
-
+		
 		$parentLeft = $this->left_key;
-
+		
 		// Update keys in current tree
 		$_2N = $child->right_key - $child->left_key + 1;
-		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->left_key,left_key+$_2N,left_key)", true )->field(
+		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->left_key,left_key+$_2N,left_key)", true )->field( 
 				"right_key", "IF(right_key>$this->left_key,right_key+$_2N,right_key)", true )->update();
-
+		
 		// Set root, level and keys for childs
 		$this->processInjection( $childQuery, $parentLeft, $this->level + 1 );
 		O_Db_Manager::getConnection()->commit();
@@ -296,14 +296,14 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 		// Remove child from its tree
 		$childQuery = $child->revoke();
 		$this->reload();
-
+		
 		$parentLeft = $this->right_key - 1;
-
+		
 		// Update keys in current tree
 		$_2N = $child->right_key - $child->left_key + 1;
-		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->right_key,left_key+$_2N,left_key)", true )->field(
+		$this->getRootNodes()->field( "left_key", "IF(left_key>$this->right_key,left_key+$_2N,left_key)", true )->field( 
 				"right_key", "IF(right_key>=$this->right_key,right_key+$_2N,right_key)", true )->update();
-
+		
 		// Set root, level and keys for childs
 		$this->processInjection( $childQuery, $parentLeft, $this->level + 1 );
 		O_Db_Manager::getConnection()->commit();

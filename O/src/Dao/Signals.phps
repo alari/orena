@@ -13,12 +13,12 @@
  * @author Dmitry Kourinski
  */
 class O_Dao_Signals {
-
+	
 	const EVENT_REMOVE = "remove";
 	const EVENT_SET = "set";
 	const EVENT_CREATE = "create";
 	const EVENT_DELETE = "delete";
-
+	
 	const REGISTRY_KEY = "app/dao-listeners";
 
 	/**
@@ -38,9 +38,9 @@ class O_Dao_Signals {
 		if (!count( $signals ))
 			$signals = array ("-");
 		foreach ($signals as $s) {
-			if (!O_Registry::get(self::REGISTRY_KEY."/$event/$s/$class") || !in_array( $callback,
-					O_Registry::get(self::REGISTRY_KEY."/$event/$s/$class") ))
-				O_Registry::add(self::REGISTRY_KEY."/$event/$s/$class", $callback);
+			if (!O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) || !in_array( $callback, 
+					O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) ))
+				O_Registry::add( self::REGISTRY_KEY . "/$event/$s/$class", $callback );
 		}
 	}
 
@@ -71,15 +71,15 @@ class O_Dao_Signals {
 	static public function getListeners( $event, $signal, $class )
 	{
 		$listeners = Array ();
-
+		
 		$events = Array ("-");
 		if ($event && $event != "-")
 			$events[] = (string)$event;
-
+		
 		$classes = Array ("-");
 		if ($class && $class != "-")
 			$classes[] = (string)$class;
-
+		
 		$signals = Array ("-");
 		if ($signal) {
 			$signal = explode( " ", $signal );
@@ -87,9 +87,9 @@ class O_Dao_Signals {
 				if (!in_array( $s, $signals ))
 					$signals[] = $s;
 		}
-
-		$av_listeners = O_Registry::get(self::REGISTRY_KEY);
-
+		
+		$av_listeners = O_Registry::get( self::REGISTRY_KEY );
+		
 		foreach ($events as $e) {
 			foreach ($signals as $s) {
 				foreach ($classes as $c) {
@@ -99,7 +99,7 @@ class O_Dao_Signals {
 				}
 			}
 		}
-
+		
 		$listeners = array_unique( $listeners );
 		$null = array_search( null, $listeners );
 		if ($null)
@@ -118,12 +118,12 @@ class O_Dao_Signals {
 	static public function unbind( $callback = null, $event = null, $signal = null, $class = null )
 	{
 		if (!$callback && !$event && !$signal && !$class) {
-			O_Registry::set(self::REGISTRY_KEY, array());
+			O_Registry::set( self::REGISTRY_KEY, array () );
 			return;
 		}
-
-		$av_listeners = O_Registry::get(self::REGISTRY_KEY);
-
+		
+		$av_listeners = O_Registry::get( self::REGISTRY_KEY );
+		
 		$signals = Array ();
 		if ($signal) {
 			$signal = explode( " ", $signal );
@@ -131,7 +131,7 @@ class O_Dao_Signals {
 				if (!in_array( $s, $signals ))
 					$signals[] = $s;
 		}
-
+		
 		foreach ($av_listeners as $e => &$listeners_ev) {
 			if ($event && $e != $event)
 				continue;
@@ -151,7 +151,7 @@ class O_Dao_Signals {
 				}
 			}
 		}
-
-		O_Registry::set(self::REGISTRY_KEY, $av_listeners);
+		
+		O_Registry::set( self::REGISTRY_KEY, $av_listeners );
 	}
 }
