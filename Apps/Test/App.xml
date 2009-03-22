@@ -35,4 +35,18 @@
 	<Registry key="db/default/dbname" value="Orena"></Registry>
 	<Registry key="test/core_class" value="Test_Models_Core"></Registry>
 	<Registry key="test/sub_class" value="Test_Models_Sub"></Registry>
+	<Registry key="classnames/user" value="Test_Models_User"></Registry>
+	<Registry key="classnames/visitor" value="O_Acl_Visitor"></Registry>
+	<Registry key="class/Test_Models_Acl/acl">
+		<Visitor role="test visitor"></Visitor>
+		<User-In field="owner">
+			<Role name="test owner"></Role>
+		</User-In>
+		<User-In field="owners">
+			<Role name="test owners"></Role>
+		</User-In>
+		<Resourse field="prop" value="abb">
+			<Role name="test prop"></Role>
+		</Resourse>
+	</Registry>
 </Application>

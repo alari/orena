@@ -15,8 +15,9 @@ class O_Db_Manager {
 	 * @param array $conf engine, host, database, user, password, port
 	 * @param string $conn_id CONN_DEFAULT is default connection
 	 * @see PDO::__construct()
+	 * @return PDO
 	 */
-	static public function connect( Array $conf, $conn_id = self::CONN_DEFAULT )
+	static protected function connect( Array $conf, $conn_id = self::CONN_DEFAULT )
 	{
 		$dsn = $conf[ "engine" ] . ":";
 		$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
@@ -39,7 +40,7 @@ class O_Db_Manager {
 		if (!isset( self::$connections[ $conn_id ] )) {
 			$conf = O_Registry::get( "app/db/" . $conn_id );
 			if (isset( $conf[ "engine" ] ))
-				self::connect( $conf );
+				self::connect( $conf )->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 		}
 		return isset( self::$connections[ $conn_id ] ) ? self::$connections[ $conn_id ] : null;
 	}

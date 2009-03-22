@@ -40,7 +40,8 @@ class O_Dao_Renderer_Show_Callbacks {
 	static public function loop( O_Dao_Renderer_Show_Params $params )
 	{
 		if ($params->value() instanceof O_Dao_Query)
-			$params->value()->show( $params->layout(), $params->params() ? $params->params() : O_Dao_Renderer::TYPE_LOOP );
+			$params->value()->show( $params->layout(), 
+					$params->params() ? $params->params() : O_Dao_Renderer::TYPE_LOOP );
 		echo "<!-- error -->";
 	}
 

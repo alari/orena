@@ -23,6 +23,10 @@ class Test_Suite extends PHPUnit_Framework_TestSuite {
 		$this->addTestSuite( 'Test_Cases_Registry' );
 		
 		$this->addTestSuite( 'Test_Cases_NestedSet' );
+		
+		$this->addTestSuite( 'Test_Cases_Acl' );
+		
+		$this->addTestSuite( 'Test_Cases_AclResourse' );
 	
 	}
 

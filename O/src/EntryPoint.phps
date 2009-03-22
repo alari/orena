@@ -396,6 +396,8 @@ class O_EntryPoint {
 			$pocket = (string)$registry[ "pocket" ];
 			if (array_key_exists( $pocket, $pockets ))
 				$value = $pockets[ $pocket ];
+		} elseif (!$value) {
+			$value = $registry;
 		}
 		if ($registry[ "type" ] == "add") {
 			O_Registry::add( $rootkey . "/" . $key, $value );

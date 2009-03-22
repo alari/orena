@@ -12,11 +12,14 @@ class O_Acl_Visitor extends O_Base_Visitor implements O_Acl_iUser {
 	{
 		// For resourse try to get access rule from -visitor role
 		if ($resourse) {
-			$registry = O_Registry::get( "acl/-visitor", $resourse );
-			if ($registry) {
-				$access = O_Acl_Role::getByName( $registry )->can( $action );
-				if (!is_null( $access ))
-					return $access;
+			$registry = O_Registry::get( "acl", $resourse );
+			if ($registry instanceof SimpleXMLElement && isset( $registry->Visitor )) {
+				$visitor = $registry->Visitor[ 0 ];
+				if ($visitor && (string)$visitor[ "role" ]) {
+					$access = O_Acl_Role::getByName( (string)$visitor[ "role" ] )->can( $action );
+					if (!is_null( $access ))
+						return $access;
+				}
 			}
 		}
 		// Rule by visitor role
