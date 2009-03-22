@@ -1,10 +1,12 @@
-#roles-list{width:120px;vertical-align:top}
-#role-edit-cell{vertical-align:top}
+#roles-list{width:30%;vertical-align:top;background:#f0f0f0}
+#role-edit-cell{vertical-align:top;background:#fafafa}
 #role-edit-cell fieldset{border-color:gray}
 #role-edit-cell legend{font-weight:bold}
-.role-act-allow{background:lightgreen}
-.role-act-deny{background:red}
-.role-act-clear{background:silver}
+#role-edit-cell fieldset table{width:100%}
+.role-act-allow{background:#c8ffcc}
+.role-act-deny{background:#ff997d}
+.role-act-clear{background:#d9d9d9}
 .role-act-allow,.role-act-deny,.role-act-clear{text-align:center;width:18%}
-.role-act{background:lightskyblue}
-.role-act-sub{background:silver;text-align:center}
+.role-act{background:#c5edff}
+.role-act-sub{background:#eeeeee;text-align:center}
+.role-current{color:black}

@@ -39,18 +39,27 @@ class O_Dao_Renderer_Shower extends O_Dao_Renderer_Commons {
 				$callback = $callback[ "callback" ];
 			}
 			
+			$call_params = new O_Dao_Renderer_Show_Params( $name, get_class( $this->record ), $params, $this->record );
+			if ($this->layout)
+				$call_params->setLayout( $this->layout );
+			$call_params->setValue( $this->record->$name );
+			
 			// Make HTML injections, display field value via callback
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
-			call_user_func_array( $callback, array ($this->record->$name, $params, $this->layout, $this->record) );
+			call_user_func( $callback, $call_params );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];
 		}
 		
 		// Calling envelop callback
 		if (is_array( $envelopCallback )) {
-			call_user_func_array( $envelopCallback[ "callback" ], 
-					array (ob_get_clean(), $envelopCallback[ "params" ], $this->record) );
+			$env_params = new O_Dao_Renderer_Show_Params( null, get_class( $this->record ), 
+					$envelopCallback[ "params" ], $this->record );
+			$env_params->setValue( ob_get_clean() );
+			if ($this->layout)
+				$env_params->setLayout( $this->layout );
+			call_user_func( $envelopCallback[ "callback" ], $env_params );
 		}
 	}
 }

@@ -19,10 +19,16 @@ class O_Registry {
 	 * Returns registry value or array of values, runtime or default
 	 *
 	 * @param string $key like ini-file[/ini-section[/key]]
+	 * @params string|object $class Returns value from app/class/$classname registry key
 	 * @return mixed
 	 */
-	static public function get( $key )
+	static public function get( $key, $class = null )
 	{
+		if (is_object( $class ))
+			$class = get_class( $class );
+		if ($class)
+			$key = "app/class/" . $class . "/$key";
+		
 		$keys = explode( "/", $key );
 		$value = self::$registry;
 		foreach ($keys as $k) {

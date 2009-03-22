@@ -103,7 +103,7 @@ class O_Dao_TableInfo {
 		$docCommentLines = Array ();
 		
 		// Import data from plugins
-		$plugins = O_Registry::get( "app/dao/$class/plugins" );
+		$plugins = O_Registry::get( "plugins", $class );
 		if (is_array( $plugins )) {
 			foreach ($plugins as $plugin) {
 				if (!class_exists( $plugin ))

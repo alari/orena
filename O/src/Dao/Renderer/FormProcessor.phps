@@ -305,9 +305,15 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			// Make HTML injections, display field value via callback
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
-			call_user_func_array( $callback, 
-					array ($name, $value, $title, $params, $this->layout, 
-								isset( $this->errors[ $name ] ) ? $this->errors[ $name ] : null) );
+			
+			$edit_params = new O_Dao_Renderer_Edit_Params( $name, $this->class, $params, $this->record );
+			$edit_params->setLayout( $this->layout );
+			$edit_params->setValue( $value );
+			$edit_params->setTitle( $title );
+			if (isset( $this->errors[ $name ] ))
+				$edit_params->setError( $this->errors[ $name ] );
+			
+			call_user_func( $callback, $edit_params );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];
 		}
@@ -367,7 +373,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	}
 
 	/**
-	 * Checks field values, collects errors (given by O_Dao_Renderer_FieldCheckException)
+	 * Checks field values, collects errors (given by O_Dao_Renderer_Check_Exception)
 	 *
 	 */
 	protected function checkValues()
@@ -388,13 +394,13 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 					if (is_array( $this->values[ $name ] )) {
 						// Array of values for *-to-one relation
 						if (!$fieldInfo->isRelationMany()) {
-							throw new O_Dao_Renderer_FieldCheckException( "Wrong values for relation." );
+							throw new O_Dao_Renderer_Check_Exception( "Wrong values for relation." );
 						}
 						// Prepare result value
 						$value = Array ();
 						foreach ($this->values[ $name ] as $id) {
 							if (is_array( $availableValues ) && !isset( $availableValues[ $id ] )) {
-								throw new O_Dao_Renderer_FieldCheckException( "Not a valid value for relation." );
+								throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
 							}
 							$value[ $id ] = O_Dao_ActiveRecord::getById( $id, $fieldInfo->getRelationTarget() );
 						}
@@ -402,7 +408,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 						// single relation
 					} else {
 						if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
-							throw new O_Dao_Renderer_FieldCheckException( "Not a valid value for relation." );
+							throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
 						}
 						$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
 								$fieldInfo->getRelationTarget() );
@@ -410,26 +416,49 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				}
 				
 				// Callback checker
-				$callback = $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_CHECK );
+				$callback = $this->getCheckCallback( $fieldInfo );
 				if ($callback) {
-					$params = $callback[ "params" ];
+					$params = new O_Dao_Renderer_Check_Params( $name, $this->class, $callback[ "params" ], 
+							$this->record );
+					$params->setNewValueRef( $this->values[ $name ] );
+					
 					$callback = $callback[ "callback" ];
 					
-					call_user_func_array( $callback, 
-							array ($this->values[ $name ], $this->record ? $this->record->$name : null, $params) );
+					call_user_func( $callback, $params );
 				}
 				
 				// Required value test
 				if (!$this->values[ $name ] && $fieldInfo->getParam( "required" )) {
-					throw new O_Dao_Renderer_FieldCheckException( 
+					throw new O_Dao_Renderer_Check_Exception( 
 							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam( 
 									"required" ) );
 				}
 			}
-			catch (O_Dao_Renderer_FieldCheckException $e) {
+			catch (O_Dao_Renderer_Check_Exception $e) {
 				$this->errors[ $name ] = $e->getMessage();
 			}
 		}
+	}
+
+	/**
+	 * Returns callback for field check
+	 *
+	 * @param O_Dao_FieldInfo $fieldInfo
+	 * @return array
+	 */
+	private function getCheckCallback( O_Dao_FieldInfo $fieldInfo )
+	{
+		$fullkey = $this->type ? O_Dao_Renderer::KEY_CHECK . "-" . $this->type : "";
+		$key = O_Dao_Renderer::KEY_CHECK;
+		$params = null;
+		if ($fullkey && $fieldInfo->getParam( $fullkey )) {
+			$params = $fieldInfo->getParam( $fullkey );
+		} elseif ($fieldInfo->getParam( $key )) {
+			$params = $fieldInfo->getParam( $key );
+		}
+		if (!$params)
+			return false;
+		return $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_CHECK );
 	}
 
 	/**

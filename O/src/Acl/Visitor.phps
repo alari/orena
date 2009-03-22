@@ -12,7 +12,7 @@ class O_Acl_Visitor extends O_Base_Visitor implements O_Acl_iUser {
 	{
 		// For resourse try to get access rule from -visitor role
 		if ($resourse) {
-			$registry = O_Registry::get( "app/acl/context/" . get_class( $resourse ) . "/-visitor" );
+			$registry = O_Registry::get( "acl/-visitor", $resourse );
 			if ($registry) {
 				$access = O_Acl_Role::getByName( $registry )->can( $action );
 				if (!is_null( $access ))
