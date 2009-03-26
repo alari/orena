@@ -254,12 +254,19 @@ class O_Dao_FieldInfo {
 		static $is_added = false;
 		if ($is_added)
 			return null;
-		$q = new O_Dao_Query( $this->class );
-		$this->addFieldTypeToQuery( $q );
-		$r = $q->alter( "ADD" );
-		O_Dao_ActiveRecord::saveAndReload( $this->class );
-		O_Dao_Query::disablePreparing( $this->class );
-		$is_added = true;
+		try {
+			$q = new O_Dao_Query( $this->class );
+			$this->addFieldTypeToQuery( $q );
+			$r = $q->alter( "ADD" );
+			O_Dao_ActiveRecord::saveAndReload( $this->class );
+			O_Dao_Query::disablePreparing( $this->class );
+			$is_added = true;
+		}
+		catch (PDOException $e) {
+			if (O_Registry::get( "app/mode" ) == "debug")
+				throw $e;
+			return null;
+		}
 		return $r;
 	}
 
@@ -301,8 +308,9 @@ class O_Dao_FieldInfo {
 	 * FieldInfo of reverse field
 	 *
 	 * @return O_Dao_FieldInfo
+	 * @access private
 	 */
-	private function getInverse()
+	public function getInverse()
 	{
 		if (!$this->relationInverseField)
 			$this->relationInverseField = O_Dao_TableInfo::get( $this->relationTarget )->getFieldInfo( 
@@ -402,7 +410,19 @@ class O_Dao_FieldInfo {
 		}
 		// Many objects
 		if ($this->relationMany) {
-			throw new Exception( "Cannot assign base-to-many relation." );
+			if ($fieldValue instanceof O_Dao_Query)
+				$fieldValue = $fieldValue->getAll();
+			if (!is_array( $fieldValue ))
+				throw new Exception( "Cannot assign non-array/query to base-to-many relation." );
+			$relation = $this->getRelation( $obj->id );
+			foreach ($relation as $_el) {
+				if (!array_key_exists( $_el->id, $fieldValue ))
+					$relation->remove( $_el, $this->relationOwns );
+			}
+			foreach ($fieldValue as $v) {
+				$relation[] = $v;
+			}
+			return $relation;
 		}
 		// Base-to-one
 		if (get_class( $fieldValue ) == $this->relationTarget || is_null( $fieldValue )) {
@@ -420,7 +440,7 @@ class O_Dao_FieldInfo {
 					$oldValue->save();
 				}
 				if ($fieldValue && (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id)) {
-					$fieldValue->{$this->getInverse()->name} = $obj;
+					$fieldValue->$inverseName = $obj;
 					$fieldValue->save();
 				}
 			}
@@ -494,11 +514,10 @@ class O_Dao_FieldInfo {
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
 		if ($this->relationMany && $this->getInverse()->relationMany) {
-			$tbl = $this->getRelation( 0 )->getRelationTableName();
-			$query->join( $tbl, 
-					$tbl . "." . O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
-					"CROSS" );
-			$joinOnField = $tbl . "." . O_Dao_TableInfo::get( $this->class )->getTableName();
+			$rel = $this->getRelation( 0 );
+			$tbl = $rel->getRelationTableName();
+			$query->join( $tbl, $tbl . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
+			$joinOnField = $tbl . "." . $rel->getBaseFieldName();
 		}
 		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id );
 		return $query;
@@ -557,19 +576,19 @@ class O_Dao_FieldInfo {
 		
 		//many-to-many: relation is a special table
 		if ($this->relationMany && $this->getInverse()->relationMany) {
-			$tbl = $this->getRelation( 0 )->getRelationTableName();
+			$rel = $this->getRelation( 0 );
+			$tbl = $rel->getRelationTableName();
 			$als = $tbl . ($i ? "_" . $i : "");
 			
-			$query->join( $tbl . " " . $als, 
-					$als . "." . O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . "=" . $joinOnField, 
-					"CROSS" );
+			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
 			
 			if ($isOneToMany) {
-				$query->join( $currTable . " " . $currAlias, $currAlias . ".id=" . $als . "." . $currTable, "CROSS" );
+				$query->join( $currTable . " " . $currAlias, 
+						$currAlias . ".id=" . $als . "." . $rel->getBaseFieldName(), "CROSS" );
 				return $currAlias . "." . $nextInfo->getInverse()->name;
 			}
 			
-			return $als . "." . $currTable;
+			return $als . "." . $rel->getBaseFieldName();
 			//relation is current table itself
 		} else {
 			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
@@ -608,7 +627,7 @@ class O_Dao_FieldInfo {
 			if ($relative) {
 				// If has one, the database field exists
 				if ($this->getInverse() && !$this->getInverse()->relationMany) {
-					$relative->setField( $this->getInverse(), null );
+					$relative->setField( $this->getInverse()->name, null );
 				}
 				if ($this->relationOwns) {
 					$relative->delete();

@@ -26,13 +26,24 @@ class O_UrlBuilder {
 			$url = $r . $url;
 		}
 		if (count( $params )) {
-			$query_string = "";
-			foreach ($params as $k => $v) {
-				$query_string .= ($query_string ? "&" : "") . urlencode( $k ) . "=" . urlencode( $v );
-			}
-			$url .= "?" . $query_string;
+			$url .= "?" . self::buildQueryString( $params );
 		}
 		return $url;
+	}
+
+	/**
+	 * Builds query string by array af params
+	 *
+	 * @param array $params
+	 * @return string
+	 */
+	static public function buildQueryString( array $params )
+	{
+		$query_string = "";
+		foreach ($params as $k => $v) {
+			$query_string .= ($query_string ? "&" : "") . urlencode( $k ) . "=" . urlencode( $v );
+		}
+		return $query_string;
 	}
 
 	/**

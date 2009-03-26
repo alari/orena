@@ -81,13 +81,13 @@ class O_Dao_Paginator {
 		$this->query = clone $query;
 		$this->perpage = (int)($perpage ? $perpage : O_Registry::get( "app/paginator/perpage" ));
 		if (!$this->perpage)
-			throw new Exception( "Cannot build paginator for 0 objects per page." );
+			throw new O_Ex_Logic( "Cannot build paginator for 0 objects per page." );
 		$this->page = (int)O_Registry::get( "app/" . $page_registry );
 		if (!$this->page)
 			$this->page = 1;
 		
 		if (!is_callable( $url_callback ))
-			throw new Exception( "Wrong callback for paginator url-builder." );
+			throw new O_Ex_Logic( "Wrong callback for paginator url-builder." );
 		$this->url_callback = $url_callback;
 		
 		if (count( $orders )) {
@@ -116,7 +116,7 @@ class O_Dao_Paginator {
 		$this->total_count = $this->query->getFoundRows();
 		
 		if (!count( $this->page_elements ))
-			throw new Exception( "No elements on current page." );
+			throw new O_Ex_PageNotFound( "No elements on current page.", 404 );
 	
 	}
 

@@ -5,17 +5,15 @@ abstract class O_Command {
 	{
 		try {
 			if (method_exists( $this, "isAuthenticated" ) && !$this->isAuthenticated())
-				throw new Exception( "Access denied." );
+				throw new O_Ex_AccessDenied( );
 			$result = $this->process();
 		}
 		catch (Exception $e) {
-			// TODO: add correct errors middleware
-			echo "Command error<br/><pre>", $e, "</pre>";
-			return;
-		}
-		if ($result instanceof O_Http_Response) {
-			// TODO: process simple http response
-			return;
+			if (method_exists( $this, "catchEx" )) {
+				$result = $this->catchEx( $e );
+			} else {
+				throw $e;
+			}
 		}
 		if ($result instanceof O_Html_Template) {
 			$result->display();
@@ -26,10 +24,13 @@ abstract class O_Command {
 
 	abstract public function process();
 
-	public function redirect( $href )
+	public function redirect( $href = null )
 	{
 		// TODO: add redirect shortcut
+		if (is_null( $href ))
+			$href = O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) );
 		Header( "Location: $href" );
+		return null;
 	}
 
 	public function getParam( $name, $defaultValue = null )

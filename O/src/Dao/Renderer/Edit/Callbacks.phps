@@ -40,15 +40,21 @@ class O_Dao_Renderer_Edit_Callbacks {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" .
+						 $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") .
 						 "oFCKeditor.ReplaceTextarea();", $params->layout() );
 		}
 		?>
 <div class="oo-renderer-field">
-<div class="oo-renderer-title">
-<?=$params->title()?>:</div>
 <?
+		if ($params->title() !== 1) {
+			?><div class="oo-renderer-title">
+<?=$params->title()?>:</div><?
+		}
+		?>
+<?
+
 		if ($params->error()) {
 			?>
 <div class="oo-renderer-error">
@@ -57,8 +63,8 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <?
 		}
 		?>
-<textarea class="oo-renderer-field-wysiwyg"
-	id="oo-r-w-<?=$params->fieldName()?>" name="<?=$params->fieldName()?>"><?=$params->value()?></textarea></div>
+<textarea class="fckeditor" id="oo-r-w-<?=$params->fieldName()?>"
+	name="<?=$params->fieldName()?>"><?=$params->value()?></textarea></div>
 <?
 	}
 

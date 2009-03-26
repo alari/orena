@@ -5,7 +5,7 @@
 	<Registry key="html/static_root" value="/Apps/Test/static/"></Registry>
 	<Registry key="class/O_Acl_User/plugins" type="add"
 		value="O_OpenId_Provider_UserPlugin"></Registry>
-	<Registry key="uses" type="add" value="O_Http_Session"></Registry>
+	<Registry key="uses" type="add" value="O_Base_Session"></Registry>
 	<If mode="development">
 		<Registry key="test/if" value="mode=dev"></Registry>
 	</If>

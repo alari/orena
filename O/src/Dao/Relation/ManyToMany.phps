@@ -11,10 +11,12 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	private $targetClass;
 	private $targetField;
 	private $targetTbl;
+	private $targetFieldName;
 	private $baseId;
 	private $baseClass;
 	private $baseField;
 	private $baseTbl;
+	private $baseFieldName;
 	private $orderBy;
 	
 	private $relationTbl;
@@ -39,15 +41,46 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		$this->baseField = $baseField;
 		$this->baseTbl = O_Dao_TableInfo::get( $baseClass )->getTableName();
 		
+		$this->getTargetFieldName();
+		$this->getBaseFieldName();
 		$this->relationTbl = $this->getRelationTableName();
 		
 		parent::__construct( $this->targetClass );
 		
 		$this->join( $this->relationTbl, 
-				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
-					 "." . $this->baseTbl . "=" . $baseId, "CROSS" );
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
+					 "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
+	}
+
+	/**
+	 * Returns target field name of relation table
+	 *
+	 * @return string
+	 */
+	public function getTargetFieldName()
+	{
+		if (!$this->targetFieldName) {
+			$this->targetFieldName = $this->targetTbl . "_" . $this->targetField;
+			if ($this->targetTbl == $this->baseTbl && $this->targetField == $this->baseField) {
+				$this->targetFieldName = "t_" . $this->targetFieldName;
+			}
+		}
+		return $this->targetFieldName;
+	}
+
+	/**
+	 * Returns base field name of relation table
+	 *
+	 * @return string
+	 */
+	public function getBaseFieldName()
+	{
+		if (!$this->baseFieldName) {
+			$this->baseFieldName = $this->baseTbl . "_" . $this->baseField;
+		}
+		return $this->baseFieldName;
 	}
 
 	/**
@@ -69,13 +102,10 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		if (isset( self::$relationTblLoaded[ $r ] ))
 			return $r;
 		
-		$stmt = O_Db_Manager::getConnection()->query( "SHOW TABLE STATUS WHERE name = '" . $r . "'" );
-		if ($stmt)
-			$stmt->execute();
-		if (!$stmt || !count( $stmt->fetchAll() )) {
-			$q = new O_Db_Query( $r );
-			$q->field( $this->targetTbl, "int NOT NULL" )->field( $this->baseTbl, "int NOT NULL" )->index( 
-					$this->targetTbl . ", " . $this->baseTbl, "PRIMARY KEY" )->create();
+		if (!O_Db_Query::get( $r )->tableExists()) {
+			$q = O_Db_Query::get( $r );
+			$q->field( $this->targetFieldName, "int NOT NULL" )->field( $this->baseFieldName, "int NOT NULL" )->index( 
+					$this->targetFieldName . ", " . $this->baseFieldName, "PRIMARY KEY" )->create();
 		}
 		
 		self::$relationTblLoaded[ $r ] = 1;
@@ -101,8 +131,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	{
 		$q = new O_Dao_Query( $this->targetClass );
 		$q->join( $this->relationTbl, 
-				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetTbl . " AND " . $this->relationTbl .
-					 "." . $this->baseTbl . "=" . $this->baseId, "CROSS" );
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
+					 "." . $this->baseFieldName . "=" . $this->baseId, "CROSS" );
 		if ($this->orderBy)
 			$q->orderBy( $this->targetTbl . "." . $this->orderBy );
 		return $q;
@@ -125,7 +155,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			return false;
 		
 		$q = new O_Db_Query( $this->relationTbl );
-		$q->test( $this->targetTbl, $object->id )->test( $this->baseTbl, $this->baseId )->delete();
+		$q->test( $this->targetFieldName, $object->id )->test( $this->baseFieldName, $this->baseId )->delete();
 		
 		if ($delete)
 			$object->delete();
@@ -170,7 +200,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		}
 		
 		$q = new O_Db_Query( $this->relationTbl );
-		$q->field( $this->targetTbl, $obj->id )->field( $this->baseTbl, $this->baseId )->insert();
+		$q->field( $this->targetFieldName, $obj->id )->field( $this->baseFieldName, $this->baseId )->insert();
 		
 		$this->reload();
 		

@@ -152,8 +152,11 @@ class O_Db_Query {
 	const EQ = "=";
 	const IN = " IN ";
 	const GT = ">";
+	const GT_EQ = ">=";
 	const LT = "<";
+	const LT_EQ = "<=";
 	const EXISTS = " EXISTS ";
+	const LIKE = " LIKE ";
 	
 	/**
 	 * @access private

@@ -34,6 +34,8 @@ class O_EntryPoint {
 		// TODO: add try-catch envelop for all this
 		
 
+		O_Registry::set( "start-time", microtime( true ) );
+		
 		// Preparing environment
 		self::prepareEnvironment();
 		
@@ -137,7 +139,7 @@ class O_EntryPoint {
 	{
 		$app_name = O_Registry::get( "app/name" );
 		if (!is_file( "./Apps/" . $app_name . "/App.xml" ))
-			throw new Exception( "Can't find application config file." );
+			throw new Exception( "Can't find application config file ($app_name)." );
 		
 		$xml_current = simplexml_load_file( "./Apps/" . $app_name . "/App.xml" );
 		foreach ($xml_current as $node) {
@@ -176,53 +178,64 @@ class O_EntryPoint {
 	 */
 	static public function makeResponse()
 	{
-		// Create O_Command and process it
-		$cmd_name = O_Registry::get( "app/command_name" );
-		if (!$cmd_name) {
-			$url = O_Registry::get( "app/env/process_url" );
-			if ($url && $url[ 0 ] == "/")
-				$url = substr( $url, 1 );
-			if (O_Registry::get( "app/pages_extension" )) {
-				$ext = O_Registry::get( "app/pages_extension" );
-				if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
-					$url = substr( $url, 0, -strlen( $ext ) );
+		try {
+			// Create O_Command and process it
+			$cmd_name = O_Registry::get( "app/command_name" );
+			if (!$cmd_name) {
+				$url = O_Registry::get( "app/env/process_url" );
+				if ($url && $url[ 0 ] == "/")
+					$url = substr( $url, 1 );
+				if (O_Registry::get( "app/pages_extension" )) {
+					$ext = O_Registry::get( "app/pages_extension" );
+					if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
+						$url = substr( $url, 0, -strlen( $ext ) );
+					}
+				}
+				if (!$url) {
+					$cmd_name = "Default";
+				} else {
+					$cmd_name = str_replace( array (".", "/"), array ("_", "_"), $url );
 				}
 			}
-			if (!$url) {
+			
+			$plugin_name = O_Registry::get( "app/plugin_name" );
+			$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
+			
+			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+			if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
 				$cmd_name = "Default";
-			} else {
-				$cmd_name = str_replace( array (".", "/"), array ("_", "_"), $url );
+				$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+				$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
 			}
-		}
-		
-		$plugin_name = O_Registry::get( "app/plugin_name" );
-		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
-		
-		$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-		
-		if (class_exists( $cmd_class, true )) {
-			$cmd = new $cmd_class( );
-			if ($cmd instanceof O_Command) {
-				/* @var $cmd O_Command */
-				$cmd->run();
-				return true;
+			
+			if (class_exists( $cmd_class, true )) {
+				$cmd = new $cmd_class( );
+				if ($cmd instanceof O_Command) {
+					/* @var $cmd O_Command */
+					$cmd->run();
+					return true;
+				}
 			}
+			
+			// Else create O_Html_Template
+			if (class_exists( $tpl_class, true )) {
+				$tpl = new $tpl_class( );
+				if ($tpl instanceof O_Html_Template) {
+					$tpl->display();
+					return true;
+				}
+			}
+			throw new O_Ex_PageNotFound( "Page Not Found", 404 );
 		}
-		
-		// Else create O_Html_Template
-		$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
-		if (class_exists( $tpl_class, true )) {
-			$tpl = new $tpl_class( );
+		catch (Exception $e) {
+			// TODO: set error template class from registry
+			$tpl = new O_Html_ErrorTpl( $e );
 			if ($tpl instanceof O_Html_Template) {
 				$tpl->display();
 				return true;
 			}
 		}
-		
-		// Else process 404 error
-		// TODO: add logic to handle 404 error
-		echo "<h1>Error 404 ($cmd_class)</h1>";
-		return false;
 	
 	}
 

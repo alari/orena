@@ -221,7 +221,14 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new O_Dao_Query( $class );
-			$row = $query->test( "id", $id )->select()->fetch();
+			try {
+				$row = $query->test( "id", $id )->select()->fetch();
+			}
+			catch (PDOException $e) {
+				if (!O_Dao_TableInfo::get( $class )->tableExists()) {
+					O_Dao_TableInfo::get( $class )->createTable();
+				}
+			}
 		}
 		if (isset( $row[ "id" ] ) && $row[ "id" ] == $id) {
 			self::$objs[ $class ][ $id ]->fields = $row;

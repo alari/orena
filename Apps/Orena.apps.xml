@@ -12,6 +12,11 @@
 			<Host value="exp"></Host>
 		</Condition>
 	</App>
+	<App ext="phps" name="Eclip" prefix="Ec">
+		<Condition mode="development">
+			<Host value="eclipse"></Host>
+		</Condition>
+	</App>
 	<App ext="phps" name="Ring" prefix="R">
 		<Condition mode="development">
 			<Host pattern="([^\.]*)"></Host>

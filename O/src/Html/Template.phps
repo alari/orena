@@ -75,9 +75,9 @@ abstract class O_Html_Template {
 	 * @param string $url
 	 * @return string
 	 */
-	public function url( $url )
+	public function url( $url, array $params = array() )
 	{
-		return $this->layout()->url( $url );
+		return $this->layout()->url( $url, $params );
 	}
 
 	/**

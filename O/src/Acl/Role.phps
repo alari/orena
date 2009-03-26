@@ -40,6 +40,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 		}
 		if ($this->parent)
 			return $this->parent->can( $action );
+		O_Acl_Action::getByRule( $action );
 		return null;
 	}
 

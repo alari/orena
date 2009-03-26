@@ -170,5 +170,4 @@ abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 <?
 	}
 
-
 }

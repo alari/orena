@@ -253,9 +253,9 @@ class O_Html_Layout {
 		return O_UrlBuilder::getStatic( $url, $fw );
 	}
 
-	public function url( $url )
+	public function url( $url, array $params = array() )
 	{
-		return O_UrlBuilder::get( $url );
+		return O_UrlBuilder::get( $url, $params );
 	}
 
 }

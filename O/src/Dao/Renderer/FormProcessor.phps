@@ -268,7 +268,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 <div>
 <form method="POST" enctype="application/x-www-form-urlencoded"
 	action="<?=$this->actionUrl?>" id="<?=$this->instanceId?>">
-<fieldset class="oo-renderer"><label><?=$this->formTitle?></label>
+<fieldset class="oo-renderer"><legend><?=$this->formTitle?></legend>
 
 <?
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
@@ -347,9 +347,18 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
  $('<?=$this->instanceId?>').getElement('input[type=submit]').addEvent("click", function(e){
 	 e.stop();
  	$(this).disabled = true;
+
+ 	$('<?=$this->instanceId?>').getElements('textarea[class=fckeditor]').each(function(el){
+		el.value = FCKeditorAPI.GetInstance(el.id). GetXHTML( 1 );
+ 	 });
+
  	new Request.JSON({url:$('<?=$this->instanceId?>').getAttribute('action'), onSuccess:function(response){
 		if(response.status == 'SUCCEED') {
-			$('<?=$this->instanceId?>').getParent().set('html', response.show);
+			if(response.refresh == 1) {
+				window.location.reload(true);
+			} else if(response.show) {
+				$('<?=$this->instanceId?>').getParent().set('html', response.show);
+			}
 		} else {
 			$('<?=$this->instanceId?>').getElements('.oo-renderer-error').dispose();
 			for(field in response.errors) {
@@ -530,14 +539,19 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * Print response to be handled as an ajax response
 	 *
 	 */
-	public function responseAjax()
+	public function responseAjax( $refresh = null )
 	{
 		$response = Array ("status" => "");
 		if ($this->handle()) {
 			$response[ "status" ] = "SUCCEED";
-			ob_start();
-			$this->record->show( $this->layout, $this->showType );
-			$response[ "show" ] = ob_get_clean();
+			
+			if ($refresh) {
+				$response[ "refresh" ] = 1;
+			} else {
+				ob_start();
+				$this->record->show( $this->layout, $this->showType );
+				$response[ "show" ] = ob_get_clean();
+			}
 		} else {
 			$response[ "status" ] = "FAILED";
 			$response[ "errors" ] = $this->errors;
