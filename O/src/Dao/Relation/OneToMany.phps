@@ -54,6 +54,22 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	}
 
 	/**
+	 * Checks without loading all objects
+	 *
+	 * @param int|target $objOrId
+	 * @return int 0 or 1
+	 */
+	public function has( $objOrId )
+	{
+		if ($objOrId instanceof $this->targetClass)
+			$objOrId = $objOrId->id;
+		if (!is_numeric( $objOrId ))
+			return false;
+		return O_Dao_Query::get( $this->targetClass )->test( $this->targetField, $this->baseId )->test( "id", $objOrId )->getFunc( 
+				"id" );
+	}
+
+	/**
 	 * Reloads the relation query
 	 *
 	 */

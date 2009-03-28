@@ -22,6 +22,24 @@ class O_Dao_Renderer_Edit_Callbacks {
 <?
 	}
 
+	static public function recordField( O_Dao_Renderer_Edit_Params $params )
+	{
+		$field = $params->params();
+		$subparams = $params->params();
+		if (strpos( $field, " " ))
+			list ($field, $subparams) = explode( " ", $field, 2 );
+		$value = $params->value();
+		$title = $params->title();
+		$error = $params->error();
+		$params = new O_Dao_Renderer_Edit_Params( $params->fieldName(), $params->className(), $subparams, 
+				$params->record() );
+		if ($value instanceof O_Dao_ActiveRecord)
+			$params->setValue( $value->$field );
+		$params->setTitle( $title );
+		$params->setError( $error );
+		self::simple( $params );
+	}
+
 	/**
 	 * WYSIWYG editor
 	 *
@@ -40,8 +58,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" .
-						 $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") .
 						 "oFCKeditor.ReplaceTextarea();", $params->layout() );
 		}

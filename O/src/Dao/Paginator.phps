@@ -102,11 +102,11 @@ class O_Dao_Paginator {
 				$this->order = substr( $this->order, 0, -5 );
 				if (isset( $this->orders_list[ $this->order ] )) {
 					$order = $this->orders_list[ $this->order ][ "field" ];
-					$this->query->orderBy( $order . " DESC" );
+					$this->query->clearOrders()->orderBy( $order . " DESC" );
 					$this->order_desc = 1;
 				}
 			} elseif (isset( $this->orders_list[ $this->order ] )) {
-				$this->query->orderBy( $this->orders_list[ $this->order ][ "field" ] );
+				$this->query->clearOrders()->orderBy( $this->orders_list[ $this->order ][ "field" ] );
 			}
 		}
 		

@@ -11,6 +11,7 @@
  * Field:
  * -edit callback
  * -check callback
+ * -check:before
  * -required error-string
  * -edit:title title
  * -title title
@@ -392,36 +393,9 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
 			
 			try {
-				// It's not an atomic field but a relation
-				if ($fieldInfo->getRelationTarget()) {
-					// Prepare available values
-					$availableValues = null;
-					if (isset( $this->relationQueries[ $name ] )) {
-						$availableValues = $this->relationQueries[ $name ][ "query" ]->getAll();
-					}
-					// multiply relation
-					if (is_array( $this->values[ $name ] )) {
-						// Array of values for *-to-one relation
-						if (!$fieldInfo->isRelationMany()) {
-							throw new O_Dao_Renderer_Check_Exception( "Wrong values for relation." );
-						}
-						// Prepare result value
-						$value = Array ();
-						foreach ($this->values[ $name ] as $id) {
-							if (is_array( $availableValues ) && !isset( $availableValues[ $id ] )) {
-								throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
-							}
-							$value[ $id ] = O_Dao_ActiveRecord::getById( $id, $fieldInfo->getRelationTarget() );
-						}
-						$this->values[ $name ] = $value;
-						// single relation
-					} else {
-						if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
-							throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
-						}
-						$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
-								$fieldInfo->getRelationTarget() );
-					}
+				// Checker callback is called after finding relations -- by default
+				if ($fieldInfo->getRelationTarget() && !$fieldInfo->getParam( "check:before" )) {
+					$this->checkRelationValue( $name, $fieldInfo );
 				}
 				
 				// Callback checker
@@ -442,10 +416,47 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam( 
 									"required" ) );
 				}
+				
+				// Checker callback already was called -- check:before param was set
+				if ($fieldInfo->getRelationTarget() && $fieldInfo->getParam( "check:before" )) {
+					$this->checkRelationValue( $name, $fieldInfo );
+				}
 			}
 			catch (O_Dao_Renderer_Check_Exception $e) {
 				$this->errors[ $name ] = $e->getMessage();
 			}
+		}
+	}
+
+	private function checkRelationValue( $name, O_Dao_FieldInfo $fieldInfo )
+	{
+		// Prepare available values
+		$availableValues = null;
+		if (isset( $this->relationQueries[ $name ] )) {
+			$availableValues = $this->relationQueries[ $name ][ "query" ]->getAll();
+		}
+		// multiply relation
+		if (is_array( $this->values[ $name ] )) {
+			// Array of values for *-to-one relation
+			if (!$fieldInfo->isRelationMany()) {
+				throw new O_Dao_Renderer_Check_Exception( "Wrong values for relation." );
+			}
+			// Prepare result value
+			$value = Array ();
+			foreach ($this->values[ $name ] as $id) {
+				if (is_array( $availableValues ) && !isset( $availableValues[ $id ] )) {
+					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
+				}
+				$value[ $id ] = O_Dao_ActiveRecord::getById( $id, $fieldInfo->getRelationTarget() );
+			}
+			$this->values[ $name ] = $value;
+			// single relation
+		} else {
+			if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
+				throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
+			}
+			$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
+					$fieldInfo->getRelationTarget() );
 		}
 	}
 

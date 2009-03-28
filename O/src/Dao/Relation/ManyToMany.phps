@@ -18,9 +18,9 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	private $baseTbl;
 	private $baseFieldName;
 	private $orderBy;
-	
+
 	private $relationTbl;
-	
+
 	private static $relationTblLoaded = Array ();
 
 	/**
@@ -40,18 +40,56 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		$this->baseClass = $baseClass;
 		$this->baseField = $baseField;
 		$this->baseTbl = O_Dao_TableInfo::get( $baseClass )->getTableName();
-		
+
 		$this->getTargetFieldName();
 		$this->getBaseFieldName();
 		$this->relationTbl = $this->getRelationTableName();
-		
+
 		parent::__construct( $this->targetClass );
-		
-		$this->join( $this->relationTbl, 
+
+		$this->join( $this->relationTbl,
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
 					 "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
+	}
+
+	/**
+	 * Rapidly counts related objects
+	 *
+	 * @return int
+	 */
+	public function count()
+	{
+		return $this->getRelationQuery()->clearFields()->field( "COUNT($this->targetFieldName) AS c" )->select()->fetchColumn(
+				0 );
+	}
+
+	/**
+	 * Checks without loading all objects
+	 *
+	 * @param int|target $objOrId
+	 * @return int 0 or 1
+	 */
+	public function has( $objOrId )
+	{
+		if ($objOrId instanceof $this->targetClass)
+			$objOrId = $objOrId->id;
+		if (!is_numeric( $objOrId ))
+			return false;
+		return $this->getRelationQuery()->test( $this->targetFieldName, $objOrId )->clearFields()->field(
+				"COUNT($this->targetFieldName) AS c" )->select()->fetchColumn( 0 );
+	}
+
+	/**
+	 * Returns query with relations, but without objects
+	 *
+	 * @return O_Db_Query
+	 */
+	public function getRelationQuery()
+	{
+		return O_Db_Query::get( $this->relationTbl )->test( $this->baseFieldName, $this->baseId )->field(
+				$this->targetFieldName . " AS target" );
 	}
 
 	/**
@@ -98,18 +136,18 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			$a = $c;
 		}
 		$r = substr( $a . "_to_" . $b, 0, 64 );
-		
+
 		if (isset( self::$relationTblLoaded[ $r ] ))
 			return $r;
-		
+
 		if (!O_Db_Query::get( $r )->tableExists()) {
 			$q = O_Db_Query::get( $r );
-			$q->field( $this->targetFieldName, "int NOT NULL" )->field( $this->baseFieldName, "int NOT NULL" )->index( 
+			$q->field( $this->targetFieldName, "int NOT NULL" )->field( $this->baseFieldName, "int NOT NULL" )->index(
 					$this->targetFieldName . ", " . $this->baseFieldName, "PRIMARY KEY" )->create();
 		}
-		
+
 		self::$relationTblLoaded[ $r ] = 1;
-		
+
 		return $r;
 	}
 
@@ -130,7 +168,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	public function query()
 	{
 		$q = new O_Dao_Query( $this->targetClass );
-		$q->join( $this->relationTbl, 
+		$q->join( $this->relationTbl,
 				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
 					 "." . $this->baseFieldName . "=" . $this->baseId, "CROSS" );
 		if ($this->orderBy)
@@ -151,17 +189,21 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			return false;
 		if (!$object instanceof $this->targetClass)
 			return false;
-		if (!$this->offsetExists( $object->id ))
+		if (!$this->has( $object->id ))
 			return false;
-		
-		$q = new O_Db_Query( $this->relationTbl );
-		$q->test( $this->targetFieldName, $object->id )->test( $this->baseFieldName, $this->baseId )->delete();
-		
+
+		O_Db_Query::get( $this->relationTbl )->test( $this->targetFieldName, $object->id )->test( $this->baseFieldName,
+				$this->baseId )->delete();
+		if ($this->targetClass == $this->baseClass && $this->targetField == $this->baseField) {
+			O_Db_Query::get( $this->relationTbl )->test( $this->targetFieldName, $this->baseId )->test(
+					$this->baseFieldName, $object->id )->delete();
+		}
+
 		if ($delete)
 			$object->delete();
-		
+
 		$this->reload();
-		
+
 		return true;
 	}
 
@@ -194,16 +236,20 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			throw new Exception( "Wrong object type for assignation." );
 		if ($offset !== null)
 			throw new Exception( "Can assign only new value with [] operator." );
-		
+
 		if ($this->offsetExists( $obj->id )) {
 			return true;
 		}
-		
-		$q = new O_Db_Query( $this->relationTbl );
-		$q->field( $this->targetFieldName, $obj->id )->field( $this->baseFieldName, $this->baseId )->insert();
-		
+
+		O_Db_Query::get( $this->relationTbl )->field( $this->targetFieldName, $obj->id )->field( $this->baseFieldName,
+				$this->baseId )->insert();
+		if ($this->targetClass == $this->baseClass && $this->targetField == $this->baseField) {
+			O_Db_Query::get( $this->relationTbl )->field( $this->targetFieldName, $this->baseId )->field(
+					$this->baseFieldName, $obj->id )->insert();
+		}
+
 		$this->reload();
-		
+
 		return true;
 	}
 

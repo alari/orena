@@ -17,7 +17,7 @@ class O_Dao_Renderer_Check_Params extends O_Dao_Renderer_Params {
 	 *
 	 * @return mixed
 	 */
-	public function &newValue()
+	public function newValue()
 	{
 		return $this->newValue;
 	}

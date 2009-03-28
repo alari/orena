@@ -134,8 +134,17 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function getFunc( $field = "*", $func = "COUNT" )
 	{
-		$q = clone $this;
-		return $q->clearFields()->field( $func . "($field) AS c" )->select()->fetch( PDO::FETCH_OBJ )->c;
+		try {
+			$q = clone $this;
+			return $q->clearFields()->field( $func . "($field) AS c" )->select()->fetch( PDO::FETCH_OBJ )->c;
+		}
+		catch (PDOException $e) {
+			if (!O_Dao_TableInfo::get( $this->class )->tableExists()) {
+				O_Dao_TableInfo::get( $this->class )->createTable();
+				return null;
+			}
+			throw $e;
+		}
 	}
 
 	/**
