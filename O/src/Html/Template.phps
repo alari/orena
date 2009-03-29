@@ -59,14 +59,7 @@ abstract class O_Html_Template {
 	 */
 	public function display()
 	{
-		try {
-			$this->layout()->display();
-		}
-		catch (Exception $e) {
-			echo "<pre>";
-			echo $e;
-			echo "</pre>";
-		}
+		$this->layout()->display();
 	}
 
 	/**

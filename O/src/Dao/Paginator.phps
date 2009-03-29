@@ -81,7 +81,7 @@ class O_Dao_Paginator {
 		$this->query = clone $query;
 		$this->perpage = (int)($perpage ? $perpage : O_Registry::get( "app/paginator/perpage" ));
 		if (!$this->perpage)
-			throw new O_Ex_Logic( "Cannot build paginator for 0 objects per page." );
+			throw new O_Ex_WrongArgument( "Cannot build paginator for 0 objects per page." );
 		$this->page = (int)O_Registry::get( "app/" . $page_registry );
 		if (!$this->page)
 			$this->page = 1;
@@ -344,7 +344,7 @@ class O_Dao_Paginator {
 		if ($this->ajax_id) {
 			if (!$this->isAjaxPageRequest()) {
 				if (!$layout)
-					throw new Exception( "Cannot build ajax pager without layout object." );
+					throw new O_Ex_Logic( "Cannot build ajax pager without layout object." );
 				O_Js_Middleware::getFramework()->addSrc( $layout );
 				$isNormal = 1;
 			}

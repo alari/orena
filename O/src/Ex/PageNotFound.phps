@@ -1,5 +1,4 @@
 <?php
-
-class O_Ex_PageNotFound extends Exception {
+class O_Ex_PageNotFound extends O_Ex_Error {
 
 }

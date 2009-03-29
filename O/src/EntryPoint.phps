@@ -31,39 +31,48 @@ class O_EntryPoint {
 	 */
 	static public function processRequest()
 	{
-		// TODO: add try-catch envelop for all this
-		
-
-		O_Registry::set( "start-time", microtime( true ) );
-		
-		// Preparing environment
-		self::prepareEnvironment();
-		
-		// At first we parse framework registry config
-		self::processFwConfig();
-		
-		// Then we handle applications to select what to run
-		self::selectApp();
-		
-		// Parsing application registry
-		self::processAppConfig();
-		
-		if (O_Registry::get( "app/mode" ) == "development") {
-
-			function throwit( $code, $msg )
-			{
-				throw new Exception( $msg, $code );
-			}
-			set_error_handler( "throwit", E_ALL );
-		}
-		
 		try {
+			O_Registry::set( "start-time", microtime( true ) );
+			
+			// Preparing environment
+			self::prepareEnvironment();
+			
+			// At first we parse framework registry config
+			self::processFwConfig();
+			
+			// Then we handle applications to select what to run
+			self::selectApp();
+			
+			// Parsing application registry
+			self::processAppConfig();
+			
+			if (O_Registry::get( "app/mode" ) == "development") {
+				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
+			}
+			
 			// Prepare and echo response
 			return self::makeResponse();
 		}
 		catch (Exception $e) {
-			echo "<br/>", $e;
+			// TODO: get exception handler class from registry
+			$tpl = new O_Html_ErrorTpl( $e );
+			if ($tpl instanceof O_Html_Template) {
+				$tpl->display();
+				return true;
+			}
 		}
+	}
+
+	/**
+	 * Internal errors handler
+	 *
+	 * @param int $code
+	 * @param string $msg
+	 */
+	static public function errorException( $code, $msg )
+	{
+		throw new O_Ex_CodeError( $msg, $code );
+		;
 	}
 
 	/**
@@ -105,12 +114,12 @@ class O_EntryPoint {
 	 * Sets "app/env/process_url" for future use inside application.
 	 * Sets "app/name", "app/class_prefix", "app/mode" registry keys.
 	 *
-	 * @throws Exception
+	 * @throws O_Ex_Critical
 	 */
 	static public function selectApp()
 	{
 		if (!is_file( "./Apps/Orena.apps.xml" ))
-			throw new Exception( "Cannot find application selecting configuration file." );
+			throw new O_Ex_Critical( "Cannot find application selecting configuration file." );
 		$app_name = null;
 		$xml_apps = simplexml_load_file( "./Apps/Orena.apps.xml" );
 		foreach ($xml_apps as $app) {
@@ -123,7 +132,7 @@ class O_EntryPoint {
 					break;
 				}
 			} else
-				throw new Exception( "App-selection file should contain only app blocks!" );
+				throw new O_Ex_Config( "App-selection file should contain only app blocks!" );
 		}
 	}
 
@@ -133,13 +142,13 @@ class O_EntryPoint {
 	 * Gets application name from registry key "app/name"
 	 * Parses config allocated in "./Apps/$app_name/App.xml"
 	 *
-	 * @throws Exception
+	 * @throws O_Ex_Critical
 	 */
 	static private function processAppConfig()
 	{
 		$app_name = O_Registry::get( "app/name" );
 		if (!is_file( "./Apps/" . $app_name . "/App.xml" ))
-			throw new Exception( "Can't find application config file ($app_name)." );
+			throw new O_Ex_Critical( "Can't find application config file ($app_name)." );
 		
 		$xml_current = simplexml_load_file( "./Apps/" . $app_name . "/App.xml" );
 		foreach ($xml_current as $node) {
@@ -156,18 +165,18 @@ class O_EntryPoint {
 	/**
 	 * Parses framework config, puts it into "fw" registry rootkey.
 	 *
-	 * @throws Exception
+	 * @throws O_Ex_Critical
 	 */
 	static public function processFwConfig()
 	{
 		if (!is_file( "./Apps/Orena.fw.xml" ))
-			throw new Exception( "Cannot find framework configuration file." );
+			throw new O_Ex_Critical( "Cannot find framework configuration file." );
 		$xml_fw = simplexml_load_file( "./Apps/Orena.fw.xml" );
 		foreach ($xml_fw as $registry) {
 			if ($registry->getName() == "Registry") {
 				self::processRegistry( $registry, "fw" );
 			} else
-				throw new Exception( "Framework configuration file should contain only registry values!" );
+				throw new O_Ex_Config( "Framework configuration file should contain only registry values!" );
 		}
 	}
 
@@ -178,65 +187,54 @@ class O_EntryPoint {
 	 */
 	static public function makeResponse()
 	{
-		try {
-			// Create O_Command and process it
-			$cmd_name = O_Registry::get( "app/command_name" );
-			if (!$cmd_name) {
-				$url = O_Registry::get( "app/env/process_url" );
-				if ($url && $url[ 0 ] == "/")
-					$url = substr( $url, 1 );
-				if (O_Registry::get( "app/pages_extension" )) {
-					$ext = O_Registry::get( "app/pages_extension" );
-					if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
-						$url = substr( $url, 0, -strlen( $ext ) );
-					}
-				}
-				if (!$url) {
-					$cmd_name = "Default";
-				} else {
-					$cmd_name = str_replace( array (".", "/"), array ("_", "_"), $url );
+		// Create O_Command and process it
+		$cmd_name = O_Registry::get( "app/command_name" );
+		if (!$cmd_name) {
+			$url = O_Registry::get( "app/env/process_url" );
+			if ($url && $url[ 0 ] == "/")
+				$url = substr( $url, 1 );
+			if (O_Registry::get( "app/pages_extension" )) {
+				$ext = O_Registry::get( "app/pages_extension" );
+				if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
+					$url = substr( $url, 0, -strlen( $ext ) );
 				}
 			}
-			
-			$plugin_name = O_Registry::get( "app/plugin_name" );
-			$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
-			
+			if (!$url) {
+				$cmd_name = "Default";
+			} else {
+				$cmd_name = str_replace( array (".", "/"), array ("_", "_"), $url );
+			}
+		}
+		
+		$plugin_name = O_Registry::get( "app/plugin_name" );
+		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
+		
+		$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+		$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+		if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
+			$cmd_name = "Default";
 			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
 			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
-			if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
-				$cmd_name = "Default";
-				$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-				$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
-			}
-			
-			if (class_exists( $cmd_class, true )) {
-				$cmd = new $cmd_class( );
-				if ($cmd instanceof O_Command) {
-					/* @var $cmd O_Command */
-					$cmd->run();
-					return true;
-				}
-			}
-			
-			// Else create O_Html_Template
-			if (class_exists( $tpl_class, true )) {
-				$tpl = new $tpl_class( );
-				if ($tpl instanceof O_Html_Template) {
-					$tpl->display();
-					return true;
-				}
-			}
-			throw new O_Ex_PageNotFound( "Page Not Found", 404 );
 		}
-		catch (Exception $e) {
-			// TODO: set error template class from registry
-			$tpl = new O_Html_ErrorTpl( $e );
+		
+		if (class_exists( $cmd_class, true )) {
+			$cmd = new $cmd_class( );
+			if ($cmd instanceof O_Command) {
+				/* @var $cmd O_Command */
+				$cmd->run();
+				return true;
+			}
+		}
+		
+		// Else create O_Html_Template
+		if (class_exists( $tpl_class, true )) {
+			$tpl = new $tpl_class( );
 			if ($tpl instanceof O_Html_Template) {
 				$tpl->display();
 				return true;
 			}
 		}
-	
+		throw new O_Ex_PageNotFound( "Page Not Found", 404 );
 	}
 
 	/**
@@ -302,7 +300,7 @@ class O_EntryPoint {
 				O_Registry::set( "app/plugin_name", (string)$node[ "name" ] );
 			break;
 			default :
-				throw new Exception( "Unknown node in application configuration file." );
+				throw new O_Ex_Config( "Unknown node in application configuration file." );
 		}
 	}
 
@@ -311,7 +309,7 @@ class O_EntryPoint {
 	 *
 	 * @param SimpleXMLElement $app
 	 * @return string application name or false
-	 * @throws Exception
+	 * @throws O_Ex_Config
 	 * @see O_EntryPoint::processAppSelectionCondition()
 	 */
 	static private function processAppSelection( SimpleXMLElement $app )
@@ -323,7 +321,7 @@ class O_EntryPoint {
 			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
 		
 		if (!$app_name || !$app_prefix)
-			throw new Exception( "Application without name or class prefix cannot be processed." );
+			throw new O_Ex_Config( "Application without name or class prefix cannot be processed." );
 		
 		foreach ($app as $cond) {
 			if ($cond->getName() == "Condition") {
@@ -335,7 +333,7 @@ class O_EntryPoint {
 					return $app_name;
 				}
 			} else
-				throw new Exception( "App section should contain only conditions." );
+				throw new O_Ex_Config( "App section should contain only conditions." );
 		}
 		return false;
 	}
@@ -347,7 +345,7 @@ class O_EntryPoint {
 	 *
 	 * @param SimpleXMLElement $cond
 	 * @return bool
-	 * @throws Exception
+	 * @throws O_Ex_Config
 	 */
 	static private function processAppSelectionCondition( SimpleXMLElement $cond )
 	{
@@ -368,7 +366,7 @@ class O_EntryPoint {
 					}
 					$pattern = (string)$condPart[ "pattern" ];
 					if (!$pattern) {
-						throw new Exception( 
+						throw new O_Ex_Config( 
 								"App-selecting Url condition must have 'base' or 'pattern' attribute." );
 					}
 					if (preg_match( "#^$pattern$#i", O_Registry::get( "app/env/request_url" ) ))
@@ -388,7 +386,7 @@ class O_EntryPoint {
 					return false;
 				break;
 				default :
-					throw new Exception( "Wrong node in app-selection condition: " . $condPart->getName() );
+					throw new O_Ex_Config( "Wrong node in app-selection condition: " . $condPart->getName() );
 			}
 		}
 		return true;

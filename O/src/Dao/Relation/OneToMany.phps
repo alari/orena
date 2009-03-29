@@ -130,11 +130,11 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 		if (!$obj)
 			return false;
 		if ($this->offsetExists( $offset ))
-			throw new Exception( "Cannot assign value to an existent dao object." );
+			throw new O_Ex_Logic( "Cannot assign value to an existent dao object." );
 		if (!$obj instanceof $this->targetClass)
-			throw new Exception( "Wrong object type for assignation." );
+			throw new O_Ex_WrongArgument( "Wrong object type for assignation." );
 		if ($offset !== null)
-			throw new Exception( "Can assign new value only with [] operator." );
+			throw new O_Ex_Logic( "Can assign new value only with [] operator." );
 			/* @var $obj O_Dao_ActiveRecord */
 		$obj->setField( $this->targetField, $this->baseId );
 		$this->reload();

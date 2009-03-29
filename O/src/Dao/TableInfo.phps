@@ -107,10 +107,11 @@ class O_Dao_TableInfo {
 		if (is_array( $plugins )) {
 			foreach ($plugins as $plugin) {
 				if (!class_exists( $plugin ))
-					throw new Exception( "Unexistent plugin class: $plugin." );
+					throw new O_Ex_NotFound( "Unexistent plugin class: $plugin." );
 				$pluginReflection = new ReflectionClass( $plugin );
 				if (!$pluginReflection->implementsInterface( "O_Dao_iPlugin" ))
-					throw new Exception( "Dao plugins must implement interface O_Dao_iPlugin, but $plugin doesn't." );
+					throw new O_Ex_Logic( 
+							"Dao plugins must implement interface O_Dao_iPlugin, but $plugin doesn't." );
 					
 				// Methods injection
 				foreach ($pluginReflection->getMethods() as $method) {
@@ -203,7 +204,7 @@ class O_Dao_TableInfo {
 	public function tableExists()
 	{
 		if (!$this->table)
-			throw new Exception( "Table name isn't specified for " . $this->class );
+			throw new O_Ex_Config( "Table name isn't specified for " . $this->class );
 		return O_Db_Query::get( $this->table )->tableExists();
 	}
 
@@ -215,7 +216,7 @@ class O_Dao_TableInfo {
 	public function createTable()
 	{
 		if (!$this->table)
-			throw new Exception( "Can't create unnamed table." );
+			throw new O_Ex_Config( "Can't create unnamed table." );
 		
 		$query = new O_Db_Query( $this->table );
 		

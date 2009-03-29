@@ -9,7 +9,7 @@ class O_Dao_Renderer_Shower extends O_Dao_Renderer_Commons {
 	{
 		// Cannot display anything
 		if (!$this->record) {
-			throw new Exception( "Nothing to render: there's no ActiveRecord provided for renderer." );
+			throw new O_Ex_NotFound( "Nothing to render: there's no ActiveRecord provided for renderer." );
 		}
 		
 		// If envelop callback is available, we need to do output bufferization

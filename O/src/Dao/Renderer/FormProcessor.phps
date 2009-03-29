@@ -542,8 +542,17 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			}
 		}
 		
+		// Trying to save
+		try {
+			$this->record->save();
+		}
+		catch (PDOException $e) {
+			$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
+			return $this->handleResult = 0;
+		}
+		
 		// Succeed
-		return $this->handleResult = $this->record->save();
+		return $this->handleResult = 1;
 	}
 
 	/**

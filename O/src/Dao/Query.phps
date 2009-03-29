@@ -80,6 +80,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 				O_Dao_TableInfo::get( $this->class )->createTable();
 				return null;
 			}
+			throw $e;
 		}
 		if ($o) {
 			return O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
@@ -278,7 +279,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function offsetSet( $offset, $obj )
 	{
-		throw new Exception( "Cannot set an offset to virtual query results array." );
+		throw new O_Ex_Logic( "Cannot set an offset to virtual query results array." );
 	}
 
 	/**

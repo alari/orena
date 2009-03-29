@@ -157,7 +157,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		$fieldInfo = O_Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
-			throw new Exception( "Unknown field: $name." );
+			throw new O_Ex_NotFound( "Unknown field: $name." );
 		
 		return $fieldInfo;
 	}
@@ -282,14 +282,14 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 * @param string $class
 	 * @param string $method_name
 	 * @param callback $callback
-	 * @throws Exception
+	 * @throws O_Ex_WrongArgument
 	 */
 	static public function injectMethod( $class, $method_name, $callback )
 	{
 		if (is_callable( $callback ))
 			self::$injected_methods[ $class ][ $method_name ] = $callback;
 		else
-			throw new Exception( "Not a valid callback for injection: $callback." );
+			throw new O_Ex_WrongArgument( "Not a valid callback for injection: $callback." );
 	}
 
 	/**
@@ -366,7 +366,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 */
 	public function offsetSet( $offset, $value )
 	{
-		throw new Exception( "Cannot assign a value to ActiveRecord sql-field directly." );
+		throw new O_Ex_Logic( "Cannot assign a value to ActiveRecord sql-field directly." );
 	}
 
 	/**
@@ -378,7 +378,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 */
 	public function offsetUnset( $offset )
 	{
-		throw new Exception( "Cannot unset value of an ActiveRecord sql-field." );
+		throw new O_Ex_Logic( "Cannot unset value of an ActiveRecord sql-field." );
 	}
 
 }
