@@ -133,10 +133,11 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	/**
 	 * This form should be handled not like edit-form, but like creation
 	 *
+	 * @param array $params Parameters to be given in constructor
 	 */
-	public function setCreateMode()
+	public function setCreateMode( array $params = array() )
 	{
-		$this->createMode = 1;
+		$this->createMode = $params;
 	}
 
 	/**
@@ -308,7 +309,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				echo $this->htmlBefore[ $name ];
 			
 			$edit_params = new O_Dao_Renderer_Edit_Params( $name, $this->class, $params, $this->record );
-			$edit_params->setLayout( $this->layout );
+			if ($this->layout)
+				$edit_params->setLayout( $this->layout );
 			$edit_params->setValue( $value );
 			$edit_params->setTitle( $title );
 			if (isset( $this->errors[ $name ] ))
@@ -340,8 +342,9 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 
 <?
 		if ($this->isAjax) {
-			O_Js_Middleware::getFramework()->addSrc( $layout );
-			//FIXME: move javascript to framework instance!
+			if ($layout)
+				O_Js_Middleware::getFramework()->addSrc( $layout );
+				//FIXME: move javascript to framework instance!
 			//TODO: add classnames to registry
 			?>
 <script type="text/javascript">
@@ -517,7 +520,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		// Create record in database
 		if ($this->createMode && !$this->record) {
 			$class = $this->class;
-			$this->record = new $class( );
+			if (count( $this->createMode )) {
+				$refl = new ReflectionClass( $class );
+				$this->record = $refl->newInstanceArgs( $this->createMode );
+			} else {
+				$this->record = new $class( );
+			}
 		}
 		
 		// Setting values for ActiveRecord
@@ -559,7 +567,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * Print response to be handled as an ajax response
 	 *
 	 */
-	public function responseAjax( $refresh = null )
+	public function responseAjax( $refresh = null, $showOnSuccess = null )
 	{
 		$response = Array ("status" => "");
 		if ($this->handle()) {
@@ -567,10 +575,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			
 			if ($refresh) {
 				$response[ "refresh" ] = 1;
-			} else {
+			} elseif (!$showOnSuccess) {
 				ob_start();
 				$this->record->show( $this->layout, $this->showType );
 				$response[ "show" ] = ob_get_clean();
+			} else {
+				$response[ "show" ] = $showOnSuccess;
 			}
 		} else {
 			$response[ "status" ] = "FAILED";
