@@ -236,7 +236,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 		$value = $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":" . $key );
-		if ($this->createMode && $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":create-" . $key )) {
+		if ($this->createMode !== 0 && $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":create-" . $key )) {
 			return $tableInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":create-" . $key );
 		} elseif ($value)
 			return $value;
@@ -501,7 +501,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			return $this->handleResult = false;
 			
 		// Load record, if needed
-		if (!$this->record && !$this->createMode) {
+		if (!$this->record && $this->createMode === 0) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
 			if (!$this->record) {
 				$this->errors[ "_" ] = "Record not found.";
@@ -518,7 +518,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		}
 		
 		// Create record in database
-		if ($this->createMode && !$this->record) {
+		if ($this->createMode !== 0 && !$this->record) {
 			$class = $this->class;
 			if (count( $this->createMode )) {
 				$refl = new ReflectionClass( $class );

@@ -78,6 +78,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		$this->reload();
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
+		
 		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
 			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, O_Dao_TableInfo::get( $class )->getParam( "signal" ), 
 					$class, $this, $this->fields[ "id" ] );
