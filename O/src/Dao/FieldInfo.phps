@@ -2,7 +2,7 @@
 /**
  * Handles one persistent field of O_Dao_ActiveRecord.
  *
- * Supported configuration.
+ * Supported configuration:
  *
  * Atomic field:
  * @field fieldname sql type
@@ -39,6 +39,9 @@
  *
  * Also FieldInfo provides signals support for fields changes:
  * @see O_Dao_Signals
+ *
+ * Finally, you can extend the field with
+ * @field:conf $name -params
  *
  * @author Dmitry Kourinski
  */
@@ -226,6 +229,17 @@ class O_Dao_FieldInfo {
 	public function getParam( $paramName )
 	{
 		return isset( $this->params[ $paramName ] ) ? $this->params[ $paramName ] : null;
+	}
+
+	/**
+	 * Merges params with the old ones
+	 *
+	 * @param array $params
+	 * @access private
+	 */
+	public function addParams( array $params )
+	{
+		$this->params = array_merge( $this->params, $params );
 	}
 
 	/**

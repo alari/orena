@@ -347,7 +347,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				//FIXME: move javascript to framework instance!
 			//TODO: add classnames to registry
 			?>
-<script type="text/javascript">
+<script language="JavaScript" type="text/javascript">
+(function(){
  $('<?=$this->instanceId?>').getElement('input[type=submit]').addEvent("click", function(e){
 	 e.stop();
  	$(this).disabled = true;
@@ -376,6 +377,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		}
  	 }}).post($('<?=$this->instanceId?>'));
  });
+}).delay(150);
+
  </script>
 <?
 		}

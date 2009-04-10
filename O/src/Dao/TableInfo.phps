@@ -10,7 +10,7 @@
  * Backslash is used for multiline configuration.
  *
  * Possible directives:
- * @table [sqlTableName]
+ * @table [sqlTableName or -]
  * @field name [type]
  * @index field1, field2 [-name index_name] [-(unique|fulltext)]
  * @tail tail-directives
@@ -137,7 +137,7 @@ class O_Dao_TableInfo {
 		$docCommentLines = array_merge( $docCommentLines, explode( "\n", $reflection->getDocComment() ) );
 		for ($line = current( $docCommentLines ); $line; $line = next( $docCommentLines )) {
 			$matches = Array ();
-			preg_match( "/@(table|field|index|tail) (.*)/", $line, $matches );
+			preg_match( "/@(table|field|index|tail|field:conf) (.*)/", $line, $matches );
 			if ($matches) {
 				$lineDirective = $matches[ 1 ];
 				$lineContent = trim( $matches[ 2 ] );
@@ -155,6 +155,7 @@ class O_Dao_TableInfo {
 				}
 				
 				$_subkeys = explode( " -", $lineContent );
+				
 				$value = array_shift( $_subkeys );
 				$subkeys = array ();
 				if (count( $_subkeys )) {
@@ -168,7 +169,7 @@ class O_Dao_TableInfo {
 						// To give ability to override params without overriding table name
 						if ($value)
 							$this->table = self::getPrefix() . $value;
-						$this->params += $subkeys;
+						$this->params = array_merge( $this->params, $subkeys );
 					break;
 					case "field" :
 						$name = $value;
@@ -176,6 +177,13 @@ class O_Dao_TableInfo {
 						if (strpos( $name, " " ))
 							list ($name, $type) = explode( " ", $value, 2 );
 						$this->fields[ $name ] = new O_Dao_FieldInfo( $this->class, $name, $type, $subkeys );
+					break;
+					case "field:conf" :
+						$name = $value;
+						if ((isset( $this->fields[ $name ] )))
+							$this->fields[ $name ]->addParams( $subkeys );
+						else
+							throw new O_Ex_Config( "field:conf for unexistent field" );
 					break;
 					case "index" :
 						$this->indexes[ $value ] = $subkeys;
