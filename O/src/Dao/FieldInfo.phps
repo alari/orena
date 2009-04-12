@@ -21,6 +21,9 @@
  * or
  * @see O_Dao_Relation_ManyToMany
  *
+ * For base to one relations you can use -preload key to preload all related objects via one request when selecting
+ * many objects with O_Dao_Query.
+ *
  * To add an object, use [] operator, e.g. $record->objs[] = new obj.
  * To remove an object, use remove() or removeAll() method:
  * @example $record->remove($obj) to delete relation with $obj
@@ -58,7 +61,7 @@ class O_Dao_FieldInfo {
 	 * @var Array
 	 */
 	private $params;
-	
+
 	/**
 	 * Database type of field, e.g. int, tinytext, or null if it's not represented in db
 	 *
@@ -71,7 +74,7 @@ class O_Dao_FieldInfo {
 	 * @var bool
 	 */
 	private $isAtomic = null;
-	
+
 	/**
 	 * Relation to one or to many objects
 	 *
@@ -161,7 +164,7 @@ class O_Dao_FieldInfo {
 		$this->name = $name;
 		$this->params = $params;
 		$this->type = $type;
-		
+
 		// check if it's relation
 		if (isset( $params[ "has" ] )) {
 			$relation = "has";
@@ -170,14 +173,14 @@ class O_Dao_FieldInfo {
 			$relation = "owns";
 			$this->relationOwns = 1;
 		}
-		
+
 		// save info about relation to be ready to sey it to other side
 		if (isset( $relation )) {
 			$this->isAtomic = false;
-			
+
 			list ($quantity, $this->relationTargetBase) = explode( " ", $params[ $relation ], 2 );
 			// Get relation classname from registry, if needed!
-			if ($this->relationTargetBase[ 0 ] == "{" && $this->relationTargetBase[ strlen( 
+			if ($this->relationTargetBase[ 0 ] == "{" && $this->relationTargetBase[ strlen(
 					$this->relationTargetBase ) - 1 ] == "}") {
 				$this->relationTarget = O_Registry::get( "app/" . substr( $this->relationTargetBase, 1, -1 ) );
 			} else {
@@ -185,7 +188,7 @@ class O_Dao_FieldInfo {
 			}
 			// Get inverse fieldname
 			$this->relationInverse = isset( $params[ "inverse" ] ) ? $params[ "inverse" ] : null;
-			
+
 			if ($quantity == "many") {
 				$this->relationMany = 1;
 				if (!$this->relationInverse)
@@ -295,12 +298,12 @@ class O_Dao_FieldInfo {
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->relationMany) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( 
-						$this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name, 
+				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany(
+						$this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name,
 						$this->getParam( "order-by" ) );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->relationTarget, 
+				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->relationTarget,
 						$this->relationInverse, $obj_id, $this->class, $this->name, $this->getParam( "order-by" ) );
 			}
 		}
@@ -327,7 +330,7 @@ class O_Dao_FieldInfo {
 	public function getInverse()
 	{
 		if (!$this->relationInverseField)
-			$this->relationInverseField = O_Dao_TableInfo::get( $this->relationTarget )->getFieldInfo( 
+			$this->relationInverseField = O_Dao_TableInfo::get( $this->relationTarget )->getFieldInfo(
 					$this->relationInverse );
 		return $this->relationInverseField;
 	}
@@ -405,10 +408,10 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
 					$obj, $obj->{$this->name} );
 			// New value is set
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, 
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class,
 					$obj, $fieldValue );
 		}
 		// Value as is
@@ -447,7 +450,7 @@ class O_Dao_FieldInfo {
 			$obj->setField( $this->name, $fieldValue ? $fieldValue->id : 0 );
 			// One-to-one is symmetric
 			if (!$this->getInverse()->relationMany) {
-				
+
 				$inverseName = $this->getInverse()->name;
 				if ($oldValue) {
 					$oldValue->$inverseName = null;
@@ -484,9 +487,9 @@ class O_Dao_FieldInfo {
 		if ($this->alias) {
 			if (!$this->aliasQuery) {
 				list ($name, $subreq) = explode( ".", $this->alias, 2 );
-				$this->aliasTestField = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery( 
+				$this->aliasTestField = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery(
 						$this->aliasQuery, $subreq );
-				
+
 				if (isset( $this->params[ "where" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
 					$this->aliasQuery->where( $this->params[ "where" ] );
 				}
@@ -524,7 +527,7 @@ class O_Dao_FieldInfo {
 	{
 		if ($this->isAtomic())
 			throw new O_Ex_Logic( "Cannot create mapped query field by atomic field basis." );
-		
+
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
 		if ($this->relationMany && $this->getInverse()->relationMany) {
@@ -534,7 +537,7 @@ class O_Dao_FieldInfo {
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
 			$joinOnField = $als . "." . $rel->getBaseFieldName();
 		}
-		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field( 
+		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field(
 				"DISTINCT " . O_Dao_TableInfo::get( $query->getClass() )->getTableName() . ".*" );
 		return $query;
 	}
@@ -557,7 +560,7 @@ class O_Dao_FieldInfo {
 				throw new O_Ex_Logic( "Cannot use atomic field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
 		}
-		
+
 		$joinOnField = null;
 		$i = 0;
 		while ($fieldInfo = current( $fieldInfos )) {
@@ -584,31 +587,31 @@ class O_Dao_FieldInfo {
 			$query = new O_Dao_Query( $this->relationTarget );
 			$joinOnField = O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . ".id";
 		}
-		
+
 		$isOneToMany = $nextInfo->relationMany && !$nextInfo->getInverse()->relationMany;
-		
+
 		$currTable = O_Dao_TableInfo::get( $this->class )->getTableName();
 		$currAlias = "__rel" . $i;
-		
+
 		//many-to-many: relation is a special table
 		if ($this->relationMany && $this->getInverse()->relationMany) {
 			$rel = $this->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel_" . $i;
-			
+
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
-			
+
 			if ($isOneToMany) {
-				$query->join( $currTable . " " . $currAlias, 
+				$query->join( $currTable . " " . $currAlias,
 						$currAlias . ".id=" . $als . "." . $rel->getBaseFieldName(), "CROSS" );
 				return $currAlias . "." . $nextInfo->getInverse()->name;
 			}
-			
+
 			return $als . "." . $rel->getBaseFieldName();
 			//relation is current table itself
 		} else {
 			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
-			
+
 			if ($isOneToMany) {
 				return $currAlias . "." . $nextInfo->getInverse()->name;
 			}
@@ -627,7 +630,7 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
 					$obj, $obj->{$this->name} );
 		}
 		if ($this->isAtomic || $this->alias) {

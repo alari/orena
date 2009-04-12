@@ -96,7 +96,6 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function getAll( $forceCacheReload = false )
 	{
-		// TODO: add whatever-to-one relations preloading
 		if (!$forceCacheReload && count( $this->objects ))
 			return $this->objects;
 		try {
@@ -109,9 +108,29 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			}
 			throw $e;
 		}
+		// Process fields preload
+		$preloadClasses = Array ();
+		foreach (O_Dao_TableInfo::get( $this->class )->getFields() as $name => $fieldInfo) {
+			/* @var $fieldInfo O_Dao_FieldInfo */
+			if ($fieldInfo->isRelationOne() && $fieldInfo->getParam( "preload" )) {
+				$preloadClasses[ $name ] = $fieldInfo->getRelationTarget();
+			}
+		}
 		$this->objects = Array ();
-		foreach ($r as $o)
+		$preloadIds = Array ();
+		foreach ($r as $o) {
 			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
+			foreach ($preloadClasses as $field => $class) {
+				if (!is_array( $preloadIds[ $class ] ))
+					$preloadIds[ $class ] = Array ();
+				if (!in_array( $o[ $field ], $preloadIds[ $class ] ))
+					$preloadIds[ $class ][] = $o[ $field ];
+			}
+		}
+		foreach ($preloadIds as $class => $ids)
+			if (count( $ids )) {
+				self::get( $class )->test( "id", $ids )->getAll();
+			}
 		return $this->objects;
 	}
 
