@@ -17,14 +17,14 @@ class O_Acl_Admin_Cmd {
 	 */
 	static public function process( O_Command $cmd )
 	{
-		Header("Content-type: text/html; charset=utf-8");
-
+		Header( "Content-type: text/html; charset=utf-8" );
+		
 		// Find role to process, if given
 		if ($cmd->getParam( "role" )) {
-			$role = O_Dao_ActiveRecord::getById( $cmd->getParam( "role" ),
+			$role = O_Dao_ActiveRecord::getById( $cmd->getParam( "role" ), 
 					O_Registry::get( "app/classnames/acl_role" ) );
 		}
-
+		
 		// Process ajax request
 		if (O_Registry::get( "app/env/request_method" ) == "POST" && isset( $role ) && $role) {
 			// Request to show role
@@ -32,8 +32,8 @@ class O_Acl_Admin_Cmd {
 				$tpl = $cmd->getTemplate();
 				$tpl->role = $role;
 				// Prepare actions array
-				$actions = O_Db_Query::get(
-						O_Dao_TableInfo::get( O_Registry::get( "app/classnames/acl_action" ) )->getTableName() )->field(
+				$actions = O_Db_Query::get( 
+						O_Dao_TableInfo::get( O_Registry::get( "app/classnames/acl_action" ) )->getTableName() )->field( 
 						"DISTINCT name" )->select()->fetchAll( PDO::FETCH_OBJ );
 				foreach ($actions as &$v)
 					$v = $v->name;
@@ -57,7 +57,7 @@ class O_Acl_Admin_Cmd {
 			}
 			// Saving role: parent
 			if ($cmd->getParam( "parent_role" )) {
-				$parent = O_Dao_ActiveRecord::getById( $cmd->getParam( "parent_role" ),
+				$parent = O_Dao_ActiveRecord::getById( $cmd->getParam( "parent_role" ), 
 						O_Registry::get( "app/classnames/acl_role" ) );
 				if ($parent && $parent->id != $role->id)
 					$role->parent = $parent;
@@ -69,7 +69,7 @@ class O_Acl_Admin_Cmd {
 				// Saving role: visitor
 			if ($cmd->getParam( "set_visitor" ) == "yes")
 				$role->setAsVisitorRole();
-
+				
 			// Simpliest json response
 			$response = array ();
 			$response[ "status" ] = $role->save() ? "SAVED" : "NO DAO CHANGES";
@@ -79,12 +79,12 @@ class O_Acl_Admin_Cmd {
 			O_Acl_Role::getByName( $cmd->getParam( "new_role" ) );
 			return $cmd->redirect( O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) ) );
 		}
-
+		
 		// Just return the template
 		$tpl = $cmd->getTemplate();
-
+		
 		$tpl->roles = O_Dao_Query::get( O_Registry::get( "app/classnames/acl_role" ) );
-
+		
 		return $tpl;
 	}
 

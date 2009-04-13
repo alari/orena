@@ -58,7 +58,8 @@ class O_Dao_Renderer_Edit_Callbacks {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" .
+						 $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") .
 						 "oFCKeditor.ReplaceTextarea();", $params->layout() );
 		}
@@ -118,6 +119,7 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 		$displayField = $_params[ "displayField" ];
 		$size = 1;
 		$multiply = $_params[ "multiply" ];
+		$value = $params->value();
 		if ($multiply)
 			$size = 3;
 		?>
@@ -135,13 +137,61 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 		?>
 <select class="oo-renderer-selectRelation"
 	name="<?=($params->fieldName() . ($multiply ? "[]" : ""))?>"
-	size="<?=$size?>">
+	size="<?=$size?>" <?=($multiply ? ' multiple="yes"' : '')?>>
 <?
 		foreach ($_params[ "query" ] as $obj) {
-			?><option value="<?=$obj->id?>"><?=$obj->$displayField?></option><?
+			?><option value="<?=$obj->id?>"
+		<?=(isset( $value[ $obj->id ] ) ? ' selected="yes"' : '')?>><?=$obj->$displayField?></option><?
 		}
 		?>
 </select></div>
+<?
+	}
+
+	static public function selectRelationBox( O_Dao_Renderer_Edit_Params $params )
+	{
+		$_params = $params->params();
+		
+		$displayField = $_params[ "displayField" ];
+		$multiply = $_params[ "multiply" ];
+		$value = $params->value();
+		if ($multiply) {
+			$type = "checkbox";
+			$name = $params->fieldName() . "[]";
+		} else {
+			$type = "radio";
+			$name = $params->fieldName();
+		}
+		
+		$echoed = 0;
+		?>
+<div class="oo-renderer-field">
+<div class="oo-renderer-title">
+<?=$params->title()?>:</div>
+<?
+		if ($params->error()) {
+			?>
+<div class="oo-renderer-error">
+<?=$params->error()?>
+</div>
+<?
+		}
+		?>
+<div class="oo-renderer-selectRelation">
+<?
+		foreach ($_params[ "query" ] as $obj) {
+			if ($echoed)
+				echo ", ";
+			else
+				$echoed = 1;
+			?>
+	<label><input type="<?=$type?>" name="<?=$name?>" value="<?=$obj->id?>"
+	<?=(isset( $value[ $obj->id ] ) ? ' checked="yes"' : '')?>> &ndash; <?=$obj->$displayField?></label>
+<?
+		}
+		?>
+</div>
+</div>
 <?
 	}
 

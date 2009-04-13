@@ -451,18 +451,20 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			$value = Array ();
 			foreach ($this->values[ $name ] as $id) {
 				if (is_array( $availableValues ) && !isset( $availableValues[ $id ] )) {
-					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
+					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation: obj not found." );
 				}
 				$value[ $id ] = O_Dao_ActiveRecord::getById( $id, $fieldInfo->getRelationTarget() );
 			}
 			$this->values[ $name ] = $value;
 			// single relation
 		} else {
-			if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
-				throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
+			if ($this->values[ $name ]) {
+				if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
+					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
+				}
+				$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
+						$fieldInfo->getRelationTarget() );
 			}
-			$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
-					$fieldInfo->getRelationTarget() );
 		}
 	}
 
@@ -539,8 +541,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				$this->record->$name = $value;
 				// Removing old values, assigning new ones
 			} elseif ($fieldInfo->isRelationMany()) {
+				$field = $this->record->$name;
 				if (is_array( $value )) {
-					$field = $this->record->$name;
 					foreach ($field as $id => $obj) {
 						if (!isset( $value[ $id ] ))
 							$field->remove( $obj, $fieldInfo->isRelationOwns() );
@@ -549,6 +551,8 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 						if (!isset( $field[ $id ] ))
 							$field[] = $obj;
 					}
+				} else {
+					$field->removeAll( $fieldInfo->isRelationOwns() );
 				}
 			}
 		}
