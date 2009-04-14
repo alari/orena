@@ -61,7 +61,9 @@ class Test_Tpl_Main extends O_Html_Template {
 			$form->setActiveRecord( $record );
 			$form->setLayout( $this->layout() );
 
-			echo $form->handle() ? "handled" : "not handled";
+			if($form->handle()) {
+				throw new O_Ex_Redirect();
+			}
 			$form->show();
 		}
 		if (!isset( $_SESSION[ "my_test" ] )) {
