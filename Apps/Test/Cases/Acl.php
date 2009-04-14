@@ -4,7 +4,7 @@
  * O_Acl_Role test case.
  */
 class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
-	
+
 	/**
 	 * Enter description here...
 	 *
@@ -12,10 +12,16 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	 */
 	private static $role;
 
+	public function __construct()
+	{
+		O_Dao_Query::get( "O_Acl_Role" )->delete();
+	}
+
 	public function testGetInh()
 	{
 		self::$role = O_Acl_Role::getByName( "test role" );
 		self::$role->parent = O_Acl_Role::getByName( "test parent" );
+		self::$role->save();
 		$this->assertEquals( O_Acl_Role::getByName( "test parent" ), self::$role->parent );
 	}
 
