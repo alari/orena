@@ -95,6 +95,8 @@ class O_Html_Layout {
 		ob_start();
 		$this->displayBody();
 		$body = ob_get_clean();
+		
+		// TODO create function to draw doctype     
 		?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
