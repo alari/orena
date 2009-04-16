@@ -1,26 +1,41 @@
-/* Globals */
-*{box-sizing:border-box; -moz-box-sizing:border-box}
-html,body{padding:0; margin:0}
-/* Header and footer position */
-body{position:relative; padding:100px 0 40px 0}
-#feet,#head{position:absolute; left:0; width:100%}
-#feet{bottom:0; height:40px}
-#head{top:0; height:100px}
-/* Columns model */
-#wrap{float:left; width:100%}
-#cont{margin:0 200px}
-#lcol,#rcol{float:left; width:200px}
-#lcol{margin-left:-100%;}
-#rcol{margin-left:-200px;}
-.clear{clear:both}
+/*general*/
+* {box-sizing:border-box;-moz-box-sizing:border-box;-webkit-box-sizing:border-box;font-family:arial,sans-serif;font-size:13px;color:#331100;}
+html,body {height:100%;margin:0;padding:0;}
+html {background-color:#eee}
 
-/* Default styles */
-body{background:#fff}
-#feet{background:wheat; text-align:center}
-	#feet a{color:black}
-#head{background:wheat}
-#cont{border:1px solid red}
-#lcol{background:lightskyblue}
-#rcol{background:silver}
+/*container construction*/
+div#body {float:left;_display:inline;clear:right;position:relative;min-width:990px;width:100%;
+_width:expression(document.body.clientWidth < 990 ? '990px' : '100%');
+height:100%;margin:0px;padding:0px;}
+div#wrap {width:100%;height:100%;margin:0px;padding:100px 0px 40px 0px;_padding-top:100px /*maybe no need*/ ;}
+@-moz-document url-prefix() { div#wrap{display:table;} }
+div#cont,div#lcol,div#rcol {float:left;_display:inline;clear:right;position:relative;height:100%;margin:0px;}
+div#lcol,div#rcol {width:20%;}
+div#lcol {_display:expression('inline');} /* _very-very_ important rule!*/
+div#cont {margin-left:20%;width:60%;margin-right:-80%;}
+div#lcol {margin-left:0%;margin-right:-20%;}
+div#rcol {margin-left:80%;margin-right:-100%;}
+div#head,div#foot {position:absolute;width:100%;}
+div#head {top:0px;height:100px;}
+div#foot {height:40px;margin-top:-40px;}
 
-/* Renderer styles */
+/*container design*/
+div#cont {padding:0px 10px 0px 10px;} 
+div#lcol {border-right:1px dashed #999; padding:0px 10px 0px 10px;}
+div#rcol {border-left:1px dashed #999; padding:0px 10px 0px 10px;}
+div#head {border-bottom:1px solid #999;background-color:#ddd;font-size:11px;}
+div#foot {text-align:center;border-top:1px solid #999;padding-top:12px;font-size:11px;background-color:#ddd;}
+
+/*elements*/
+a,a:hover,a:visited {color:#111166;text-decoration:none;}
+a:hover {text-decoration:underline;}
+input.text,input.button {margin:0px;border:1px solid #999;height:18px;font-size:11px;}
+
+/*parts*/
+	/*head*/
+div#head_logo {float:left;width:20%;padding-top:40px;text-align:center;}
+div#head_info {float:right;width:80%;padding:10px;text-align:left;}
+	div#head_info form {margin:12px 0px 0px 0px;}
+	div#head_info form label {display:block;clear:left;margin-bottom:3px;}
+	div#head_info form label span {float:left;width:70px;}
+	div#head_info input.button {margin-left:70px;_margin-left:73px;}
