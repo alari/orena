@@ -7,14 +7,14 @@ class O_Html_Layout {
 	 * @var O_Html_Template
 	 */
 	protected $tpl;
-	
+
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-	
+
 	/**
 	 * Array of metatags
 	 *
@@ -57,7 +57,7 @@ class O_Html_Layout {
 	 * @var Array
 	 */
 	protected $headLinks = Array ();
-	
+
 	/**
 	 * HTTP response code
 	 *
@@ -90,7 +90,7 @@ class O_Html_Layout {
 		Header( "HTTP/1.1 " . $this->responseCode . " " . $this->responseMessage );
 		if ($this->contentType)
 			Header( "Content-type: " . $this->contentType );
-			
+
 		// TODO find the way to avoid output bufferization
 		ob_start();
 		$this->displayBody();
@@ -266,6 +266,13 @@ class O_Html_Layout {
 		return O_UrlBuilder::getStatic( $url, $fw );
 	}
 
+	/**
+	 * Returns full url given by urlbuilder
+	 *
+	 * @param string $url
+	 * @param array $params
+	 * @return string
+	 */
 	public function url( $url, array $params = array() )
 	{
 		return O_UrlBuilder::get( $url, $params );
