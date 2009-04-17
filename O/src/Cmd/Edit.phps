@@ -10,6 +10,15 @@
  * cmd/edit/redirect -- if set to 1, refresh; to "-obj:url" -- get ->url() from object; elsewhere urlbuilder will be called
  * cmd/edit/show_on_success -- message to show when form is processed successfully
  *
+ * Registry to prepare relation queries:
+ * cmd/edit/relations/$field_name:
+ * 		multiply -- allow multiply selection or not
+ * 		display -- field name to display, default is id
+ * 		source -- where to get query from
+ * 		class -- if source==class, so there should be stored classname to get query from
+ * 		field -- if source==field or source==user field, there should be described a field relative to a resourse
+ * 		resourse -- if source==field, there should be stored registry key to the resourse to get relative field from
+ *
  * Notice: you can use "layout_class" registry key to easily change formatting of default templates
  *
  * @author Dmitry Kourinski
@@ -25,24 +34,29 @@ class O_Cmd_Edit extends O_Command {
 		}
 		/* @var $form O_Dao_Renderer_FormProcessor */
 		$form = $tpl->obj->form();
-		
+
 		if (O_Registry::get( "app/cmd/edit/type" )) {
 			$form->setType( O_Registry::get( "app/cmd/edit/type" ) );
 		}
 		if (O_Registry::get( "app/cmd/edit/show_type" )) {
 			$form->setShowType( O_Registry::get( "app/cmd/edit/show_type" ) );
 		}
-		
+
+		// Prepare relations
+		$relations = O_Registry::get( "app/cmd/edit/relations" );
+		if (is_array( $relations ))
+			$this->setRelationQueries( $form, $relations );
+
 		// Prepare form fields by inherited commands
 		$this->prepareForm( $form );
-		
+
 		// Prepare redirect url
 		$redirect = O_Registry::get( "app/cmd/edit/redirect" );
 		if ($redirect == "-obj:url")
 			$redirect = $tpl->obj->url();
 		elseif ($redirect !== 1 && $redirect)
 			$redirect = O_UrlBuilder::get( $redirect );
-			
+
 		// Ajax response
 		if (O_Registry::get( "app/cmd/edit/ajax" )) {
 			$form->setAjaxMode();
@@ -59,7 +73,7 @@ class O_Cmd_Edit extends O_Command {
 			}
 		}
 		$tpl->form = $form;
-		
+
 		return $tpl;
 	}
 
@@ -73,4 +87,44 @@ class O_Cmd_Edit extends O_Command {
 		;
 	}
 
+	/**
+	 * Sets relation queries from registry array
+	 *
+	 * @param O_Dao_Renderer_FormProcessor $form
+	 * @param array $registry
+	 */
+	protected function setRelationQueries( O_Dao_Renderer_FormProcessor $form, Array $registry )
+	{
+		foreach ($registry as $fieldName => $params) {
+			$multiply = isset( $params[ "multiply" ] ) ? $params[ "multiply" ] : false;
+			$display = isset( $params[ "display" ] ) ? $params[ "display" ] : "id";
+			$source = isset( $params[ "source" ] ) ? $params[ "source" ] : null;
+			switch ($source) {
+				// User related field
+				case "user field" :
+					$resourse = O_Acl_Session::getUser();
+				// Resourse related field
+				case "field" :
+					if (!$resourse && isset( $params[ "resourse" ] )) {
+						$resourse = O_Registry::get( $params[ "resourse" ] );
+					}
+					if (!$resourse instanceof O_Dao_ActiveRecord) {
+						throw new O_Ex_NotFound( "Resourse not found.", 404 );
+					}
+					if (iset( $params[ "field" ] )) {
+						$field = $params[ "field" ];
+						$query = $resourse->$field;
+					}
+				break;
+				default :
+					if (isset( $params[ "class" ] ))
+						$query = O_Dao_Query::get( $params[ "class" ] );
+			}
+			if (!$query instanceof O_Dao_Query) {
+				throw new O_Ex_NotFound( "Wrong query provided.", 404 );
+			}
+
+			$form->setRelationQuery( $fieldName, $query, $display, $multiply );
+		}
+	}
 }
