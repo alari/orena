@@ -87,7 +87,7 @@ class O_Cmd_ShowLoop extends O_Command {
 			$tpl->paginator->setModeAjax();
 			
 			if ($tpl->paginator->isAjaxPageRequest()) {
-				$tpl->paginator->show( $tpl->layout(), $tpl->mode );
+				$tpl->paginator->show( $tpl->layout(), $tpl->type );
 				return null;
 			}
 		}
@@ -119,7 +119,8 @@ class O_Cmd_ShowLoop extends O_Command {
 	 */
 	public function url( $page, $order )
 	{
-		return O_UrlBuilder::get( str_replace( array ("{PAGE}", "{ORDER}"), array ($page, $order), $this->url_pattern ) );
+		return O_UrlBuilder::get( 
+				str_replace( array ("{PAGE}", "{ORDER}"), array ($page, $order), $this->url_pattern ) );
 	}
 
 }
