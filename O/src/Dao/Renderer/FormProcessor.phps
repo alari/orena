@@ -18,14 +18,14 @@
  *
  */
 class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
-
+	
 	/**
 	 * Instances counter -- to give an unique id to each form
 	 *
 	 * @var int
 	 */
 	private static $instancesCount = 0;
-
+	
 	/**
 	 * Form title
 	 *
@@ -63,7 +63,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * @var bool
 	 */
 	protected $handleResult;
-
+	
 	/**
 	 * Array of hidden fields
 	 *
@@ -94,7 +94,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 * @var unknown_type
 	 */
 	protected $createMode = 0;
-
+	
 	/**
 	 * Array of field errors
 	 *
@@ -170,7 +170,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id", $multiply = false )
 	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField,
+		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField, 
 														"multiply" => $multiply);
 	}
 
@@ -252,7 +252,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 	{
 		if ($layout)
 			$this->setLayout( $layout );
-
+			
 		// Form title
 		if (!$this->formTitle) {
 			$this->formTitle = $this->getFormText( "title", "Form" );
@@ -265,11 +265,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		if (is_null( $this->resetButtonValue )) {
 			$this->resetButtonValue = $this->getFormText( "reset", null );
 		}
-
+		
 		?>
 <div>
-<form method="POST" enctype="application/x-www-form-urlencoded" accept-charset="utf-8"
-	action="<?=$this->actionUrl?>" id="<?=$this->instanceId?>">
+<form method="POST" enctype="application/x-www-form-urlencoded"
+	accept-charset="utf-8" action="<?=$this->actionUrl?>"
+	id="<?=$this->instanceId?>">
 <fieldset class="oo-renderer"><legend><?=$this->formTitle?></legend>
 
 <?
@@ -287,14 +288,14 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			} else {
 				$params = $callback[ "params" ];
 				$callback = $callback[ "callback" ];
-
+				
 				if (isset( $this->relationQueries[ $name ] )) {
 					$_params = $this->relationQueries[ $name ];
 					$_params[ "params" ] = $params;
 					$params = $_params;
 				}
 			}
-
+			
 			// Prepare field value and title
 			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
@@ -303,11 +304,11 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				$title = $fieldInfo->getParam( "title" );
 			if (!$title)
 				$title = $name;
-
+				
 			// Make HTML injections, display field value via callback
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
-
+			
 			$edit_params = new O_Dao_Renderer_Edit_Params( $name, $this->class, $params, $this->record );
 			if ($this->layout)
 				$edit_params->setLayout( $this->layout );
@@ -315,7 +316,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			$edit_params->setTitle( $title );
 			if (isset( $this->errors[ $name ] ))
 				$edit_params->setError( $this->errors[ $name ] );
-
+			
 			call_user_func( $callback, $edit_params );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];
@@ -326,7 +327,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		}
 		if ($this->record)
 			echo "<input type=\"hidden\" name=\"id\" value=\"{$this->record->id}\"/>";
-
+		
 		?>
 
 <input type="submit"
@@ -397,32 +398,32 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
-
+			
 			try {
 				// Checker callback is called after finding relations -- by default
 				if ($fieldInfo->getRelationTarget() && !$fieldInfo->getParam( "check:before" )) {
 					$this->checkRelationValue( $name, $fieldInfo );
 				}
-
+				
 				// Callback checker
 				$callback = $this->getCheckCallback( $fieldInfo );
 				if ($callback) {
-					$params = new O_Dao_Renderer_Check_Params( $name, $this->class, $callback[ "params" ],
+					$params = new O_Dao_Renderer_Check_Params( $name, $this->class, $callback[ "params" ], 
 							$this->record );
 					$params->setNewValueRef( $this->values[ $name ] );
-
+					
 					$callback = $callback[ "callback" ];
-
+					
 					call_user_func( $callback, $params );
 				}
-
+				
 				// Required value test
 				if (!$this->values[ $name ] && $fieldInfo->getParam( "required" )) {
-					throw new O_Dao_Renderer_Check_Exception(
-							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
+					throw new O_Dao_Renderer_Check_Exception( 
+							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam( 
 									"required" ) );
 				}
-
+				
 				// Checker callback already was called -- check:before param was set
 				if ($fieldInfo->getRelationTarget() && $fieldInfo->getParam( "check:before" )) {
 					$this->checkRelationValue( $name, $fieldInfo );
@@ -462,7 +463,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
 					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
 				}
-				$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ],
+				$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
 						$fieldInfo->getRelationTarget() );
 			}
 		}
@@ -500,11 +501,11 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		if ($this->handled)
 			return $this->handleResult;
 		$this->handled = true;
-
+		
 		// Process only POST requests
 		if (O_Registry::get( "app/env/request_method" ) != "POST")
 			return $this->handleResult = false;
-
+			
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
@@ -513,15 +514,15 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				return $this->handleResult = false;
 			}
 		}
-
+		
 		// Check and prepare values, found errors if they are
 		$this->checkValues();
-
+		
 		// Stop processing without saving, if errors occured
 		if (count( $this->errors )) {
 			return $this->handleResult = false;
 		}
-
+		
 		// Create record in database
 		if ($this->createMode !== 0 && !$this->record) {
 			$class = $this->class;
@@ -532,7 +533,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				$this->record = new $class( );
 			}
 		}
-
+		
 		// Setting values for ActiveRecord
 		foreach ($this->values as $name => $value) {
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
@@ -556,7 +557,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 				}
 			}
 		}
-
+		
 		// Trying to save
 		try {
 			$this->record->save();
@@ -565,7 +566,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 			$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
 			return $this->handleResult = 0;
 		}
-
+		
 		// Succeed
 		return $this->handleResult = 1;
 	}
@@ -579,7 +580,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_Commons {
 		$response = Array ("status" => "");
 		if ($this->handle()) {
 			$response[ "status" ] = "SUCCEED";
-
+			
 			if ($refresh) {
 				$response[ "refresh" ] = 1;
 			} elseif (!$showOnSuccess) {

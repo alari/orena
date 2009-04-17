@@ -7,14 +7,14 @@ class O_Html_Layout {
 	 * @var O_Html_Template
 	 */
 	protected $tpl;
-
+	
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-
+	
 	/**
 	 * Array of metatags
 	 *
@@ -57,7 +57,7 @@ class O_Html_Layout {
 	 * @var Array
 	 */
 	protected $headLinks = Array ();
-
+	
 	/**
 	 * HTTP response code
 	 *
@@ -90,14 +90,13 @@ class O_Html_Layout {
 		Header( "HTTP/1.1 " . $this->responseCode . " " . $this->responseMessage );
 		if ($this->contentType)
 			Header( "Content-type: " . $this->contentType );
-
+			
 		// TODO find the way to avoid output bufferization
 		ob_start();
 		$this->displayBody();
 		$body = ob_get_clean();
 		
-		// TODO create function to draw doctype
-		$this->displayDoctype();     
+		$this->displayDoctype();
 		?>
 <html>
 <head>
@@ -115,7 +114,7 @@ class O_Html_Layout {
 
 	/**
 	 * Echoes doctype
-	 * 
+	 *
 	 */
 	protected function displayDoctype()
 	{
@@ -123,7 +122,7 @@ class O_Html_Layout {
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <?
 	}
-	
+
 	/**
 	 * Echoes contents of head tag
 	 *

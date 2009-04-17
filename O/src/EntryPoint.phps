@@ -209,8 +209,12 @@ class O_EntryPoint {
 		$plugin_name = O_Registry::get( "app/plugin_name" );
 		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
 		
-		$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-		$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+		if (!O_Registry::get( "app/command_full" )) {
+			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+		} else {
+			$cmd_class = $cmd_name;
+		}
 		if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
 			$cmd_name = "Default";
 			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
@@ -293,7 +297,12 @@ class O_EntryPoint {
 					break;
 				if ((string)$node[ "plugin" ])
 					O_Registry::set( "app/plugin_name", (string)$node[ "plugin" ] );
-				O_Registry::set( "app/command_name", (string)$node[ "name" ] );
+				if ((string)$node[ "type" ]) {
+					O_Registry::set( "app/command_name", "O_Cmd_" . ((string)$node[ "type" ]) );
+					O_Registry::set( "app/command_full", 1 );
+				} else {
+					O_Registry::set( "app/command_name", (string)$node[ "name" ] );
+				}
 			break;
 			// Set plugin into "app/plugin_name" registry
 			case "Plugin" :
@@ -409,6 +418,20 @@ class O_EntryPoint {
 				$value = $pockets[ $pocket ];
 		} elseif (!$value) {
 			$value = $registry;
+		}
+		// Load object into registry
+		if ((string)$registry[ "class" ]) {
+			$class = (string)$registry[ "class" ];
+			if (!class_exists( $class, true )) {
+				throw O_Ex_Config( "Wrong class given in registry." );
+			}
+			$method = (string)$registry[ "method" ];
+			$value = $method ? call_user_func( array ($class, $method), $value ) : O_Dao_ActiveRecord::getById( 
+					$value, $class );
+			// Add to default acl checker
+			if ((string)$registry[ "can" ]) {
+				O_Registry::add( "app/cmd/can", array ($registry[ "can" ], $rootkey . "/" . $key) );
+			}
 		}
 		if ($registry[ "type" ] == "add") {
 			O_Registry::add( $rootkey . "/" . $key, $value );

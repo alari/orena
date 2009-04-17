@@ -5,13 +5,23 @@ abstract class O_Html_Template {
 	 *
 	 * @var string
 	 */
-	protected $layoutClass = "O_Html_Layout";
+	protected $layoutClass;
 	/**
 	 * Layout object
 	 *
 	 * @var O_Html_Layout
 	 */
 	private $layoutObject;
+
+	/**
+	 * Constructor -- sets default layout class, if it's not specified at all
+	 *
+	 */
+	public function __construct()
+	{
+		if (!$this->layoutClass)
+			$this->layoutClass = O_Registry::get( "app/layout_class" );
+	}
 
 	/**
 	 * Echoes template main contents

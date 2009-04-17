@@ -23,4 +23,5 @@
 	<Registry key="paginator/next" value="Next"></Registry>
 	<Registry key="paginator/css_envelop" value="o-pager"></Registry>
 	<Registry key="paginator/order_title" value="Order by"></Registry>
+	<Registry key="layout_class" value="O_Html_Layout"></Registry>
 </Config>

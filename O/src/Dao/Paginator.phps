@@ -253,7 +253,7 @@ class O_Dao_Paginator {
 			if ($page == $this->page) {
 				$html[ $page ] = "<b>" . $v . "</b>";
 			} else {
-				$url = call_user_func( $this->url_callback, $page, $this->order );
+				$url = call_user_func( $this->url_callback, $page, $this->order . ($this->order_desc ? "-desc" : "") );
 				if ($this->ajax_id) {
 					$html[ $page ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
 							$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>";

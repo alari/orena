@@ -9,35 +9,46 @@ class O_Html_MainLayout extends O_Html_Layout {
 	protected $mainCssHref;
 
 	/**
+	 * Redefine O_Html_Layout::displayDoctype
+	 *
+	 */
+	protected function displayDoctype()
+	{
+		?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<?
+	}
+
+	/**
 	 * Simple layout with three columns
 	 *
 	 */
 	public function displayBody()
 	{
 		?>
+<div id="body">
 <div id="wrap">
 <div id="cont">
 		<?
 		$this->displayContents();
 		?>
 </div>
-</div>
 
-<div id="head"><?
-		$this->displayHeader();
-		?></div>
 <div id="lcol"><?
 		$this->displayColLeft();
 		?></div>
 <div id="rcol"><?
 		$this->displayColRight();
 		?></div>
+</div>
 
-<div class="clear"><!--  --></div>
-
-<div id="feet"><?
+<div id="head"><?
+		$this->displayHeader();
+		?></div>
+<div id="foot"><?
 		$this->displayFooter();
 		?></div>
+</div>
 <?
 	}
 
