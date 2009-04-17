@@ -122,7 +122,7 @@ abstract class O_Command {
 		if ($tpl && $omitPrefix) {
 			$class = $tpl;
 		} else {
-			preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches = array () );
+			preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches );
 			$class = $matches[ 1 ] . "Tpl" . ($tpl ? $tpl : $matches[ 2 ]);
 		}
 		if (!class_exists( $class ))
