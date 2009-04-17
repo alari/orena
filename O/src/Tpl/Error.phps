@@ -1,5 +1,5 @@
 <?php
-class O_Html_ErrorTpl extends O_Html_Template {
+class O_Tpl_Error extends O_Html_Template {
 	
 	/**
 	 * Exception object

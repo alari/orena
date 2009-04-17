@@ -1,4 +1,12 @@
 <?php
+/**
+ * Templates abstraction.
+ *
+ * Notise that you could simply tune up default templates via defining "app/layout_class"
+ * registry key.
+ *
+ * @author Dmitry Kourinski
+ */
 abstract class O_Html_Template {
 	/**
 	 * Classname of layout assotiated with current template

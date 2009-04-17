@@ -34,29 +34,29 @@ class O_Cmd_Edit extends O_Command {
 		}
 		/* @var $form O_Dao_Renderer_FormProcessor */
 		$form = $tpl->obj->form();
-
+		
 		if (O_Registry::get( "app/cmd/edit/type" )) {
 			$form->setType( O_Registry::get( "app/cmd/edit/type" ) );
 		}
 		if (O_Registry::get( "app/cmd/edit/show_type" )) {
 			$form->setShowType( O_Registry::get( "app/cmd/edit/show_type" ) );
 		}
-
+		
 		// Prepare relations
 		$relations = O_Registry::get( "app/cmd/edit/relations" );
 		if (is_array( $relations ))
 			$this->setRelationQueries( $form, $relations );
-
+			
 		// Prepare form fields by inherited commands
 		$this->prepareForm( $form );
-
+		
 		// Prepare redirect url
 		$redirect = O_Registry::get( "app/cmd/edit/redirect" );
 		if ($redirect == "-obj:url")
 			$redirect = $tpl->obj->url();
 		elseif ($redirect !== 1 && $redirect)
 			$redirect = O_UrlBuilder::get( $redirect );
-
+			
 		// Ajax response
 		if (O_Registry::get( "app/cmd/edit/ajax" )) {
 			$form->setAjaxMode();
@@ -73,7 +73,7 @@ class O_Cmd_Edit extends O_Command {
 			}
 		}
 		$tpl->form = $form;
-
+		
 		return $tpl;
 	}
 
@@ -123,7 +123,7 @@ class O_Cmd_Edit extends O_Command {
 			if (!$query instanceof O_Dao_Query) {
 				throw new O_Ex_NotFound( "Wrong query provided.", 404 );
 			}
-
+			
 			$form->setRelationQuery( $fieldName, $query, $display, $multiply );
 		}
 	}

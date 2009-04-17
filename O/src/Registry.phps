@@ -1,5 +1,9 @@
 <?php
-
+/**
+ * Class to store request environment information.
+ *
+ * @author Dmitry Kourinski
+ */
 class O_Registry {
 	/**
 	 * Parsed ini-files -- registry defaults

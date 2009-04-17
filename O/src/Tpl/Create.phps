@@ -1,6 +1,6 @@
 <?php
 class O_Tpl_Create extends O_Html_Template {
-
+	
 	public $form;
 	public $success;
 

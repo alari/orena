@@ -1,4 +1,16 @@
 <?php
+/**
+ * Main command abstraction.
+ * Provides authentication control, exceptions catching middleware, response displaying.
+ *
+ * To use acl via registry:
+ * Way #1: add "can" attribute to any registry node with O_Dao_ActiveRecord inside, type
+ * action name in it.
+ * Way #2: add registry to key "app/cmd/can", format for values: $action#$resourse_registry,
+ * resourse registry key is not required.
+ *
+ * @author Dmitry Kourinski
+ */
 abstract class O_Command {
 
 	/**
@@ -40,8 +52,8 @@ abstract class O_Command {
 	{
 		$can = O_Registry::get( "app/cmd/can" );
 		if (is_array( $can )) {
-			foreach ($can as $arr) {
-				list ($action, $resourse) = $arr;
+			foreach ($can as $acl) {
+				list ($action, $resourse) = strpos( $acl, "#" ) ? explode( "#", $acl, 2 ) : array ($acl, null);
 				if ($resourse)
 					$resourse = O_Registry::get( $resourse );
 				if (!$resourse instanceof O_Dao_ActiveRecord)
@@ -110,7 +122,7 @@ abstract class O_Command {
 		if ($tpl && $omitPrefix) {
 			$class = $tpl;
 		} else {
-			preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches );
+			preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches = array () );
 			$class = $matches[ 1 ] . "Tpl" . ($tpl ? $tpl : $matches[ 2 ]);
 		}
 		if (!class_exists( $class ))

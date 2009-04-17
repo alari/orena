@@ -29,10 +29,10 @@ class O_Cmd_Create extends O_Cmd_Edit {
 	public function process()
 	{
 		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
-
+		
 		$form = new O_Dao_Renderer_FormProcessor( );
 		$form->setClass( O_Registry::get( "app/cmd/create/class" ) );
-
+		
 		$createParams = O_Registry::get( "app/cmd/create/params" );
 		if (!is_array( $createParams ))
 			$createParams = array ();
@@ -44,27 +44,27 @@ class O_Cmd_Create extends O_Cmd_Edit {
 			}
 		}
 		$form->setCreateMode( $createParams );
-
+		
 		if (O_Registry::get( "app/cmd/create/type" )) {
 			$form->setType( O_Registry::get( "app/cmd/create/type" ) );
 		}
 		if (O_Registry::get( "app/cmd/create/show_type" )) {
 			$form->setShowType( O_Registry::get( "app/cmd/create/show_type" ) );
 		}
-
+		
 		// Prepare relations
 		$relations = O_Registry::get( "app/cmd/create/relations" );
 		if (is_array( $relations ))
 			$this->setRelationQueries( $form, $relations );
-
+			
 		// Prepare form fields by inherited commands
 		$this->prepareForm( $form );
-
+		
 		// Prepare redirect url
 		$redirect = O_Registry::get( "app/cmd/create/redirect" );
 		if ($redirect != "-obj:url" && $redirect !== 1 && $redirect)
 			$redirect = O_UrlBuilder::get( $redirect );
-
+			
 		// Ajax response
 		if (O_Registry::get( "app/cmd/create/ajax" )) {
 			$form->setAjaxMode();
@@ -86,7 +86,7 @@ class O_Cmd_Create extends O_Cmd_Edit {
 			}
 		}
 		$tpl->form = $form;
-
+		
 		return $tpl;
 	}
 }

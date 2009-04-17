@@ -24,14 +24,14 @@
  * @author Dmitry Kourinski
  */
 class O_Cmd_ShowLoop extends O_Command {
-
+	
 	private $url_pattern;
 	private $resourse;
 
 	public function process()
 	{
 		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
-
+		
 		$type = O_Registry::get( "app/cmd/show/source" );
 		switch ($type) {
 			// User related field
@@ -55,21 +55,21 @@ class O_Cmd_ShowLoop extends O_Command {
 		if (!$query instanceof O_Dao_Query) {
 			throw new O_Ex_NotFound( "Wrong query provided.", 404 );
 		}
-
+		
 		// Default order
 		if (O_Registry::get( "app/cmd/show/order_by" )) {
 			$query->orderBy( O_Registry::get( "app/cmd/show/order_by" ) );
 		}
-
+		
 		// Other orders
 		$orders = O_Registry::get( "app/cmd/show/orders" );
 		if (!is_array( $orders ))
 			$orders = array ();
-
+			
 		// Url pattern
 		$this->url_pattern = O_Registry::get( "app/cmd/show/url_pattern" );
 		if ($this->url_pattern) {
-			$this->url_pattern = preg_replace_callback( "#{([^}]+)}#", array ($this, "replaceInUrlPattern"),
+			$this->url_pattern = preg_replace_callback( "#{([^}]+)}#", array ($this, "replaceInUrlPattern"), 
 					$this->url_pattern );
 			$url_callback = array ($this, "url");
 		} elseif (O_Registry::get( "app/cmd/show/url_callback" )) {
@@ -77,21 +77,21 @@ class O_Cmd_ShowLoop extends O_Command {
 		} else {
 			$url_callback = array ($this->resourse, "url");
 		}
-
+		
 		$tpl->paginator = $query->getPaginator( $url_callback, null, "paginator/page", $orders );
 		if (O_Registry::get( "app/cmd/show/type" ))
 			$tpl->type = O_Registry::get( "app/cmd/show/type" );
-
+			
 		// Ajax response
 		if (O_Registry::get( "app/cmd/show/ajax" )) {
 			$tpl->paginator->setModeAjax();
-
+			
 			if ($tpl->paginator->isAjaxPageRequest()) {
 				$tpl->paginator->show( $tpl->layout(), $tpl->type );
 				return null;
 			}
 		}
-
+		
 		return $tpl;
 	}
 
@@ -119,7 +119,7 @@ class O_Cmd_ShowLoop extends O_Command {
 	 */
 	public function url( $page, $order )
 	{
-		return O_UrlBuilder::get(
+		return O_UrlBuilder::get( 
 				str_replace( array ("{PAGE}", "{ORDER}"), array ($page, $order), $this->url_pattern ) );
 	}
 

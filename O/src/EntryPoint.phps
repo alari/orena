@@ -2,7 +2,7 @@
 // We need to require it manually
 require_once 'ClassManager.phps';
 /**
- * Processes request -- from url and host parsing to response echo.
+ * Processes request -- from url and host parsing to response echoing.
  *
  * To build your project based on this, type in your entry-point file:
  * <code>
@@ -15,7 +15,9 @@ require_once 'ClassManager.phps';
  * ./Apps/Orena.apps.xml -- application selection
  * ./Apps/{APP_NAME}/Application.xml -- concrete application config, include registry and url-parsing
  *
- * @copyright Dmitry Kourinski
+ * Configuration files formats could be seen in ./O/static/dtd/
+ *
+ * @author Dmitry Kourinski
  */
 class O_EntryPoint {
 
@@ -55,7 +57,7 @@ class O_EntryPoint {
 		}
 		catch (Exception $e) {
 			// TODO: get exception handler class from registry
-			$tpl = new O_Html_ErrorTpl( $e );
+			$tpl = new O_Tpl_Error( $e );
 			if ($tpl instanceof O_Html_Template) {
 				$tpl->display();
 				return true;
@@ -72,7 +74,6 @@ class O_EntryPoint {
 	static public function errorException( $code, $msg )
 	{
 		throw new O_Ex_CodeError( $msg, $code );
-		;
 	}
 
 	/**
@@ -430,7 +431,7 @@ class O_EntryPoint {
 					$value, $class );
 			// Add to default acl checker
 			if ((string)$registry[ "can" ]) {
-				O_Registry::add( "app/cmd/can", array ($registry[ "can" ], $rootkey . "/" . $key) );
+				O_Registry::add( "app/cmd/can", $registry[ "can" ] . "#" . $rootkey . "/" . $key );
 			}
 		}
 		if ($registry[ "type" ] == "add") {
