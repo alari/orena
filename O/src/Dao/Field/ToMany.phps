@@ -12,7 +12,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var string
 	 */
 	private $name;
-	
+
 	/**
 	 * Owns it its targets or not
 	 *
@@ -31,7 +31,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var string
 	 */
 	private $target;
-	
+
 	/**
 	 * Inverse fieldname
 	 *
@@ -44,14 +44,14 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var O_Dao_FieldInfo
 	 */
 	private $inverseField;
-	
+
 	/**
 	 * Cached relation objects, like O_Dao_Relation_Base
 	 *
 	 * @var O_Dao_Relation_Base[]
 	 */
 	private $relations = Array ();
-	
+
 	/**
 	 * Current dao classname -- cached in property
 	 *
@@ -81,7 +81,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 		$this->inverse = $fieldInfo->getParam( "inverse" );
 		if (!$this->inverse)
 			throw new O_Ex_Config( "Inverse field must be specified for whatever-to-many relations." );
-	
+
 	}
 
 	/**
@@ -118,6 +118,8 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	{
 		if ($fieldValue instanceof O_Dao_Query)
 			$fieldValue = $fieldValue->getAll();
+		if (!$fieldValue)
+			$fieldValue = Array ();
 		if (!is_array( $fieldValue ))
 			throw new O_Ex_WrongArgument( "Cannot assign non-array/query to base-to-many relation." );
 		$relation = $this->getRelation( $obj->id );
@@ -189,11 +191,11 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->isRelationMany()) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->target, 
+				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->target,
 						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target, 
+				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target,
 						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
 			}
 		}
@@ -222,7 +224,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 */
 	public function addFieldTypeToQuery( O_Db_Query $query )
 	{
-	
+
 	}
 
 }
