@@ -370,16 +370,15 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	}
 
 	/**
-	 * Does nothing
+	 * Changes the field value
 	 *
 	 * @param string $offset
 	 * @param mixed $value
-	 * @throws Exception
 	 * @access private
 	 */
 	public function offsetSet( $offset, $value )
 	{
-		throw new O_Ex_Logic( "Cannot assign a value to ActiveRecord sql-field directly." );
+		$this->setField( $offset, $value );
 	}
 
 	/**

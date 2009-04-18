@@ -66,100 +66,19 @@ class O_Dao_FieldInfo {
 	 * @var Array
 	 */
 	private $params;
-
-	/**
-	 * Database type of field, e.g. int, tinytext, or null if it's not represented in db
-	 *
-	 * @var string
-	 */
-	private $type;
-	/**
-	 * Do the field contain its data as is or showing relation to other objects
-	 *
-	 * @var bool
-	 */
-	private $isAtomic = null;
-
-	/**
-	 * Relation to one or to many objects
-	 *
-	 * @var bool
-	 */
-	private $relationMany = 0;
-	/**
-	 * Target classname of relation
-	 *
-	 * @var string
-	 */
-	private $relationTarget;
-	/**
-	 * Unparsed target
-	 *
-	 * @var string
-	 */
-	private $relationTargetBase;
-	/**
-	 * Name of inverse field of related object
-	 *
-	 * @var string
-	 */
-	private $relationInverse;
-	/**
-	 * Object of inverse field
-	 *
-	 * @var O_Dao_FieldInfo
-	 */
-	private $relationInverseField;
-	/**
-	 * Relation consists of target or just links it
-	 *
-	 * @var bool
-	 */
-	private $relationOwns = 0;
-	/**
-	 * Object of relation -- OneToMany, ManyToMany, etc.
-	 *
-	 * @var O_Dao_Relation_BaseToMany
-	 */
-	private $relationObject;
 	/**
 	 * Classname of current O_Dao_ActiveRecord
 	 *
 	 * @var string
 	 */
 	private $class;
+	
 	/**
-	 * Cached relation objects
+	 * Instance of field
 	 *
-	 * @var O_Dao_Relation_BaseToMany[]
+	 * @var O_Dao_Field_iFace
 	 */
-	private $relation = Array ();
-	/**
-	 * String map for alias field
-	 * e.g. fieldA.fieldB means relation field A which targets object whith relation field B
-	 * Query with B will be returned
-	 *
-	 * @var string
-	 */
-	private $alias;
-	/**
-	 * Field to test to get concrete alias instance
-	 *
-	 * @var string
-	 */
-	private $aliasTestField;
-	/**
-	 * Query for alias
-	 *
-	 * @var O_Dao_Query
-	 */
-	private $aliasQuery;
-	/**
-	 * Array of other class fields to make alias
-	 *
-	 * @var Array
-	 */
-	private $oneOf;
+	private $fieldInstance;
 
 	/**
 	 * Creates FieldInfo object
@@ -174,58 +93,37 @@ class O_Dao_FieldInfo {
 		$this->class = $class;
 		$this->name = $name;
 		$this->params = $params;
-		$this->type = $type;
-
+		
 		// check if it's relation
 		if (isset( $params[ "has" ] )) {
 			$relation = "has";
-			$this->relationOwns = 0;
+			$relationOwns = 0;
 		} elseif (isset( $params[ "owns" ] )) {
 			$relation = "owns";
-			$this->relationOwns = 1;
+			$relationOwns = 1;
 		}
-
-		// save info about relation to be ready to sey it to other side
+		
+		// save info about relation to be ready to say it to another side
 		if (isset( $relation )) {
-			$this->isAtomic = false;
-
-			list ($quantity, $this->relationTargetBase) = explode( " ", $params[ $relation ], 2 );
-			// Get relation classname from registry, if needed!
-			if ($this->relationTargetBase[ 0 ] == "{" && $this->relationTargetBase[ strlen(
-					$this->relationTargetBase ) - 1 ] == "}") {
-				$this->relationTarget = O_Registry::get( "app/" . substr( $this->relationTargetBase, 1, -1 ) );
+			
+			list ($quantity, $relationTargetBase) = explode( " ", $params[ $relation ], 2 );
+			
+			if ($quantity == "one") {
+				$this->fieldInstance = new O_Dao_Field_ToOne( $this, $name, $relationOwns, $relationTargetBase );
 			} else {
-				$this->relationTarget = $this->relationTargetBase;
-			}
-			// Get inverse fieldname
-			$this->relationInverse = isset( $params[ "inverse" ] ) ? $params[ "inverse" ] : null;
-
-			if ($quantity == "many") {
-				$this->relationMany = 1;
-				if (!$this->relationInverse)
-					throw new O_Ex_Config( "Inverse field must be specified for whatever-to-many relations." );
+				$this->fieldInstance = new O_Dao_Field_ToMany( $this, $name, $relationOwns, $relationTargetBase );
+			
 			}
 		} else {
 			// Alias field
 			if (isset( $params[ "alias" ] ) && strpos( $params[ "alias" ], "." )) {
-				$this->isAtomic = false;
-				$this->alias = $params[ "alias" ];
+				$this->fieldInstance = new O_Dao_Field_Alias( $this, $params[ "alias" ] );
 				// Alias for a number of other fields
 			} elseif (isset( $params[ "one-of" ] ) && strpos( $params[ "one-of" ], "," )) {
-				$oneOf = explode( ",", $params[ "one-of" ] );
-				$this->oneOf = Array ();
-				foreach ($oneOf as $v) {
-					$f = O_Dao_TableInfo::get( $class )->getFieldInfo( trim( $v ) );
-					if (!$f || !$f->isRelationOne() || isset( $this->oneOf[ $f->getRelationTarget() ] )) {
-						throw new O_Ex_Config( "Wrong fields enumeration for one-of aliasing." );
-					}
-					$this->oneOf[ $f->getRelationTarget() ] = trim( $v );
-				}
+				$this->fieldInstance = new O_Dao_Field_OneOf( $this, $params[ "one-of" ] );
 				// Atomic field
 			} else {
-				$this->isAtomic = true;
-				if (!$this->type)
-					throw new O_Ex_Config( "Cannot initiate atomic field without type ($this->name)" );
+				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
 			}
 		}
 	}
@@ -240,11 +138,18 @@ class O_Dao_FieldInfo {
 	public function setClass( $class )
 	{
 		$this->class = $class;
-		if ($this->relationTargetBase && $this->relationTargetBase[ 0 ] == ":") {
-			$const = $this->class . ":" . $this->relationTargetBase;
-			$this->relationTarget = defined( $const ) ? constant( $const ) : null;
-			$this->relationInverseField = null;
-		}
+		if ($this->fieldInstance)
+			$this->fieldInstance->setFieldInfo( $this );
+	}
+
+	/**
+	 * Returns current classname this field is attached to
+	 *
+	 * @return unknown
+	 */
+	public function getClass()
+	{
+		return $this->class;
 	}
 
 	/**
@@ -277,61 +182,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function addFieldTypeToQuery( O_Db_Query $query )
 	{
-		if ($this->relationMany || $this->alias)
-			return;
-		if ($this->isAtomic)
-			$query->field( $this->name, $this->type );
-		else
-			$query->field( $this->name, "int" )->index( $this->name );
-	}
-
-	/**
-	 * Alters table to add unexistent field
-	 *
-	 * @return PDOStatement
-	 */
-	private function addFieldToTable()
-	{
-		static $is_added = false;
-		if ($is_added)
-			return null;
-		try {
-			$q = new O_Dao_Query( $this->class );
-			$this->addFieldTypeToQuery( $q );
-			$r = $q->alter( "ADD" );
-			O_Dao_ActiveRecord::saveAndReload( $this->class );
-			O_Dao_Query::disablePreparing( $this->class );
-			$is_added = true;
-		}
-		catch (PDOException $e) {
-			if (O_Registry::get( "app/mode" ) == "debug")
-				throw $e;
-			return null;
-		}
-		return $r;
-	}
-
-	/**
-	 * Create relation with other objects.
-	 *
-	 * @param int $obj_id
-	 * @return O_Dao_Relation_BaseToMany
-	 */
-	private function getRelation( $obj_id )
-	{
-		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
-			if ($this->getInverse()->relationMany) {
-				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany(
-						$this->relationTarget, $this->relationInverse, $obj_id, $this->class, $this->name,
-						$this->getParam( "order-by" ) );
-			} else {
-				// Has many with inverse
-				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->relationTarget,
-						$this->relationInverse, $obj_id, $this->class, $this->name, $this->getParam( "order-by" ) );
-			}
-		}
-		return clone $this->relation[ $obj_id ];
+		return $this->fieldInstance->addFieldTypeToQuery( $query );
 	}
 
 	/**
@@ -342,21 +193,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function reload( $obj_id )
 	{
-		$this->relation[ $obj_id ] = null;
-	}
-
-	/**
-	 * FieldInfo of reverse field
-	 *
-	 * @return O_Dao_FieldInfo
-	 * @access private
-	 */
-	public function getInverse()
-	{
-		if (!$this->relationInverseField)
-			$this->relationInverseField = O_Dao_TableInfo::get( $this->relationTarget )->getFieldInfo(
-					$this->relationInverse );
-		return $this->relationInverseField;
+		return $this->fieldInstance->reload( $obj_id );
 	}
 
 	/**
@@ -366,7 +203,17 @@ class O_Dao_FieldInfo {
 	 */
 	public function isAtomic()
 	{
-		return $this->isAtomic;
+		return $this->fieldInstance instanceof O_Dao_Field_Atomic;
+	}
+
+	/**
+	 * Returns true if the field is an one-of alias
+	 *
+	 * @return bool
+	 */
+	public function isOneOf()
+	{
+		return $this->fieldInstance instanceof O_Dao_Field_OneOf;
 	}
 
 	/**
@@ -376,7 +223,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isAlias()
 	{
-		return (bool)$this->alias;
+		return $this->fieldInstance instanceof O_Dao_Field_Alias;
 	}
 
 	/**
@@ -386,7 +233,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationOne()
 	{
-		return $this->relationTarget && !$this->relationMany;
+		return $this->fieldInstance instanceof O_Dao_Field_ToOne;
 	}
 
 	/**
@@ -396,27 +243,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationMany()
 	{
-		return $this->relationTarget && $this->relationMany;
-	}
-
-	/**
-	 * Returns true if it's a "on delete cascade" relation
-	 *
-	 * @return bool
-	 */
-	public function isRelationOwns()
-	{
-		return $this->relationTarget && $this->relationOwns;
-	}
-
-	/**
-	 * Returns classname of relation target
-	 *
-	 * @return string
-	 */
-	public function getRelationTarget()
-	{
-		return $this->relationTarget;
+		return $this->fieldInstance instanceof O_Dao_Field_ToMany;
 	}
 
 	/**
@@ -432,72 +259,14 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
 					$obj, $obj->{$this->name} );
 			// New value is set
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, 
 					$obj, $fieldValue );
 		}
-		// Value as is
-		if ($this->isAtomic) {
-			if (!$fieldExists) {
-				$this->addFieldToTable();
-			}
-			return $obj->setField( $this->name, $fieldValue );
-		}
-		// Alias -- setting impossible
-		if ($this->alias) {
-			throw new O_Ex_Critical( "Cannot assign to aliases." );
-		}
-		// Assign to one of enumerated fields
-		if ($this->oneOf) {
-			foreach ($this->oneOf as $class => $field) {
-				if ($fieldValue instanceof $class)
-					$obj->$field = $fieldValue;
-				else
-					$obj->$field = null;
-			}
-			return null;
-		}
-		// Many objects
-		if ($this->relationMany) {
-			if ($fieldValue instanceof O_Dao_Query)
-				$fieldValue = $fieldValue->getAll();
-			if (!is_array( $fieldValue ))
-				throw new O_Ex_WrongArgument( "Cannot assign non-array/query to base-to-many relation." );
-			$relation = $this->getRelation( $obj->id );
-			foreach ($relation as $_el) {
-				if (!array_key_exists( $_el->id, $fieldValue ))
-					$relation->remove( $_el, $this->relationOwns );
-			}
-			foreach ($fieldValue as $v) {
-				$relation[] = $v;
-			}
-			return $relation;
-		}
-		// Base-to-one
-		if (get_class( $fieldValue ) == $this->relationTarget || is_null( $fieldValue )) {
-			if (!$fieldExists) {
-				$this->addFieldToTable();
-			}
-			$oldValue = $obj->{$this->name};
-			$obj->setField( $this->name, $fieldValue ? $fieldValue->id : 0 );
-			// One-to-one is symmetric
-			if (!$this->getInverse()->relationMany) {
-
-				$inverseName = $this->getInverse()->name;
-				if ($oldValue) {
-					$oldValue->$inverseName = null;
-					$oldValue->save();
-				}
-				if ($fieldValue && (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id)) {
-					$fieldValue->$inverseName = $obj;
-					$fieldValue->save();
-				}
-			}
-			return $fieldValue;
-		}
-		throw new O_Ex_WrongArgument( "Assigment of wrong value type." );
+		
+		return $this->fieldInstance->setValue( $obj, $fieldValue, $fieldExists );
 	}
 
 	/**
@@ -510,48 +279,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function getValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
-		// Value as is
-		if ($this->isAtomic) {
-			if (!$fieldExists) {
-				$this->addFieldToTable();
-			}
-			return $fieldValue;
-		}
-		// One of enumerated fields
-		if ($this->oneOf) {
-			foreach ($this->oneOf as $field)
-				if ($obj[ $field ])
-					return $obj->$field;
-		}
-		// Alias -- cached query
-		if ($this->alias) {
-			if (!$this->aliasQuery) {
-				list ($name, $subreq) = explode( ".", $this->alias, 2 );
-				$this->aliasTestField = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name )->prepareMappedQuery(
-						$this->aliasQuery, $subreq );
-
-				if (isset( $this->params[ "where" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
-					$this->aliasQuery->where( $this->params[ "where" ] );
-				}
-				if (isset( $this->params[ "order-by" ] ) && $this->aliasQuery instanceof O_Dao_Query) {
-					$this->aliasQuery->orderBy( $this->params[ "order-by" ] );
-				}
-			}
-			if (!$this->aliasQuery instanceof O_Dao_Query) {
-				throw new O_Ex_Critical( "Wrong mapped query is produced by $name.$subreq map." );
-			}
-			$q = clone $this->aliasQuery;
-			return $q->test( $this->aliasTestField, $fieldValue ? $fieldValue : $obj->id );
-		}
-		// Many objects
-		if ($this->relationMany) {
-			return $this->getRelation( $obj->id );
-		}
-		// Base-to-one
-		if (!$fieldExists) {
-			$this->addFieldToTable();
-		}
-		return O_Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
+		return $this->fieldInstance->getValue( $obj, $fieldValue, $fieldExists );
 	}
 
 	/**
@@ -569,23 +297,23 @@ class O_Dao_FieldInfo {
 		if ($this->isAtomic())
 			throw new O_Ex_Logic( "Cannot create mapped query field by atomic field basis." );
 			// If the basis is an alias for a number of fields, build query from it
-		if ($this->oneOf) {
-			foreach ($this->oneOf as $field)
-				if ($obj[ $field ])
-					return $obj->{$field . "." . $subreq};
+		if ($this->isOneOf()) {
+			$field = $this->fieldInstance->getExistentFieldName( $obj );
+			if ($field)
+				return $obj->{$field . "." . $subreq};
 			return false;
 		}
-
+		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
-		if ($this->relationMany && $this->getInverse()->relationMany) {
-			$rel = $this->getRelation( 0 );
+		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
+			$rel = $this->fieldInstance->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel";
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
 			$joinOnField = $als . "." . $rel->getBaseFieldName();
 		}
-		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field(
+		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field( 
 				"DISTINCT " . O_Dao_TableInfo::get( $query->getClass() )->getTableName() . ".*" );
 		return $query;
 	}
@@ -596,22 +324,20 @@ class O_Dao_FieldInfo {
 	 * @param O_Dao_Query $query
 	 * @param string $subreq
 	 * @return string Field to test
+	 * @access private
 	 */
-	protected function prepareMappedQuery( O_Dao_Query &$query = null, $subreq = "" )
+	public function prepareMappedQuery( O_Dao_Query &$query = null, $subreq = "" )
 	{
 		$fieldInfos = Array ();
 		$subreq = explode( ".", $subreq );
 		$info = $this;
 		foreach ($subreq as $fieldName) {
-			$info = O_Dao_TableInfo::get( $info->relationTarget )->getFieldInfo( $fieldName );
-			if ($info->isAtomic())
-				throw new O_Ex_Logic( "Cannot use atomic field ($fieldName) as a part of mapped query field." );
-			if ($info->oneOf)
-				throw new O_Ex_Logic(
-						"Cannot use one-of aliased field ($fieldName) as a part of mapped query field." );
+			$info = O_Dao_TableInfo::get( $info->fieldInstance->getTargetClass() )->getFieldInfo( $fieldName );
+			if (!$info->fieldInstance instanceof O_Dao_Field_iRelation)
+				throw new O_Ex_Logic( "Cannot use non-relative field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
 		}
-
+		
 		$joinOnField = null;
 		$i = 0;
 		while ($fieldInfo = current( $fieldInfos )) {
@@ -635,36 +361,36 @@ class O_Dao_FieldInfo {
 	private function modifyMappedQuery( O_Dao_Query &$query = null, $joinOnField = null, O_Dao_FieldInfo $nextInfo = null, $i = 0 )
 	{
 		if (!$query) {
-			$query = new O_Dao_Query( $this->relationTarget );
-			$joinOnField = O_Dao_TableInfo::get( $this->relationTarget )->getTableName() . ".id";
+			$query = new O_Dao_Query( $this->fieldInstance->getTargetClass() );
+			$joinOnField = O_Dao_TableInfo::get( $this->fieldInstance->getTargetClass() )->getTableName() . ".id";
 		}
-
-		$isOneToMany = $nextInfo->relationMany && !$nextInfo->getInverse()->relationMany;
-
+		
+		$isOneToMany = $nextInfo->isRelationMany() && !$nextInfo->fieldInstance->getInverse()->isRelationMany();
+		
 		$currTable = O_Dao_TableInfo::get( $this->class )->getTableName();
 		$currAlias = "__rel" . $i;
-
-		//many-to-many: relation is a special table
-		if ($this->relationMany && $this->getInverse()->relationMany) {
-			$rel = $this->getRelation( 0 );
+		
+		// many-to-many: relation is a special table
+		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
+			$rel = $this->fieldInstance->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel_" . $i;
-
+			
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
-				$query->join( $currTable . " " . $currAlias,
+				$query->join( $currTable . " " . $currAlias, 
 						$currAlias . ".id=" . $als . "." . $rel->getBaseFieldName(), "CROSS" );
-				return $currAlias . "." . $nextInfo->getInverse()->name;
+				return $currAlias . "." . $nextInfo->fieldInstance->getInverse()->name;
 			}
-
+			
 			return $als . "." . $rel->getBaseFieldName();
 			//relation is current table itself
 		} else {
 			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
-				return $currAlias . "." . $nextInfo->getInverse()->name;
+				return $currAlias . "." . $nextInfo->fieldInstance->getInverse()->name;
 			}
 			return $currAlias . ".id";
 		}
@@ -681,29 +407,11 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
 					$obj, $obj->{$this->name} );
 		}
-		if ($this->isAtomic || $this->alias || $this->oneOf) {
-			return;
-		}
-		unset( $this->relation[ $obj->id ] );
-		if ($this->relationMany) {
-			// Action is always needed
-			$this->getRelation( $obj->id )->removeAll( $this->relationOwns );
-		} else {
-			// Action needed if target is set and must be deleted, or if inverse field must be cleaned
-			$relative = O_Dao_ActiveRecord::getById( $fieldValue, $this->relationTarget );
-			if ($relative) {
-				// If has one, the database field exists
-				if ($this->getInverse() && !$this->getInverse()->relationMany) {
-					$relative->setField( $this->getInverse()->name, null );
-				}
-				if ($this->relationOwns) {
-					$relative->delete();
-				}
-			}
-		}
+		
+		$this->fieldInstance->deleteThis( $obj, $fieldValue );
 	}
 
 }

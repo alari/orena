@@ -58,7 +58,8 @@ class O_Dao_Renderer_Edit_Callbacks {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" .
+						 $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") .
 						 "oFCKeditor.ReplaceTextarea();", $params->layout() );
 		}
