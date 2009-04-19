@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
+class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	/**
 	 * Field info instance for the field
 	 *
@@ -18,6 +18,12 @@ class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFac
 	 * @var string
 	 */
 	private $field;
+	/**
+	 * Target classname
+	 *
+	 * @var string
+	 */
+	private $targetClass;
 
 	public function __construct( O_Dao_FieldInfo $fieldInfo )
 	{
@@ -41,7 +47,7 @@ class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFac
 			if (!$relative instanceof O_Dao_ActiveRecord)
 				return false;
 		}
-		return $obj->{$this->field} = $fieldValue;
+		return $relative->{$this->field} = $fieldValue;
 	}
 
 	/**
@@ -60,7 +66,7 @@ class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFac
 			if (!$relative instanceof O_Dao_ActiveRecord)
 				return null;
 		}
-		return $obj->{$this->field};
+		return $relative->{$this->field};
 	}
 
 	/**
@@ -76,6 +82,56 @@ class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFac
 		$this->fieldInfo = $fieldInfo;
 		list ($relative, $this->field) = explode( "->", $relative, 2 );
 		$this->relative = explode( ".", $relative );
+		$this->targetClass = null;
+	}
+
+	/**
+	 * FieldInfo of reverse field
+	 *
+	 * @return O_Dao_FieldInfo
+	 * @access private
+	 */
+	public function getInverse()
+	{
+		return false;
+	}
+
+	/**
+	 * Returns field info for real relative field
+	 *
+	 * @return O_Dao_FieldInfo
+	 */
+	private function getLastFieldInfo()
+	{
+		$tableInfo = O_Dao_TableInfo::get( $this->fieldInfo->getClass() );
+		foreach ($this->relative as $field) {
+			$fieldInfo = $tableInfo->getFieldInfo( $field );
+			$tableInfo = O_Dao_TableInfo::get( $fieldInfo->getRelationTarget());
+		}
+		return $tableInfo->getFieldInfo( $this->field );
+	}
+
+	/**
+	 * Returns true if it's a *-to-many relation
+	 *
+	 * @return bool
+	 */
+	public function isRelationMany()
+	{
+		return $this->getLastFieldInfo()->isRelationMany();
+	}
+
+	/**
+	 * Returns relation target classname
+	 *
+	 * @return string
+	 */
+	public function getTargetClass()
+	{
+		if (!$this->targetClass) {
+			$this->targetClass = $this->getLastFieldInfo()->getRelationTarget();
+		}
+		return $this->targetClass;
 	}
 
 }

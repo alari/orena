@@ -249,8 +249,19 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationMany()
 	{
+		if($this->fieldInstance instanceof O_Dao_Field_Relative ) return $this->fieldInstance->isRelationMany();
 		return $this->fieldInstance instanceof O_Dao_Field_ToMany;
 	}
+
+	/**
+	 * Returns true if it's a relation
+	 *
+	 * @return bool
+	 */
+	public function isRelation() {
+		return $this->fieldInstance instanceof O_Dao_Field_iRelation;
+	}
+
 
 	/**
 	 * Returns relation target class name, if it's a relation
