@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_Atomic implements O_Dao_Field_iFace {
+class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	/**
 	 * Field info instance for the field
 	 *
@@ -79,26 +79,6 @@ class O_Dao_Field_Atomic implements O_Dao_Field_iFace {
 	public function setFieldInfo( O_Dao_FieldInfo $fieldInfo )
 	{
 		$this->fieldInfo = $fieldInfo;
-	}
-
-	/**
-	 * Reloads field's cache for the object
-	 *
-	 * @param int $obj_id
-	 */
-	public function reload( $obj_id )
-	{
-	}
-
-	/**
-	 * No special actions should be done on atomic field deletion
-	 *
-	 * @param O_Dao_ActiveRecord $obj
-	 * @param mixed $fieldValue
-	 * @access private
-	 */
-	public function deleteThis( O_Dao_ActiveRecord $obj, $fieldValue = null )
-	{
 	}
 
 	/**

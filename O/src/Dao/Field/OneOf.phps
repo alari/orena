@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_OneOf implements O_Dao_Field_iFace {
+class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	/**
 	 * Field info instance for the field
 	 *
@@ -75,15 +75,6 @@ class O_Dao_Field_OneOf implements O_Dao_Field_iFace {
 	}
 
 	/**
-	 * Reloads field's cache for the object
-	 *
-	 * @param int $obj_id
-	 */
-	public function reload( $obj_id )
-	{
-	}
-
-	/**
 	 * Returns fieldname where current value could be got from
 	 *
 	 * @param O_Dao_ActiveRecord $obj
@@ -96,27 +87,6 @@ class O_Dao_Field_OneOf implements O_Dao_Field_iFace {
 			if ($obj[ $field ])
 				return $field;
 		return null;
-	}
-
-	/**
-	 * No special actions should be done on atomic field deletion
-	 *
-	 * @param O_Dao_ActiveRecord $obj
-	 * @param mixed $fieldValue
-	 * @access private
-	 */
-	public function deleteThis( O_Dao_ActiveRecord $obj, $fieldValue = null )
-	{
-	}
-
-	/**
-	 * Adds field to CREATE query
-	 *
-	 * @param O_Db_Query $query
-	 * @access private
-	 */
-	public function addFieldTypeToQuery( O_Db_Query $query )
-	{
 	}
 
 }

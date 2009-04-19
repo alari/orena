@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_ToOne implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
+class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	/**
 	 * Field info instance for the field
 	 *
@@ -179,15 +179,6 @@ class O_Dao_Field_ToOne implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 				$relative->save();
 			}
 		}
-	}
-
-	/**
-	 * Reloads field's cache for the object
-	 *
-	 * @param int $obj_id
-	 */
-	public function reload( $obj_id )
-	{
 	}
 
 	/**

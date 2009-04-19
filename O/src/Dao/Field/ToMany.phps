@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
+class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	/**
 	 * Field info instance for the field
 	 *
@@ -12,7 +12,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var string
 	 */
 	private $name;
-
+	
 	/**
 	 * Owns it its targets or not
 	 *
@@ -31,7 +31,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var string
 	 */
 	private $target;
-
+	
 	/**
 	 * Inverse fieldname
 	 *
@@ -44,14 +44,14 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 	 * @var O_Dao_FieldInfo
 	 */
 	private $inverseField;
-
+	
 	/**
 	 * Cached relation objects, like O_Dao_Relation_Base
 	 *
 	 * @var O_Dao_Relation_Base[]
 	 */
 	private $relations = Array ();
-
+	
 	/**
 	 * Current dao classname -- cached in property
 	 *
@@ -81,7 +81,7 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 		$this->inverse = $fieldInfo->getParam( "inverse" );
 		if (!$this->inverse)
 			throw new O_Ex_Config( "Inverse field must be specified for whatever-to-many relations." );
-
+	
 	}
 
 	/**
@@ -191,11 +191,11 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->isRelationMany()) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->target,
+				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->target, 
 						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target,
+				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target, 
 						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
 			}
 		}
@@ -214,17 +214,6 @@ class O_Dao_Field_ToMany implements O_Dao_Field_iFace, O_Dao_Field_iRelation {
 		$this->reload( $obj->id );
 		$this->getRelation( $obj->id )->removeAll( $this->owns );
 		$this->reload( $obj->id );
-	}
-
-	/**
-	 * Adds field to CREATE query
-	 *
-	 * @param O_Db_Query $query
-	 * @access private
-	 */
-	public function addFieldTypeToQuery( O_Db_Query $query )
-	{
-
 	}
 
 }

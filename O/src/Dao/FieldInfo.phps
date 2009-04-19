@@ -75,7 +75,7 @@ class O_Dao_FieldInfo {
 	 * @var string
 	 */
 	private $class;
-
+	
 	/**
 	 * Instance of field
 	 *
@@ -96,7 +96,7 @@ class O_Dao_FieldInfo {
 		$this->class = $class;
 		$this->name = $name;
 		$this->params = $params;
-
+		
 		// check if it's relation
 		if (isset( $params[ "has" ] )) {
 			$relation = "has";
@@ -105,17 +105,17 @@ class O_Dao_FieldInfo {
 			$relation = "owns";
 			$relationOwns = 1;
 		}
-
+		
 		// save info about relation to be ready to say it to another side
 		if (isset( $relation )) {
-
+			
 			list ($quantity, $relationTargetBase) = explode( " ", $params[ $relation ], 2 );
-
+			
 			if ($quantity == "one") {
 				$this->fieldInstance = new O_Dao_Field_ToOne( $this, $name, $relationOwns, $relationTargetBase );
 			} else {
 				$this->fieldInstance = new O_Dao_Field_ToMany( $this, $name, $relationOwns, $relationTargetBase );
-
+			
 			}
 		} else {
 			// Alias field
@@ -275,13 +275,13 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
 					$obj, $obj->{$this->name} );
 			// New value is set
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_SET, $this->params[ "signal" ], $this->class, 
 					$obj, $fieldValue );
 		}
-
+		
 		return $this->fieldInstance->setValue( $obj, $fieldValue, $fieldExists );
 	}
 
@@ -319,7 +319,7 @@ class O_Dao_FieldInfo {
 				return $obj->{$field . "." . $subreq};
 			return false;
 		}
-
+		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
 		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
@@ -329,7 +329,7 @@ class O_Dao_FieldInfo {
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
 			$joinOnField = $als . "." . $rel->getBaseFieldName();
 		}
-		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field(
+		$query->test( $joinOnField, $fieldValue ? $fieldValue : $obj->id )->clearFields()->field( 
 				"DISTINCT " . O_Dao_TableInfo::get( $query->getClass() )->getTableName() . ".*" );
 		return $query;
 	}
@@ -353,7 +353,7 @@ class O_Dao_FieldInfo {
 				throw new O_Ex_Logic( "Cannot use non-relative field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
 		}
-
+		
 		$joinOnField = null;
 		$i = 0;
 		while ($fieldInfo = current( $fieldInfos )) {
@@ -380,31 +380,31 @@ class O_Dao_FieldInfo {
 			$query = new O_Dao_Query( $this->fieldInstance->getTargetClass() );
 			$joinOnField = O_Dao_TableInfo::get( $this->fieldInstance->getTargetClass() )->getTableName() . ".id";
 		}
-
+		
 		$isOneToMany = $nextInfo->isRelationMany() && !$nextInfo->fieldInstance->getInverse()->isRelationMany();
-
+		
 		$currTable = O_Dao_TableInfo::get( $this->class )->getTableName();
 		$currAlias = "__rel" . $i;
-
+		
 		// many-to-many: relation is a special table
 		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
 			$rel = $this->fieldInstance->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel_" . $i;
-
+			
 			$query->join( $tbl . " " . $als, $als . "." . $rel->getTargetFieldName() . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
-				$query->join( $currTable . " " . $currAlias,
+				$query->join( $currTable . " " . $currAlias, 
 						$currAlias . ".id=" . $als . "." . $rel->getBaseFieldName(), "CROSS" );
 				return $currAlias . "." . $nextInfo->fieldInstance->getInverse()->name;
 			}
-
+			
 			return $als . "." . $rel->getBaseFieldName();
 			//relation is current table itself
 		} else {
 			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
-
+			
 			if ($isOneToMany) {
 				return $currAlias . "." . $nextInfo->fieldInstance->getInverse()->name;
 			}
@@ -423,10 +423,10 @@ class O_Dao_FieldInfo {
 	{
 		if (isset( $this->params[ "signal" ] )) {
 			// Old value removed
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class,
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_REMOVE, $this->params[ "signal" ], $this->class, 
 					$obj, $obj->{$this->name} );
 		}
-
+		
 		$this->fieldInstance->deleteThis( $obj, $fieldValue );
 	}
 

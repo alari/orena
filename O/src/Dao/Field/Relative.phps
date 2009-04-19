@@ -1,5 +1,5 @@
 <?php
-class O_Dao_Field_Relative implements O_Dao_Field_iFace {
+class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	/**
 	 * Field info instance for the field
 	 *
@@ -76,36 +76,6 @@ class O_Dao_Field_Relative implements O_Dao_Field_iFace {
 		$this->fieldInfo = $fieldInfo;
 		list ($relative, $this->field) = explode( "->", $relative, 2 );
 		$this->relative = explode( ".", $relative );
-	}
-
-	/**
-	 * Reloads field's cache for the object
-	 *
-	 * @param int $obj_id
-	 */
-	public function reload( $obj_id )
-	{
-	}
-
-	/**
-	 * No special actions should be done on atomic field deletion
-	 *
-	 * @param O_Dao_ActiveRecord $obj
-	 * @param mixed $fieldValue
-	 * @access private
-	 */
-	public function deleteThis( O_Dao_ActiveRecord $obj, $fieldValue = null )
-	{
-	}
-
-	/**
-	 * Adds field to CREATE query
-	 *
-	 * @param O_Db_Query $query
-	 * @access private
-	 */
-	public function addFieldTypeToQuery( O_Db_Query $query )
-	{
 	}
 
 }
