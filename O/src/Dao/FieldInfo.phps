@@ -52,7 +52,7 @@
  * @see O_Dao_Signals
  *
  * Finally, you can extend the field with
- * @field:conf $name -params
+ * @field:config $name -params
  *
  * @author Dmitry Kourinski
  */

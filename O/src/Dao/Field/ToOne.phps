@@ -12,7 +12,7 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 	 * @var string
 	 */
 	private $name;
-	
+
 	/**
 	 * On delete cascade or not
 	 *
@@ -31,14 +31,14 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 	 * @var string
 	 */
 	private $target;
-	
+
 	/**
 	 * Was field already added to sql this time or not
 	 *
 	 * @var bool
 	 */
 	private $isAdded = 0;
-	
+
 	/**
 	 * Inverse field name
 	 *
@@ -95,7 +95,7 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 			$obj[ $this->name ] = $fieldValue ? $fieldValue->id : 0;
 			// One-to-one is symmetric
 			if (!$this->getInverse()->isRelationMany()) {
-				
+
 				$inverseName = $this->inverse;
 				if ($oldValue) {
 					$oldValue->$inverseName = null;
@@ -143,6 +143,7 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 			$this->target = defined( $const ) ? constant( $const ) : null;
 			$this->inverseField = null;
 		}
+		$this->inverse = $fieldInfo->getParam( "inverse" );
 	}
 
 	/**
@@ -153,8 +154,12 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 	 */
 	public function getInverse()
 	{
+		if (!$this->inverse)
+			$this->inverse = $this->fieldInfo->getParam( "inverse" );
 		if (!$this->inverseField)
 			$this->inverseField = O_Dao_TableInfo::get( $this->target )->getFieldInfo( $this->inverse );
+		if (!$this->inverseField)
+			throw new O_Ex_Critical( "Inverse field not found: $this->target -> $this->inverse" );
 		return $this->inverseField;
 	}
 
