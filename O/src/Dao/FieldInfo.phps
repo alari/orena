@@ -45,6 +45,9 @@
  * If you're getting such alias value, the first existent field will be returned.
  * If you're setting to it, all fields will be nullified, except one with relation classname equal to value type.
  *
+ * Next, you can create pseudo-field by going throught one or several to-one relations:
+ * @field fieldname -relative field.itsField.relativeField->fieldToLinkAsPseudo
+ *
  * Also FieldInfo provides signals support for fields changes:
  * @see O_Dao_Signals
  *
@@ -121,6 +124,9 @@ class O_Dao_FieldInfo {
 				// Alias for a number of other fields
 			} elseif (isset( $params[ "one-of" ] ) && strpos( $params[ "one-of" ], "," )) {
 				$this->fieldInstance = new O_Dao_Field_OneOf( $this, $params[ "one-of" ] );
+				// Relative field
+			} elseif (isset( $params[ "relative" ] ) && strpos( $params[ "relative" ], "->" )) {
+				$this->fieldInstance = new O_Dao_Field_Relative( $this );
 				// Atomic field
 			} else {
 				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
