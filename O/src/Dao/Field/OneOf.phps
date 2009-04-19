@@ -12,18 +12,16 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	 * @var string
 	 */
 	private $otherFields = Array ();
+	/**
+	 * Lazy load flag
+	 *
+	 * @var bool
+	 */
+	private $isInitiated;
 
-	public function __construct( O_Dao_FieldInfo $fieldInfo, $oneOfFields )
+	public function __construct( O_Dao_FieldInfo $fieldInfo )
 	{
 		$this->fieldInfo = $fieldInfo;
-		$oneOfFields = explode( ",", $oneOfFields );
-		foreach ($oneOfFields as $v) {
-			$f = O_Dao_TableInfo::get( $fieldInfo->getClass() )->getFieldInfo( trim( $v ) );
-			if (!$f || !$f->isRelationOne() || isset( $this->otherFields[ $f->getRelationTarget() ] )) {
-				throw new O_Ex_Config( "Wrong fields enumeration for one-of aliasing." );
-			}
-			$this->otherFields[ $f->getRelationTarget() ] = trim( $v );
-		}
 	}
 
 	/**
@@ -37,6 +35,7 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	 */
 	public function setValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
+		$this->initiate();
 		foreach ($this->otherFields as $class => $field) {
 			if ($fieldValue instanceof $class)
 				$obj->$field = $fieldValue;
@@ -56,6 +55,7 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	 */
 	public function getValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
+		$this->initiate();
 		foreach ($this->otherFields as $field)
 			if ($obj[ $field ])
 				return $obj->$field;
@@ -72,6 +72,8 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	public function setFieldInfo( O_Dao_FieldInfo $fieldInfo )
 	{
 		$this->fieldInfo = $fieldInfo;
+		$this->isInitiated = 0;
+		$this->otherFields = Array ();
 	}
 
 	/**
@@ -83,10 +85,30 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	 */
 	public function getExistentFieldName( O_Dao_ActiveRecord $obj )
 	{
+		$this->initiate();
 		foreach ($this->otherFields as $field)
 			if ($obj[ $field ])
 				return $field;
 		return null;
+	}
+
+	/**
+	 * Lazy load pattern
+	 *
+	 */
+	private function initiate()
+	{
+		if ($this->isInitiated)
+			return;
+		$oneOfFields = explode( ",", $this->fieldInfo->getParam( "one-of" ) );
+		foreach ($oneOfFields as $v) {
+			$f = O_Dao_TableInfo::get( $this->fieldInfo->getClass() )->getFieldInfo( trim( $v ) );
+			if (!$f || !$f->isRelationOne() || isset( $this->otherFields[ $f->getRelationTarget() ] )) {
+				throw new O_Ex_Config( "Wrong fields enumeration for one-of aliasing." );
+			}
+			$this->otherFields[ $f->getRelationTarget() ] = trim( $v );
+		}
+		$this->isInitiated = 1;
 	}
 
 }
