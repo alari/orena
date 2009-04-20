@@ -43,7 +43,8 @@ class O_Cmd_Create extends O_Cmd_Edit {
 				$createParams[] = O_Registry::get( $reg );
 			}
 		}
-		$form->setCreateMode( $createParams );
+		
+		call_user_method_array( "setCreateMode", $form, $createParams );
 		
 		if (O_Registry::get( "app/cmd/create/type" )) {
 			$form->setType( O_Registry::get( "app/cmd/create/type" ) );

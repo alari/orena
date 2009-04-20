@@ -87,9 +87,10 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 	 *
 	 * @param array $params Parameters to be given in constructor
 	 */
-	public function setCreateMode( array $params = array() )
+	public function setCreateMode()
 	{
-		$this->createMode = $params;
+		$params = func_get_args();
+		$this->createMode = $params ? $params : 1;
 	}
 
 	/**

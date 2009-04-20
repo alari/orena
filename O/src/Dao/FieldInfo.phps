@@ -144,8 +144,7 @@ class O_Dao_FieldInfo {
 	public function setClass( $class )
 	{
 		$this->class = $class;
-		if ($this->fieldInstance)
-			$this->fieldInstance->setFieldInfo( $this );
+		$this->fieldInstance->setFieldInfo( $this );
 	}
 
 	/**
