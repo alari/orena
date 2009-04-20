@@ -162,11 +162,23 @@ class O_Dao_FieldInfo {
 	 * Returns value of param stored in field config query
 	 *
 	 * @param string $paramName
-	 * @return string
+	 * @return string or array
 	 */
-	public function getParam( $paramName )
+	public function getParam( $paramName, $parseAsArray=false )
 	{
-		return isset( $this->params[ $paramName ] ) ? $this->params[ $paramName ] : null;
+		if(!isset($this->params[$paramName])) return null;
+		if($parseAsArray && !is_array($this->params[$paramName])) {
+			$arr = array();
+			foreach(explode(";", $this->params[$paramName]) as $v){
+				$v = trim($v);
+ 				if(strpos(":", $v)) {
+  					$v = explode(":", $v, 2);
+  					$arr[trim($v[0])]=trim($v[1]);
+ 				} else $arr[] = $v;
+			}
+			$this->params[$paramName] = $arr;
+		}
+		return $this->params[$paramName];
 	}
 
 	/**
