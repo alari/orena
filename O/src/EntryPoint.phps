@@ -11,7 +11,7 @@ require_once 'ClassManager.phps';
  * </code>
  *
  * This depends on configuration files:
- * ./Apps/Orena.fw.xml -- framework registry configuration
+ * ./Apps/Orena.fw.xml -- framework registry configuration (to be used instead of default one, located in ./O/src/)
  * ./Apps/Orena.apps.xml -- application selection
  * ./Apps/{APP_NAME}/Application.xml -- concrete application config, include registry and url-parsing
  *
@@ -173,9 +173,10 @@ class O_EntryPoint {
 	 */
 	static public function processFwConfig()
 	{
-		if (!is_file( "./Apps/Orena.fw.xml" ))
+		$src = is_file( "./Apps/Orena.fw.xml" ) ? "./Apps/Orena.fw.xml" : "./O/src/Orena.fw.xml";
+		if (!is_file( $src ))
 			throw new O_Ex_Critical( "Cannot find framework configuration file." );
-		$xml_fw = simplexml_load_file( "./Apps/Orena.fw.xml" );
+		$xml_fw = simplexml_load_file( $src );
 		foreach ($xml_fw as $registry) {
 			if ($registry->getName() == "Registry") {
 				self::processRegistry( $registry, "fw" );
