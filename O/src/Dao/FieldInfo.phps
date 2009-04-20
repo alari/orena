@@ -264,8 +264,9 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationMany()
 	{
-		if ($this->fieldInstance instanceof O_Dao_Field_Relative)
+		if ($this->fieldInstance instanceof O_Dao_Field_Relative) {
 			return $this->fieldInstance->isRelationMany();
+		}
 		return $this->fieldInstance instanceof O_Dao_Field_ToMany;
 	}
 
@@ -276,6 +277,10 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelation()
 	{
+		if ($this->fieldInstance instanceof O_Dao_Field_Relative) {
+			return (bool)$this->fieldInstance->getTargetClass();
+		}
+		
 		return $this->fieldInstance instanceof O_Dao_Field_iRelation;
 	}
 

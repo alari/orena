@@ -20,6 +20,37 @@ class O_Dao_Renderer_Edit_Callbacks {
 <input type="text" name="<?=$params->fieldName()?>"
 	value="<?=htmlspecialchars( $params->value() )?>" /></div>
 <?
+	
+	}
+
+	static public function enum( O_Dao_Renderer_Edit_Params $params )
+	{
+		$fieldInfo = O_Dao_TableInfo::get( $params->className() )->getFieldInfo( $params->fieldName() );
+		?>
+<div class="oo-renderer-field">
+<div class="oo-renderer-title">
+<?=$params->title()?>:</div>
+<?
+		if ($params->error()) {
+			?>
+<div class="oo-renderer-error">
+<?=$params->error()?>
+</div>
+<?
+		}
+		
+		?>
+<select name="<?=$params->fieldName()?>">
+	<?
+		foreach ($fieldInfo->getParam( "enum", 1 ) as $v) {
+			?>
+		<option <?=($v == $params->value() ? ' selected="yes"' : "")?>><?=$v?></option>
+	<?
+		}
+		?>
+</select>
+			<?
+	
 	}
 
 	static public function recordField( O_Dao_Renderer_Edit_Params $params )

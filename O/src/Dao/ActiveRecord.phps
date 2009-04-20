@@ -344,6 +344,21 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	}
 
 	/**
+	 * Shortcut for class field parameters getting
+	 *
+	 * @param string $fieldName
+	 * @param string $paramName
+	 * @param bool $parseAsArray
+	 * @return string or array
+	 */
+	public function getParam( $paramName, $fieldName = null, $parseAsArray = 0 )
+	{
+		$tableInfo = O_Dao_TableInfo::get( get_class( $this ) );
+		return $fieldName ? $tableInfo->getFieldInfo( $fieldName )->getParam( $paramName, $parseAsArray ) : $tableInfo->getParam( 
+				$fieldName, $parseAsArray );
+	}
+
+	/**
 	 * Checks if a field exists
 	 *
 	 * @param string $offset

@@ -48,9 +48,10 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 			return $this->handleResult;
 		$this->handled = true;
 		
-		if (!$this->isFormRequest())
+		if (!$this->isFormRequest()) {
 			return $this->handleResult = false;
-			
+		}
+		
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
