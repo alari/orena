@@ -55,7 +55,7 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 	 * @var array or 0
 	 */
 	protected $createMode = 0;
-
+	
 	/**
 	 * Array of field errors
 	 *
@@ -68,7 +68,7 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 	 * @var Array
 	 */
 	protected $values = Array ();
-
+	
 	/**
 	 * Was the form handled or not
 	 *
@@ -122,7 +122,7 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id", $multiply = false )
 	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField,
+		$this->relationQueries[ $fieldName ] = array ("query" => $query, "displayField" => $displayField, 
 														"multiply" => $multiply);
 	}
 
@@ -245,7 +245,7 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 }).delay(150);
  </script>
 <?
-
+	
 	}
 
 	/**
@@ -322,9 +322,9 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 	{
 		if ($layout)
 			$this->setLayout( $layout );
-
+		
 		$this->prepareFormTexts();
-
+		
 		?>
 <div>
 <form method="POST" enctype="application/x-www-form-urlencoded"
@@ -333,9 +333,9 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 <fieldset class="oo-renderer"><legend><?=$this->formTitle?></legend>
 
 <?
-
+		
 		$this->showFormContents();
-
+		
 		?>
 
 <input type="submit"
@@ -385,32 +385,32 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
-
+			
 			try {
 				// Checker callback is called after finding relations -- by default
 				if ($fieldInfo->isRelation() && !$fieldInfo->getParam( "check:before" )) {
 					$this->checkRelationValue( $name, $fieldInfo );
 				}
-
+				
 				// Callback checker
 				$callback = $this->getCheckCallback( $fieldInfo );
 				if ($callback) {
-					$params = new O_Dao_Renderer_Check_Params( $name, $this->class, $callback[ "params" ],
+					$params = new O_Dao_Renderer_Check_Params( $name, $this->class, $callback[ "params" ], 
 							$this->record );
 					$params->setNewValueRef( $this->values[ $name ] );
-
+					
 					$callback = $callback[ "callback" ];
-
+					
 					call_user_func( $callback, $params );
 				}
-
+				
 				// Required value test
 				if (!$this->values[ $name ] && $fieldInfo->getParam( "required" )) {
-					throw new O_Dao_Renderer_Check_Exception(
-							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
+					throw new O_Dao_Renderer_Check_Exception( 
+							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam( 
 									"required" ) );
 				}
-
+				
 				// Checker callback already was called -- check:before param was set
 				if ($fieldInfo->isRelation() && $fieldInfo->getParam( "check:before" )) {
 					$this->checkRelationValue( $name, $fieldInfo );
@@ -456,7 +456,7 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 				if (is_array( $availableValues ) && !isset( $availableValues[ $this->values[ $name ] ] )) {
 					throw new O_Dao_Renderer_Check_Exception( "Not a valid value for relation." );
 				}
-				$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ],
+				$this->values[ $name ] = O_Dao_ActiveRecord::getById( $this->values[ $name ], 
 						$fieldInfo->getRelationTarget() );
 			}
 		}
@@ -482,14 +482,14 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 			} else {
 				$params = $callback[ "params" ];
 				$callback = $callback[ "callback" ];
-
+				
 				if (isset( $this->relationQueries[ $name ] )) {
 					$_params = $this->relationQueries[ $name ];
 					$_params[ "params" ] = $params;
 					$params = $_params;
 				}
 			}
-
+			
 			// Prepare field value and title
 			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
 			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
@@ -498,11 +498,11 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 				$title = $fieldInfo->getParam( "title" );
 			if (!$title)
 				$title = $name;
-
+				
 			// Make HTML injections, display field value via callback
 			if (isset( $this->htmlBefore[ $name ] ))
 				echo $this->htmlBefore[ $name ];
-
+			
 			$edit_params = new O_Dao_Renderer_Edit_Params( $name, $this->class, $params, $this->record );
 			if ($this->layout)
 				$edit_params->setLayout( $this->layout );
@@ -510,7 +510,7 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 			$edit_params->setTitle( $title );
 			if (isset( $this->errors[ $name ] ))
 				$edit_params->setError( $this->errors[ $name ] );
-
+			
 			call_user_func( $callback, $edit_params );
 			if (isset( $this->htmlAfter[ $name ] ))
 				echo $this->htmlAfter[ $name ];

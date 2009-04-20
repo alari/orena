@@ -25,12 +25,20 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 	 * @var bool
 	 */
 	private $isAdded = 0;
+	
+	/**
+	 * Enumeration middleware
+	 *
+	 * @var bool
+	 */
+	private $isEnumerated = 0;
 
 	public function __construct( O_Dao_FieldInfo $fieldInfo, $type, $name )
 	{
 		$this->fieldInfo = $fieldInfo;
 		$this->type = $type;
 		$this->name = $name;
+		$this->isEnumerated = (bool)$fieldInfo->getParam( "enum" );
 		
 		if (!$type)
 			throw new O_Ex_Config( "Cannot initiate atomic field without type ($this->name)" );
@@ -50,6 +58,13 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 		if (!$fieldExists) {
 			$this->addFieldToTable();
 		}
+		if ($this->isEnumerated) {
+			$v = $this->fieldInfo->getParam( "enum", 1 );
+			$v = array_search( $fieldValue, $v );
+			if ($v === false)
+				throw new O_Ex_WrongArgument( "Cannot assign \"$fieldValue\" to enumerated atomic field." );
+			$fieldValue = $v;
+		}
 		return $obj[ $this->name ] = $fieldValue;
 	}
 
@@ -66,6 +81,10 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 		if (!$fieldExists) {
 			$this->addFieldToTable();
 		}
+		if ($this->isEnumerated) {
+			$v = $this->fieldInfo->getParam( "enum", 1 );
+			return isset( $v[ $fieldValue ] ) ? $v[ $fieldValue ] : null;
+		}
 		return $fieldValue;
 	}
 
@@ -79,6 +98,7 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 	public function setFieldInfo( O_Dao_FieldInfo $fieldInfo )
 	{
 		$this->fieldInfo = $fieldInfo;
+		$this->isEnumerated = (bool)$fieldInfo->getParam( "enum" );
 	}
 
 	/**

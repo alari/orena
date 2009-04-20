@@ -187,5 +187,20 @@ class Test_Cases_DaoObject extends PHPUnit_Framework_TestCase {
 		$this->assertEquals( $obj->id, $obj->injection(), "valid injection" );
 	}
 
+	public function testEnumWrongArgument()
+	{
+		$obj = new Test_Models_Core( );
+		$this->setExpectedException( "O_Ex_WrongArgument" );
+		$obj->my_enum = 55;
+	}
+
+	public function testEnumKeys()
+	{
+		$obj = new Test_Models_Core( );
+		$obj->my_enum_keys = "d";
+		$obj->save();
+		$this->assertEquals( "d", $obj->my_enum_keys );
+	}
+
 }
 

@@ -4,7 +4,7 @@
  * O_Acl_Role test case.
  */
 class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
-
+	
 	/**
 	 * Enter description here...
 	 *

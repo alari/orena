@@ -106,7 +106,7 @@ class O_Dao_Field_Relative extends O_Dao_Field_Bases implements O_Dao_Field_iFac
 		$tableInfo = O_Dao_TableInfo::get( $this->fieldInfo->getClass() );
 		foreach ($this->relative as $field) {
 			$fieldInfo = $tableInfo->getFieldInfo( $field );
-			$tableInfo = O_Dao_TableInfo::get( $fieldInfo->getRelationTarget());
+			$tableInfo = O_Dao_TableInfo::get( $fieldInfo->getRelationTarget() );
 		}
 		return $tableInfo->getFieldInfo( $this->field );
 	}

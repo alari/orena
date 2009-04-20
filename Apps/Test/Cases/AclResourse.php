@@ -4,7 +4,7 @@
  * Test_Models_Acl test case.
  */
 class Test_Cases_AclResourse extends PHPUnit_Framework_TestCase {
-
+	
 	/**
 	 * @var Test_Models_Acl
 	 */
@@ -16,9 +16,9 @@ class Test_Cases_AclResourse extends PHPUnit_Framework_TestCase {
 	protected function setUp()
 	{
 		parent::setUp();
-
+		
 		$this->resourse = new Test_Models_Acl(/* parameters */);
-
+	
 	}
 
 	/**
@@ -26,9 +26,9 @@ class Test_Cases_AclResourse extends PHPUnit_Framework_TestCase {
 	 */
 	protected function tearDown()
 	{
-
+		
 		$this->Test_Models_Acl = null;
-
+		
 		parent::tearDown();
 	}
 
@@ -51,15 +51,15 @@ class Test_Cases_AclResourse extends PHPUnit_Framework_TestCase {
 		$role2->clear( "test one" );
 		$role3 = O_Acl_Role::getByName( "test prop" );
 		$role3->allow( "test propp" );
-
+		
 		$this->assertNull( $user->can( "test own", $this->resourse ) );
 		$this->resourse->owner = $user;
 		$this->assertTrue( $user->can( "test own", $this->resourse ) );
-
+		
 		$this->assertNull( $user->can( "test own many", $this->resourse ) );
 		$this->resourse->owners[] = $user;
 		$this->assertTrue( $user->can( "test own many", $this->resourse ) );
-
+		
 		$this->assertNull( $user->can( "test propp", $this->resourse ) );
 		$this->resourse->prop = "abb";
 		$this->resourse->save();

@@ -14,6 +14,8 @@
  * @field one_sub -has one Test_Models_Sub -inverse one_core
  * @field core_direct -has one {test/core_class} -inverse core_inverse
  * @field core_inverse -has one Test_Models_Core -inverse core_direct
+ * @field my_enum TINYINT -enum first; second; third
+ * @field my_enum_keys ENUM('a','b','c') -enum a:d; b:e; c:f
  */
 class Test_Models_Core extends O_Dao_ActiveRecord {
 
