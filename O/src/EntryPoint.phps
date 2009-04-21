@@ -127,7 +127,7 @@ class O_EntryPoint {
 		$app_name = null;
 		if (!is_file( "./Apps/Orena.apps.xml" )) {
 			$d = opendir( "./Apps" );
-			while ($f = readdir( $d ))
+			while ($f = readdir( $d )){
 				if ($f != "." && $f != "..") {
 					if (is_dir( "./Apps/" . $f ) && is_file( "./Apps/" . $f . "/App.xml" )) {
 						self::$appConfigXml = simplexml_load_file( "./Apps/" . $f . "/App.xml" );
@@ -140,7 +140,7 @@ class O_EntryPoint {
 							throw new O_Ex_Config(
 									"Application without name or class prefix cannot be processed." );
 
-						foreach (self::$appConfigXml->xpath( "/Condition" ) as $cond) {
+						foreach (self::$appConfigXml->xpath( "//Condition" ) as $cond) {
 							if (self::processAppSelectionCondition( $cond )) {
 
 								$app_name = $f;
@@ -153,6 +153,7 @@ class O_EntryPoint {
 						}
 					}
 				}
+			}
 		} else {
 			$xml_apps = simplexml_load_file( "./Apps/Orena.apps.xml" );
 			foreach ($xml_apps as $app) {
