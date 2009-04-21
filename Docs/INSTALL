@@ -1,0 +1,16 @@
+Installation Instructions
+*************************
+
+Copyright (C) Dmitry Kourinski.
+
+Package Dependencies
+====================
+PHP >=5.2.* with modules ctype, mhash, simplexml, pdo.
+
+
+
+Getting Started
+===============
+1. Add your folder (project) to Apps.
+2. Modify Apps/Orena.apps.xml for your project. See Example.
+3. Create App.xml in your Application folder.
