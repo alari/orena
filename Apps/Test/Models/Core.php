@@ -8,7 +8,7 @@
  * 		-edit-ajax area -required Введи текст!
  * @field intfield int -signal -show simple -loop simple -edit-ajax -required Число!
  * @field subs -owns many {test/sub_class} -inverse core
- * @field manysubs -owns many Test_Models_Sub -inverse cores
+ * @field manysubs -owns many Test_Models_Sub -inverse cores -signal my
  * @field myalias -alias subs.core
  * @field test_alter int default 1 -e-dit Test_Fragments_CustomEditor::render
  * @field one_sub -has one Test_Models_Sub -inverse one_core
