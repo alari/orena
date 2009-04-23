@@ -100,7 +100,7 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	{
 		if ($this->isInitiated)
 			return;
-		$oneOfFields = explode( ",", $this->fieldInfo->getParam( "one-of" ) );
+		$oneOfFields = $this->fieldInfo->getParam( "one-of", 1 );
 		foreach ($oneOfFields as $v) {
 			$f = O_Dao_TableInfo::get( $this->fieldInfo->getClass() )->getFieldInfo( trim( $v ) );
 			if (!$f || !$f->isRelationOne() || isset( $this->otherFields[ $f->getRelationTarget() ] )) {

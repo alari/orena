@@ -11,11 +11,12 @@ class O_Dao_Renderer {
 	const CALLBACK_SHOW = "O_Dao_Renderer_Show_Callbacks";
 	const CALLBACK_EDIT = "O_Dao_Renderer_Edit_Callbacks";
 	const CALLBACK_CHECK = "O_Dao_Renderer_Check_Callbacks";
-	
+
 	const KEY_SHOW = "show";
+	const KEY_LOOP = "loop";
 	const KEY_EDIT = "edit";
 	const KEY_CHECK = "check";
-	
+
 	const TYPE_DEF = "def";
 	const TYPE_LOOP = "loop";
 
@@ -50,9 +51,11 @@ class O_Dao_Renderer {
 	{
 		if (!$type)
 			$type = self::TYPE_LOOP;
-		foreach ($query as $obj) {
-			self::show( $obj, $layout, $type );
-		}
-	}
+		$renderer = new O_Dao_Renderer_LoopShower($query);
+		if ($layout)
+			$renderer->setLayout( $layout );
+		if ($type)
+			$renderer->setType( $type );
+		$renderer->display();	}
 
 }

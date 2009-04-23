@@ -1,10 +1,15 @@
 <?php
 /**
  * Table:
- * -show[-type]:callback -- callback for envelop
+ * -(show|loop)[-type]:envelop -- callback for envelop
+ * -(show|loop)[-type]:callback -- callback for object rendering
+ *
  */
 abstract class O_Dao_Renderer_Commons {
-	
+
+	const SUFF_CALLBACK = "callback";
+	const SUFF_ENVELOP = "envelop";
+
 	/**
 	 * Active record to handle
 	 *
@@ -178,21 +183,21 @@ abstract class O_Dao_Renderer_Commons {
 	{
 		if ($params === 1)
 			return "";
-		
+
 		$subparams = "";
 		if (strpos( $params, " " )) {
 			list ($callback, $subparams) = explode( " ", $params, 2 );
 		} else {
 			$callback = $params;
 		}
-		
+
 		if (!strpos( $callback, "::" )) {
 			$callback = $callback_type . "::" . $callback;
 		}
-		
+
 		if (!is_callable( $callback ))
 			return "";
-		
+
 		return array ("callback" => $callback, "params" => $subparams);
 	}
 
@@ -203,19 +208,19 @@ abstract class O_Dao_Renderer_Commons {
 	 * @param const $callback_type
 	 * @return array("callback","params")
 	 */
-	protected function getEnvelopCallback( $key, $callback_type )
+	protected function getEnvelopCallback( $key, $callback_type, $suffix=self::SUFF_CALLBACK )
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 		$params = "";
-		
+
 		if ($this->type) {
-			$params = $tableInfo->getParam( $key . "-" . $this->type . ":callback" );
+			$params = $tableInfo->getParam( $key . "-" . $this->type . ":".$suffix );
 		}
-		
+
 		if (!$params) {
-			$params = $tableInfo->getParam( $key . ":callback" );
+			$params = $tableInfo->getParam( $key . ":".$suffix );
 		}
-		
+
 		return $this->getCallbackByParams( $params, $callback_type );
 	}
 }

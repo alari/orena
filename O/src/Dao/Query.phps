@@ -92,9 +92,10 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 * Returns (cached) array of query results as O_Dao_ActiveRecords
 	 *
 	 * @param bool $forceCacheReload If true, objects are regenerated
+	 * @param bool $processPreload
 	 * @return O_Dao_ActiveRecord[]
 	 */
-	public function getAll( $forceCacheReload = false )
+	public function getAll( $forceCacheReload = false, $processPreload = true )
 	{
 		if (!$forceCacheReload && count( $this->objects ))
 			return $this->objects;
@@ -108,22 +109,49 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			}
 			throw $e;
 		}
-		// Process fields preload
-		$preloadClasses = Array ();
-		foreach (O_Dao_TableInfo::get( $this->class )->getFields() as $name => $fieldInfo) {
-			/* @var $fieldInfo O_Dao_FieldInfo */
-			if ($fieldInfo->isRelationOne() && $fieldInfo->getParam( "preload" )) {
-				$preloadClasses[ $name ] = $fieldInfo->getRelationTarget();
-			}
-		}
+
 		$this->objects = Array ();
-		$preloadIds = Array ();
 		foreach ($r as $o) {
 			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
+		}
+		// Process fields preload
+		if ($processPreload) {
+			$preloadFields = Array ();
+			foreach (O_Dao_TableInfo::get( $this->class )->getFields() as $name => $fieldInfo) {
+				/* @var $fieldInfo O_Dao_FieldInfo */
+				if ($fieldInfo->isRelationOne() && $fieldInfo->getParam( "preload" )) {
+					$preloadFields[] = $name;
+				}
+			}
+			if (count( $preloadFields ))
+				$this->preload( $preloadFields );
+		}
+
+		return $this->objects;
+	}
+
+	/**
+	 * Preloads a number of fields relative to one target
+	 *
+	 * @param array $fieldsToPreload
+	 */
+	public function preload( $fields )
+	{
+		$preloadClasses = Array ();
+		foreach ($fields as $fieldName) {
+			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $fieldName );
+			if ($fieldInfo->isRelationOne() && $fieldInfo->getRelationTarget()) {
+				$preloadClasses[ $fieldName ] = $fieldInfo->getRelationTarget();
+			}
+		}
+		$objects = count( $this->objects ) ? $this->objects : $this->getAll( 0, 0 );
+		$preloadIds = Array ();
+		foreach ($objects as $o) {
 			foreach ($preloadClasses as $field => $class) {
 				if (!isset( $preloadIds[ $class ] ))
 					$preloadIds[ $class ] = Array ();
-				if (!in_array( $o[ $field ], $preloadIds[ $class ] ))
+				if (!in_array( $o[ $field ], $preloadIds[ $class ] ) && !O_Dao_ActiveRecord::objectLoaded(
+						$o[ $field ], $class ))
 					$preloadIds[ $class ][] = $o[ $field ];
 			}
 		}
@@ -131,7 +159,6 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			if (count( $ids )) {
 				self::get( $class )->test( "id", $ids )->getAll();
 			}
-		return $this->objects;
 	}
 
 	/**
