@@ -33,7 +33,7 @@ class O_Dao_TableInfo {
 	 * @var O_Dao_TableInfo[]
 	 */
 	private static $conf = Array ();
-
+	
 	/**
 	 * Name of sql table data stored in
 	 *
@@ -79,15 +79,15 @@ class O_Dao_TableInfo {
 	private function __construct( $class )
 	{
 		$this->class = $class;
-
+		
 		$reflection = new ReflectionClass( $class );
 		if (!$reflection->isSubclassOf( "O_Dao_ActiveRecord" ))
 			return;
-
+			
 		// Copy all data from parent object
 		if ($reflection->getParentClass()) {
 			$parent = self::get( $reflection->getParentClass()->getName() );
-
+			
 			$this->table = $parent->table;
 			foreach ($parent->fields as $name => $info) {
 				$this->fields[ $name ] = clone $info;
@@ -97,14 +97,14 @@ class O_Dao_TableInfo {
 			$this->indexes = $parent->indexes;
 			$this->tail = $parent->tail;
 		}
-
+		
 		// Inherited injections
 		foreach (O_Dao_ActiveRecord::getInjectedMethods( $reflection->getParentClass()->getName() ) as $name => $callback) {
 			O_Dao_ActiveRecord::injectMethod( $class, $name, $callback );
 		}
-
+		
 		$docCommentLines = Array ();
-
+		
 		// Import data from plugins
 		$plugins = O_Registry::get( "plugins", $class );
 		if (is_array( $plugins )) {
@@ -113,9 +113,9 @@ class O_Dao_TableInfo {
 					throw new O_Ex_NotFound( "Unexistent plugin class: $plugin." );
 				$pluginReflection = new ReflectionClass( $plugin );
 				if (!$pluginReflection->implementsInterface( "O_Dao_iPlugin" ))
-					throw new O_Ex_Logic(
+					throw new O_Ex_Logic( 
 							"Dao plugins must implement interface O_Dao_iPlugin, but $plugin doesn't." );
-
+					
 				// Methods injection
 				foreach ($pluginReflection->getMethods() as $method) {
 					if (substr( $method->getName(), 0, 2 ) != "i_")
@@ -126,16 +126,16 @@ class O_Dao_TableInfo {
 						continue;
 					if ($method->getNumberOfParameters() < 1)
 						continue;
-					O_Dao_ActiveRecord::injectMethod( $class, substr( $method->getName(), 2 ),
+					O_Dao_ActiveRecord::injectMethod( $class, substr( $method->getName(), 2 ), 
 							array ($plugin, $method->getName()) );
 				}
-
+				
 				// Attributes injection
-				$docCommentLines = array_merge( $docCommentLines,
+				$docCommentLines = array_merge( $docCommentLines, 
 						explode( "\n", $pluginReflection->getDocComment() ) );
 			}
 		}
-
+		
 		// Override
 		$docCommentLines = array_merge( $docCommentLines, explode( "\n", $reflection->getDocComment() ) );
 		for ($line = current( $docCommentLines ); $line; $line = next( $docCommentLines )) {
@@ -144,21 +144,21 @@ class O_Dao_TableInfo {
 			if ($matches) {
 				$lineDirective = $matches[ 1 ];
 				$lineContent = trim( $matches[ 2 ] );
-
+				
 				// Processing multiline config
 				while ($lineContent[ strlen( $lineContent ) - 1 ] == '\\') {
 					$line = next( $docCommentLines );
 					$lineContent = substr( $lineContent, 0, -1 ) . " " . trim( substr( $line, 2 ) );
 				}
-
+				
 				// Processing tail directive before parsing subkeys (tail have no subkeys)
 				if ($lineDirective == "tail") {
 					$this->tail = $lineContent;
 					continue;
 				}
-
+				
 				$_subkeys = explode( " -", $lineContent );
-
+				
 				$value = array_shift( $_subkeys );
 				$subkeys = array ();
 				if (count( $_subkeys )) {
@@ -191,7 +191,7 @@ class O_Dao_TableInfo {
 					case "field:replace" :
 						// Just replace field positions in array
 						if (!strpos( $value, "," ))
-							throw new O_Ex_Config(
+							throw new O_Ex_Config( 
 									"field:replace requires two fields, separated with comma. Comma not found." );
 						list ($field1, $field2) = explode( ",", $value, 2 );
 						$field1 = trim( $field1 );
@@ -257,15 +257,15 @@ class O_Dao_TableInfo {
 	{
 		if (!$this->table)
 			throw new O_Ex_Config( "Can't create unnamed table." );
-
+		
 		$query = new O_Db_Query( $this->table );
-
+		
 		$query->field( "id", "int auto_increment primary key" );
-
+		
 		foreach ($this->fields as $fieldInfo) {
 			$fieldInfo->addFieldTypeToQuery( $query );
 		}
-
+		
 		foreach ($this->indexes as $fields => $keys) {
 			$indexType = "index";
 			if (isset( $keys[ "unique" ] ))
@@ -274,7 +274,7 @@ class O_Dao_TableInfo {
 				$indexType = "fulltext";
 			$query->index( $fields, $indexType, isset( $keys[ "name" ] ) ? $keys[ "name" ] : null );
 		}
-
+		
 		return $query->create( $this->tail ? $this->tail : O_Registry::get( "app/dao-params/default_tail" ) );
 	}
 

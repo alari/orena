@@ -109,7 +109,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			}
 			throw $e;
 		}
-
+		
 		$this->objects = Array ();
 		foreach ($r as $o) {
 			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, $o );
@@ -126,7 +126,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			if (count( $preloadFields ))
 				$this->preload( $preloadFields );
 		}
-
+		
 		return $this->objects;
 	}
 
@@ -150,7 +150,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			foreach ($preloadClasses as $field => $class) {
 				if (!isset( $preloadIds[ $class ] ))
 					$preloadIds[ $class ] = Array ();
-				if (!in_array( $o[ $field ], $preloadIds[ $class ] ) && !O_Dao_ActiveRecord::objectLoaded(
+				if (!in_array( $o[ $field ], $preloadIds[ $class ] ) && !O_Dao_ActiveRecord::objectLoaded( 
 						$o[ $field ], $class ))
 					$preloadIds[ $class ][] = $o[ $field ];
 			}

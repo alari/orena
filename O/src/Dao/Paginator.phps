@@ -239,13 +239,13 @@ class O_Dao_Paginator {
 		foreach ($pages as $page) {
 			$v = $page;
 			if ($v != $this->page) {
-				if ($v == 1)
+				if ($v == 1 && $this->page > 3)
 					$v = O_Registry::get( "app/paginator/first" );
-				elseif ($v == $this->numPages())
+				elseif ($v == $this->numPages() && $this->page < $this->numPages() - 3)
 					$v = O_Registry::get( "app/paginator/last" );
-				elseif ($v == $this->numPages() - 1 && $this->page != $this->numPages() - 1)
+				elseif ($v == $this->numPages() - 1 && $this->page < $this->numPages() - 3)
 					$v = O_Registry::get( "app/paginator/next" );
-				elseif ($v == 2 && $this->page > 2)
+				elseif ($v == 2 && $this->page > 3)
 					$v = O_Registry::get( "app/paginator/prev" );
 				if (!$v)
 					$v = $page;

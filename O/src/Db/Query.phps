@@ -134,6 +134,13 @@ class O_Db_Query {
 	protected $tables = "";
 	
 	/**
+	 * Cached calculation of rows found
+	 *
+	 * @var int
+	 */
+	private $found_rows;
+	
+	/**
 	 * Array of tables with deny to prepare statements
 	 *
 	 * @var Array
@@ -479,7 +486,7 @@ class O_Db_Query {
 	 */
 	public function getFoundRows()
 	{
-		return $this->conn()->query( "SELECT FOUND_ROWS()" )->fetchColumn();
+		return $this->found_rows ? $this->found_rows : $this->conn()->query( "SELECT FOUND_ROWS()" )->fetchColumn();
 	}
 
 	/**
@@ -493,6 +500,11 @@ class O_Db_Query {
 		
 		$this->bindParams( $this->stmt );
 		$this->stmt->execute();
+		
+		if (in_array( self::CALC_FOUND_ROWS, $this->sql_options )) {
+			$this->found_rows = 0;
+			$this->found_rows = $this->getFoundRows();
+		}
 		
 		$this->stmt->setFetchMode( PDO::FETCH_ASSOC );
 		
