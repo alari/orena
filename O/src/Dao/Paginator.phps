@@ -85,11 +85,11 @@ class O_Dao_Paginator {
 		$this->page = (int)O_Registry::get( "app/" . $page_registry );
 		if (!$this->page)
 			$this->page = 1;
-		
+
 		if (!is_callable( $url_callback ))
 			throw new O_Ex_Logic( "Wrong callback for paginator url-builder." );
 		$this->url_callback = $url_callback;
-		
+
 		if (count( $orders )) {
 			$this->order = O_Registry::get( "app/" . $order_registry );
 			$this->orders_list = $orders;
@@ -97,7 +97,7 @@ class O_Dao_Paginator {
 				if (!is_array( $v ))
 					$v = array ("field" => $k, "title" => $v);
 			}
-			
+
 			if (substr( $this->order, -5 ) == "-desc") {
 				$this->order = substr( $this->order, 0, -5 );
 				if (isset( $this->orders_list[ $this->order ] )) {
@@ -109,15 +109,11 @@ class O_Dao_Paginator {
 				$this->query->clearOrders()->orderBy( $this->orders_list[ $this->order ][ "field" ] );
 			}
 		}
-		
-		$this->page_elements = $this->query->setSqlOption( O_Db_Query::CALC_FOUND_ROWS )->limit( 
+
+		$this->page_elements = $this->query->setSqlOption( O_Db_Query::CALC_FOUND_ROWS )->limit(
 				$this->perpage * ($this->page - 1), $this->perpage );
 		$this->page_elements->getAll( true );
 		$this->total_count = $this->query->getFoundRows();
-		
-		if (!count( $this->page_elements ))
-			throw new O_Ex_PageNotFound( "No elements on current page.", 404 );
-	
 	}
 
 	/**
@@ -215,9 +211,9 @@ class O_Dao_Paginator {
 			$tailsRange = (int)O_Registry::get( "app/paginator/tails_range" );
 		$pages = range( max( 1, $this->page - $range ), min( $this->page + $range, $this->numPages() ) );
 		if ($tailsRange) {
-			$pages = array_merge( 
-					range( 1, 1 + $tailsRange > $this->numPages() ? $this->numPages() : 1 + $tailsRange ), $pages, 
-					range( $this->numPages() - $tailsRange > 1 ? $this->numPages() - $tailsRange : 1, 
+			$pages = array_merge(
+					range( 1, 1 + $tailsRange > $this->numPages() ? $this->numPages() : 1 + $tailsRange ), $pages,
+					range( $this->numPages() - $tailsRange > 1 ? $this->numPages() - $tailsRange : 1,
 							$this->numPages() ) );
 			$pages = array_unique( $pages );
 			sort( $pages );
@@ -255,7 +251,7 @@ class O_Dao_Paginator {
 			} else {
 				$url = call_user_func( $this->url_callback, $page, $this->order . ($this->order_desc ? "-desc" : "") );
 				if ($this->ajax_id) {
-					$html[ $page ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
+					$html[ $page ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml(
 							$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>";
 				} else {
 					$html[ $page ] = "<a href=\"" . $url . "\">$v</a>";
@@ -284,7 +280,7 @@ class O_Dao_Paginator {
 			}
 			$url = call_user_func( $this->url_callback, 1, $order );
 			if ($this->ajax_id) {
-				$html[ $order ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
+				$html[ $order ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml(
 						$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$title</a>";
 			} else {
 				$html[ $order ] = "<a href=\"" . $url . "\">$title</a>";
@@ -306,7 +302,7 @@ class O_Dao_Paginator {
 		$orders = $this->getOrdersHtml();
 		if (count( $html ) <= 1 && !count( $orders ))
 			return;
-		
+
 		echo "<div class='" . O_Registry::get( "app/paginator/css_envelop" ) . "'>";
 		if (count( $html ) > 1) {
 			echo "<div><span>" . O_Registry::get( "app/paginator/title" ) . ":</span>";
@@ -326,7 +322,7 @@ class O_Dao_Paginator {
 			}
 			echo "</div>";
 		}
-		
+
 		echo "</div>";
 	}
 
@@ -348,18 +344,18 @@ class O_Dao_Paginator {
 				O_Js_Middleware::getFramework()->addSrc( $layout );
 				$isNormal = 1;
 			}
-			
+
 			if (isset( $isNormal )) {
 				echo "<div id='$this->ajax_id'>";
 			}
 		}
-		
+
 		ob_start();
 		$this->showPager( $range, $tailsRange );
 		$pager = ob_get_flush();
 		$this->page_elements->show( $layout, $type );
 		echo $pager;
-		
+
 		if ($this->ajax_id && isset( $isNormal )) {
 			echo "</div>";
 		}
@@ -387,7 +383,7 @@ class O_Dao_Paginator {
 	 */
 	public function isAjaxPageRequest()
 	{
-		return $this->ajax_id && O_Registry::get( "app/env/request_method" ) == "POST" && O_Registry::get( 
+		return $this->ajax_id && O_Registry::get( "app/env/request_method" ) == "POST" && O_Registry::get(
 				"app/env/params/mode" ) == $this->ajax_id;
 	}
 
