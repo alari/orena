@@ -191,7 +191,7 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <?
 		foreach ($_params[ "query" ] as $obj) {
 			?><option value="<?=$obj->id?>"
-		<?=(isset( $value[ $obj->id ] ) ? ' selected="yes"' : '')?>><?=$obj->$displayField?></option><?
+		<?=(isset( $value[ $obj->id ] ) || $value == $obj ? ' selected="yes"' : '')?>><?=$obj->$displayField?></option><?
 		}
 		?>
 </select></div>

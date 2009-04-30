@@ -30,7 +30,7 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 		if ($fieldValue instanceof O_Image_Resizer) {
 			$resizer = $fieldValue;
 		} else {
-			if (!isset( $_FILES[ $this->name ] )) {
+			if (!isset( $_FILES[ $this->name ] ) || !$_FILES[$this->name]["size"]) {
 				if ($this->type)
 					$obj[ $this->name ] = $this->getValueByExt( $obj );
 				return;

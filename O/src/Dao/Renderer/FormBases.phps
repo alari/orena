@@ -405,11 +405,12 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 				}
 
 				// Required value test
-				if (((!$this->values[ $name ] && !$fieldInfo->isFile()) || ($fieldInfo->isFile() && (!isset(
-						$_FILES[ $name ] ) || !$_FILES[ $name ][ "size" ]))) && $fieldInfo->getParam( "required" )) {
-					throw new O_Dao_Renderer_Check_Exception(
-							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
-									"required" ) );
+				if (((!$this->values[ $name ] && !$fieldInfo->isFile()) || ($fieldInfo->isFile() &&
+											 $this->createMode !== 0 && (!isset( $_FILES[ $name ] ) || !$_FILES[ $name ][ "size" ]))) &&
+											 $fieldInfo->getParam( "required" )) {
+												throw new O_Dao_Renderer_Check_Exception(
+														$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
+																"required" ) );
 				}
 
 				// Checker callback already was called -- check:before param was set
