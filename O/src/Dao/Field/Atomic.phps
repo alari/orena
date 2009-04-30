@@ -18,14 +18,14 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 	 * @var string
 	 */
 	private $name;
-	
+
 	/**
 	 * Was this field added to sql-table this time or not
 	 *
 	 * @var bool
 	 */
 	private $isAdded = 0;
-	
+
 	/**
 	 * Enumeration middleware
 	 *
@@ -39,7 +39,7 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 		$this->type = $type;
 		$this->name = $name;
 		$this->isEnumerated = (bool)$fieldInfo->getParam( "enum" );
-		
+
 		if (!$type)
 			throw new O_Ex_Config( "Cannot initiate atomic field without type ($this->name)" );
 	}
@@ -61,8 +61,12 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 		if ($this->isEnumerated) {
 			$v = $this->fieldInfo->getParam( "enum", 1 );
 			$v = array_search( $fieldValue, $v );
-			if ($v === false)
-				throw new O_Ex_WrongArgument( "Cannot assign \"$fieldValue\" to enumerated atomic field." );
+			if ($v === false) {
+				if (array_key_exists( $fieldValue, $this->fieldInfo->getParam( "enum", 1 ) ))
+					$v = $fieldValue;
+				else
+					throw new O_Ex_WrongArgument( "Cannot assign \"$fieldValue\" to enumerated atomic field." );
+			}
 			$fieldValue = $v;
 		}
 		return $obj[ $this->name ] = $fieldValue;
