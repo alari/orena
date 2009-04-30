@@ -174,6 +174,7 @@ class O_Dao_TableInfo {
 							$this->table = self::getPrefix() . $value;
 						$this->params = array_merge( $this->params, $subkeys );
 					break;
+					
 					case "field" :
 						$name = $value;
 						$type = null;
@@ -181,13 +182,15 @@ class O_Dao_TableInfo {
 							list ($name, $type) = explode( " ", $value, 2 );
 						$this->fields[ $name ] = new O_Dao_FieldInfo( $this->class, $name, $type, $subkeys );
 					break;
+					
 					case "field:config" :
 						$name = $value;
-						if ((isset( $this->fields[ $name ] )))
+						if ((isset( $this->fields[ $name ] ))) {
 							$this->fields[ $name ]->addParams( $subkeys );
-						else
+						} else
 							throw new O_Ex_Config( "field:config for unexistent field." );
 					break;
+					
 					case "field:replace" :
 						// Just replace field positions in array
 						if (!strpos( $value, "," ))
@@ -209,9 +212,11 @@ class O_Dao_TableInfo {
 								$this->fields[ $name ] = $info;
 						}
 					break;
+					
 					case "index" :
 						$this->indexes[ $value ] = $subkeys;
 					break;
+					
 					case "registry" :
 						list ($key, $value) = explode( " ", $value, 2 );
 						if (isset( $subkeys[ "add" ] )) {

@@ -5,19 +5,19 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 	 *
 	 * @var O_Dao_FieldInfo
 	 */
-	private $fieldInfo;
+	protected $fieldInfo;
 	/**
 	 * Database's fieldtype
 	 *
 	 * @var string
 	 */
-	private $type;
+	protected $type;
 	/**
 	 * Database's field name
 	 *
 	 * @var string
 	 */
-	private $name;
+	protected $name;
 
 	/**
 	 * Was this field added to sql-table this time or not
@@ -110,7 +110,7 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 	 *
 	 * @return PDOStatement
 	 */
-	private function addFieldToTable()
+	protected function addFieldToTable()
 	{
 		if ($this->isAdded)
 			return null;

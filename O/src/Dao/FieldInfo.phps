@@ -127,6 +127,9 @@ class O_Dao_FieldInfo {
 				// Relative field
 			} elseif (isset( $params[ "relative" ] ) && strpos( $params[ "relative" ], "->" )) {
 				$this->fieldInstance = new O_Dao_Field_Relative( $this );
+				// Image file
+			} elseif (isset( $params[ "image" ] )) {
+				$this->fieldInstance = new O_Dao_Field_Image( $this, $type, $this->name );
 				// Atomic field
 			} else {
 				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
@@ -191,7 +194,8 @@ class O_Dao_FieldInfo {
 	 */
 	public function addParams( array $params )
 	{
-		$this->params = array_merge( $this->params, $params );
+		$this->params = array_merge( $params, $this->params );
+		$this->fieldInstance->setFieldInfo( $this );
 	}
 
 	/**
@@ -294,6 +298,16 @@ class O_Dao_FieldInfo {
 	}
 
 	/**
+	 * Returns true if it's a file
+	 *
+	 * @return bool
+	 */
+	public function isFile()
+	{
+		return $this->fieldInstance instanceof O_Dao_Field_Image;
+	}
+
+	/**
 	 * Returns true if it's one-to-* relation
 	 *
 	 * @return bool
@@ -303,6 +317,16 @@ class O_Dao_FieldInfo {
 		if (!$this->fieldInstance instanceof O_Dao_Field_iRelation)
 			return false;
 		return $this->fieldInstance->getInverse()->isRelationOne();
+	}
+
+	/**
+	 * Clone field instance on field info cloning
+	 *
+	 */
+	public function __clone()
+	{
+		$this->fieldInstance = clone $this->fieldInstance;
+		$this->fieldInstance->setFieldInfo( $this );
 	}
 
 	/**

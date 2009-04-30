@@ -90,7 +90,7 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 	public function setCreateMode()
 	{
 		$params = func_get_args();
-		$this->createMode = $params ? $params : Array();
+		$this->createMode = $params ? $params : Array ();
 	}
 
 	/**
@@ -328,9 +328,8 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 
 		?>
 <div>
-<form method="POST" enctype="application/x-www-form-urlencoded"
-	accept-charset="utf-8" action="<?=$this->actionUrl?>"
-	id="<?=$this->instanceId?>">
+<form method="POST" enctype="multipart/form-data" accept-charset="utf-8"
+	action="<?=$this->actionUrl?>" id="<?=$this->instanceId?>">
 <fieldset class="oo-renderer"><legend><?=$this->formTitle?></legend>
 
 <?
@@ -406,7 +405,8 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 				}
 
 				// Required value test
-				if (!$this->values[ $name ] && $fieldInfo->getParam( "required" )) {
+				if (((!$this->values[ $name ] && !$fieldInfo->isFile()) || ($fieldInfo->isFile() && (!isset(
+						$_FILES[ $name ] ) || !$_FILES[ $name ][ "size" ]))) && $fieldInfo->getParam( "required" )) {
 					throw new O_Dao_Renderer_Check_Exception(
 							$fieldInfo->getParam( "required" ) === 1 ? "Field value is required!" : $fieldInfo->getParam(
 									"required" ) );
@@ -472,10 +472,15 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
 			// Find a callback for field renderer
 			$callback = $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_EDIT );
+			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
+
 			if (!$callback) {
 				if (isset( $this->relationQueries[ $name ] )) {
 					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::selectRelation";
 					$params = $this->relationQueries[ $name ];
+				} elseif ($fieldInfo->isFile()) {
+					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::file";
+					$params = "";
 				} else {
 					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::simple";
 					$params = "";
@@ -493,7 +498,6 @@ el.getElement('input[type=submit]').addEvent("click", function(e){
 
 			// Prepare field value and title
 			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
-			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
 			$title = $fieldInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":title" );
 			if (!$title)
 				$title = $fieldInfo->getParam( "title" );

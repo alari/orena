@@ -6,6 +6,7 @@
  */
 class O_Image_Resizer {
 	private $src;
+	private $ext;
 
 	/**
 	 * Creates resizer instance for specified image file
@@ -21,6 +22,18 @@ class O_Image_Resizer {
 	}
 
 	/**
+	 * Returns image extension
+	 *
+	 * @return string
+	 */
+	public function getExtension()
+	{
+		if($this->ext) return $this->ext;
+		list (, , $type, ) = getimagesize( $this->src );
+		return $this->ext = image_type_to_extension( $type );
+	}
+
+	/**
 	 * Resizes image keeping its proportions and type, saves it on disc
 	 *
 	 * @param int $max_width
@@ -33,19 +46,19 @@ class O_Image_Resizer {
 	public function resize( $max_width, $max_height, $target_file = null, $substitute_ext = false )
 	{
 		list ($width, $height, $type, ) = getimagesize( $this->src );
-		
+
 		if (!$target_file) {
 			$target_file = $this->src;
 		} elseif ($substitute_ext) {
-			$target_file .= image_type_to_extension( $type );
+			$target_file .= $this->ext ? $this->ext : image_type_to_extension( $type );
 		}
-		
+
 		if ($type != IMAGETYPE_GIF && $type != IMAGETYPE_JPEG && $type != IMAGETYPE_PNG) {
 			throw new O_Ex_WrongArgument( "Need the image to be in png, jpg or gif format to process it correctly." );
 		}
-		
+
 		// We do not need to resize image, so just copy it if needed
-		if ($width <= $max_width && $height <= $max_height) {
+		if (($width <= $max_width && $height <= $max_height) || (!$max_height && !$max_width)) {
 			if ($this->src != $target_file) {
 				if (is_file( $target_file ))
 					unlink( $target_file );
@@ -53,7 +66,7 @@ class O_Image_Resizer {
 			}
 			return $target_file;
 		}
-		
+
 		// Resizing is necessary
 		$k = $width / $max_width > $height / $max_height ? $width / $max_width : $height / $max_height;
 		switch ($type) {
@@ -70,7 +83,7 @@ class O_Image_Resizer {
 		$newim = imagecreatetruecolor( round( $width / $k ), round( $height / $k ) );
 		imagecopyresized( $newim, $im, 0, 0, 0, 0, imagesx( $newim ), imagesy( $newim ), $width, $height );
 		imagedestroy( $im );
-		
+
 		if (is_file( $target_file ))
 			unlink( $target_file );
 		switch ($type) {
@@ -84,7 +97,7 @@ class O_Image_Resizer {
 				imagepng( $newim, $target_file );
 			break;
 		}
-		
+
 		imagedestroy( $newim );
 		return $target_file;
 	}

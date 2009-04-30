@@ -29,7 +29,6 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	 *
 	 * @param O_Dao_ActiveRecord $obj
 	 * @param mixed $fieldValue
-	 * @throws Exception
 	 * @return bool
 	 * @access private
 	 */
@@ -37,10 +36,11 @@ class O_Dao_Field_OneOf extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	{
 		$this->initiate();
 		foreach ($this->otherFields as $class => $field) {
-			if ($fieldValue instanceof $class)
+			if ($fieldValue instanceof $class) {
 				$obj->$field = $fieldValue;
-			else
+			} else {
 				$obj->$field = null;
+			}
 		}
 		return null;
 	}

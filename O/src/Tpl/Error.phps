@@ -1,13 +1,13 @@
 <?php
 class O_Tpl_Error extends O_Html_Template {
-	
+
 	/**
 	 * Exception object
 	 *
 	 * @var Exception
 	 */
 	public $e;
-	
+
 	protected $layoutClass = "O_Html_Layout";
 
 	public function __construct( Exception $e )
