@@ -423,7 +423,7 @@ class O_Dao_FieldInfo {
 	}
 
 	/**
-	 * Prepares query but don't substitute concrete object
+	 * Prepares query but doesn't substitute concrete object
 	 *
 	 * @param O_Dao_Query $query
 	 * @param string $subreq
@@ -466,7 +466,11 @@ class O_Dao_FieldInfo {
 	{
 		if (!$query) {
 			$query = new O_Dao_Query( $this->fieldInstance->getTargetClass() );
-			$joinOnField = O_Dao_TableInfo::get( $this->fieldInstance->getTargetClass() )->getTableName() . ".id";
+			$core_tbl = O_Dao_TableInfo::get( $this->fieldInstance->getTargetClass() )->getTableName();
+			$joinOnField = $core_tbl . ".id";
+			if ($this->isOneToWhateverRelation() && $this->isRelationMany())
+				$joinOnField = $core_tbl . "." . $this->fieldInstance->getInverse()->name;
+
 		}
 
 		$isOneToMany = $nextInfo->isRelationMany() && !$nextInfo->fieldInstance->getInverse()->isRelationMany();
@@ -491,7 +495,11 @@ class O_Dao_FieldInfo {
 			return $als . "." . $rel->getBaseFieldName();
 			//relation is current table itself
 		} else {
-			$query->join( $currTable . " " . $currAlias, $currAlias . "." . $this->name . "=" . $joinOnField, "CROSS" );
+			if ($this->isOneToWhateverRelation() && $this->isRelationMany())
+				$relLeft = $currAlias . ".id";
+			else
+				$relLeft = $currAlias . "." . $this->name;
+			$query->join( $currTable . " " . $currAlias, $relLeft . "=" . $joinOnField, "CROSS" );
 
 			if ($isOneToMany) {
 				return $currAlias . "." . $nextInfo->fieldInstance->getInverse()->name;
