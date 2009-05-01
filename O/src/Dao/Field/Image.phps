@@ -23,16 +23,15 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 			$this->addFieldToTable();
 		}
 
-		$filepath = $this->getFilePath( $obj );
-		if (is_file( $filepath ))
-			unlink( $filepath );
+		$params = $this->fieldInfo->getParam( "image", 1 );
 
 		if ($fieldValue instanceof O_Image_Resizer) {
 			$resizer = $fieldValue;
 		} else {
-			if (!isset( $_FILES[ $this->name ] ) || !$_FILES[$this->name]["size"]) {
-				if ($this->type)
-					$obj[ $this->name ] = $this->getValueByExt( $obj );
+			if (!isset( $_FILES[ $this->name ] ) || !$_FILES[ $this->name ][ "size" ]) {
+				if (isset( $params[ "clear" ] )) {
+					$this->deleteThis( $obj );
+				}
 				return;
 			}
 
@@ -40,7 +39,8 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 			$resizer = new O_Image_Resizer( $file[ "tmp_name" ] );
 		}
 
-		$params = $this->fieldInfo->getParam( "image", 1 );
+		$this->deleteThis($obj);
+
 		$resizer->resize( isset( $params[ "width" ] ) ? $params[ "width" ] : 0,
 				isset( $params[ "height" ] ) ? $params[ "height" ] : 0,
 				$this->getFilePath( $obj, $resizer->getExtension() ) );
@@ -123,5 +123,31 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 	{
 		if ($this->type)
 			$query->field( $this->name, $this->type );
+	}
+
+	/**
+	 * No special actions should be done on atomic field deletion
+	 *
+	 * @param O_Dao_ActiveRecord $obj
+	 * @param mixed $fieldValue
+	 * @access private
+	 */
+	public function deleteThis( O_Dao_ActiveRecord $obj, $fieldValue = null )
+	{
+		$filepath = $this->getFilePath( $obj );
+		if (is_file( $filepath ))
+			unlink( $filepath );
+
+		if ($this->type)
+			$obj[ $this->name ] = $this->getValueByExt( $obj );
+
+		$params = $this->fieldInfo->getParam( "image", 1 );
+		if (isset( $params[ "cascade" ] )) {
+			$fields = explode( ",", $params[ "cascade" ] );
+			foreach ($fields as $field) {
+				$field = trim( $field );
+				O_Dao_TableInfo::get( $obj )->getFieldInfo( $field )->deleteThis( $obj );
+			}
+		}
 	}
 }
