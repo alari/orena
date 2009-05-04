@@ -105,7 +105,8 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 			// TODO add additional config file, get toolbar from params with something as the default
 			//
 			$customConfig = O_Registry::get( "app/js/fckeditor/config_path" );
-			$toolbarSet = O_Registry::get( "app/js/fckeditor/toolbar_set" );
+			$toolbarSet = $params->params();
+			if(!$toolbarSet) $toolbarSet = O_Registry::get( "app/js/fckeditor/toolbar_set" );
 			O_Js_Middleware::getFramework()->addDomreadyCode(
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
@@ -131,7 +132,7 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <?
 		}
 		?>
-<textarea class="fckeditor" id="oo-r-w-<?=$params->fieldName()?>"
+<textarea class="fckeditor fck-<?=$toolbarSet?>" id="oo-r-w-<?=$params->fieldName()?>"
 	name="<?=$params->fieldName()?>"><?=$params->value()?></textarea></div>
 <?
 	}

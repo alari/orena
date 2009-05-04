@@ -194,7 +194,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function addParams( array $params )
 	{
-		$this->params = array_merge( $params, $this->params );
+		$this->params = array_merge( $this->params, $params );
 		$this->fieldInstance->setFieldInfo( $this );
 	}
 
