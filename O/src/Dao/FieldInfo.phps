@@ -130,6 +130,9 @@ class O_Dao_FieldInfo {
 				// Image file
 			} elseif (isset( $params[ "image" ] )) {
 				$this->fieldInstance = new O_Dao_Field_Image( $this, $type, $this->name );
+				// File
+			} elseif (isset( $params[ "file" ] )) {
+				$this->fieldInstance = new O_Dao_Field_File( $this, $type, $this->name );
 				// Atomic field
 			} else {
 				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
@@ -304,7 +307,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isFile()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_Image;
+		return $this->fieldInstance instanceof O_Dao_Field_Image || $this->fieldInstance instanceof O_Dao_Field_File;
 	}
 
 	/**
