@@ -123,7 +123,7 @@ abstract class O_Command {
 			$class = $tpl;
 		} else {
 			preg_match( "#([_a-z]+_)Cmd(_[_a-z]+)#i", get_class( $this ), $matches );
-			$class = $matches[ 1 ] . "Tpl" . ($tpl ? $tpl : $matches[ 2 ]);
+			$class = $matches[ 1 ] . "Tpl" . ($tpl ? "_".$tpl : $matches[ 2 ]);
 		}
 		if (!class_exists( $class ))
 			throw new O_Ex_PageNotFound( "Cannot find template class for current command." );
