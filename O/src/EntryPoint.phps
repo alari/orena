@@ -52,7 +52,7 @@ class O_EntryPoint {
 			// TODO: get locale from registry
 			setlocale( LC_ALL, "ru_RU.UTF8" );
 
-			if (O_Registry::get( "app/mode" ) == "development"||1) {
+			if (O_Registry::get( "app/mode" ) == "development") {
 				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
 			}
 
@@ -61,7 +61,8 @@ class O_EntryPoint {
 		}
 		catch (Exception $e) {
 			// TODO: get exception handler class from registry
-			$tpl = new O_Tpl_Error( $e );
+			$errTpl = O_Registry::get("app/err_tpl");
+			$tpl = new $errTpl( $e );
 			if ($tpl instanceof O_Html_Template) {
 				$tpl->display();
 				return true;

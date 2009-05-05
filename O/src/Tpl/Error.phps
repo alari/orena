@@ -38,7 +38,5 @@ class O_Tpl_Error extends O_Html_Template {
 </p>
 <?
 		}
-		?>
-<?
 	}
 }
