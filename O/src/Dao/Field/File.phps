@@ -37,10 +37,14 @@ class O_Dao_Field_File extends O_Dao_Field_Atomic {
 		if(isset($params["max_size"]) && $file["size"] > $params["max_size"]) {
 			return false;
 		}
+
 		// Check file extension
-		preg_match("#\.([a-zA-Z]+)$#", $file["name"], $p);
-		$ext = $p[1];
-		if(!$ext) return false;
+		preg_match("#\\.([a-zA-Z]+)#i", $file["name"], $p);
+
+		$ext = isset($p[1]) ? strtolower($p[1]) : null;
+		if(!$ext) {
+			return false;
+		}
 
 		// Ext is not allowed
 		if(isset($params["ext_allow"]) && strpos($params["ext_allow"], $ext) === false) {
