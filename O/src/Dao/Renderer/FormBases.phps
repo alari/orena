@@ -208,42 +208,45 @@ abstract class O_Dao_Renderer_FormBases extends O_Dao_Renderer_Commons {
 		//TODO: add classnames to registry
 		?>
 <script language="JavaScript" type="text/javascript">
-var el = $('<?=$this->instanceId?>');
-(function(){
-while(!el) {
+_getEl = function(){
 	el = $('<?=$this->instanceId?>');
+	if(!el) {
+		_getEl.delay(50);
+		return;
+	}
+	el.getElement('input[type=submit]').addEvent("click", function(e){
+		 e.stop();
+	 	$(this).disabled = true;
+
+	 	el.getElements('textarea.fckeditor').each(function(_el){
+			_el.value = FCKeditorAPI.GetInstance(_el.id). GetXHTML( 1 );
+	 	 });
+
+	 	new Request.JSON({url:el.getAttribute('action'), onSuccess:function(response){
+			if(response.status == 'SUCCEED') {
+				if(response.refresh == 1) {
+					window.location.reload(true);
+				} else if(response.show) {
+					el.getParent().set('html', response.show);
+				} else if(response.redirect) {
+					window.location.href = response.redirect;
+				}
+			} else {
+				el.getElements('.oo-renderer-error').dispose();
+				for(field in response.errors) {
+					erre = el.getElement('[name='+field+']');
+					if(!erre) erre = el.getElement('input[type=submit]');
+					err = new Element('span', {class:'oo-renderer-error'});
+					err.set('html', response.errors[field]);
+					err.inject(erre, 'after');
+				}
+				el.getElement('input[type=submit]').disabled = false;
+			}
+	 	 }}).post(el);
+	 });
+
 }
-el.getElement('input[type=submit]').addEvent("click", function(e){
-	 e.stop();
- 	$(this).disabled = true;
-
- 	el.getElements('textarea[class=fckeditor]').each(function(el){
-		el.value = FCKeditorAPI.GetInstance(el.id). GetXHTML( 1 );
- 	 });
-
- 	new Request.JSON({url:el.getAttribute('action'), onSuccess:function(response){
-		if(response.status == 'SUCCEED') {
-			if(response.refresh == 1) {
-				window.location.reload(true);
-			} else if(response.show) {
-				el.getParent().set('html', response.show);
-			} else if(response.redirect) {
-				window.location.href = response.redirect;
-			}
-		} else {
-			el.getElements('.oo-renderer-error').dispose();
-			for(field in response.errors) {
-				erre = el.getElement('[name='+field+']');
-				if(!erre) erre = el.getElement('input[type=submit]');
-				err = new Element('span', {class:'oo-renderer-error'});
-				err.set('html', response.errors[field]);
-				err.inject(erre, 'after');
-			}
-			el.getElement('input[type=submit]').disabled = false;
-		}
- 	 }}).post(el);
- });
-}).delay(150);
+_getEl();
  </script>
 <?
 

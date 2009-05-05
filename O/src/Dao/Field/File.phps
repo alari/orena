@@ -88,7 +88,7 @@ class O_Dao_Field_File extends O_Dao_Field_Atomic {
 		$param = null;
 		if (strpos( $callback, " " ))
 			list ($callback, $param) = explode( " ", $callback, 2 );
-		return $obj->$callback( $param, $ext );
+		return $obj->$callback( $ext );
 	}
 
 	/**
