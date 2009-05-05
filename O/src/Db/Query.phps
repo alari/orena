@@ -632,7 +632,7 @@ class O_Db_Query {
 				$query->bindValue( $k + 1, '' );
 			elseif (is_numeric( $v ))
 				$query->bindValue( $k + 1, $v, PDO::PARAM_INT );
-			elseif (is_double( $v ))
+			elseif (is_double( $v ) || is_float( $v ))
 				$query->bindValue( $k + 1, str_replace( ",", ".", $v ), PDO::PARAM_INT );
 			elseif ($v === true || $v === false)
 				$query->bindValue( $k + 1, $v, PDO::PARAM_BOOL );
