@@ -18,7 +18,7 @@
  *
  */
 class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
-	
+
 	/**
 	 * Instances counter -- to give an unique id to each form
 	 *
@@ -47,11 +47,11 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 		if ($this->handled)
 			return $this->handleResult;
 		$this->handled = true;
-		
+
 		if (!$this->isFormRequest()) {
 			return $this->handleResult = false;
 		}
-		
+
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
 			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), $this->class );
@@ -60,40 +60,54 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 				return $this->handleResult = false;
 			}
 		}
-		
-		// Check and prepare values, found errors if they are
-		$this->checkValues();
-		
-		// Stop processing without saving, if errors occured
-		if (count( $this->errors )) {
-			return $this->handleResult = false;
-		}
-		
-		// Create record in database
-		if ($this->createMode !== 0 && !$this->record) {
-			$class = $this->class;
-			if (count( $this->createMode )) {
-				$refl = new ReflectionClass( $class );
-				$this->record = $refl->newInstanceArgs( $this->createMode );
-			} else {
-				$this->record = new $class( );
-			}
-		}
-		
-		// Setting values for ActiveRecord
-		foreach ($this->values as $name => $value) {
-			$this->record->$name = $value;
-		}
-		
-		// Trying to save
+
+		// Start transaction
+		O_Db_Manager::getConnection()->beginTransaction();
+
 		try {
-			$this->record->save();
+
+			// Check and prepare values, found errors if they are
+			$this->checkValues();
+
+			// Stop processing without saving, if errors occured
+			if (count( $this->errors )) {
+				return $this->handleResult = false;
+			}
+
+			// Create record in database
+			if ($this->createMode !== 0 && !$this->record) {
+				$class = $this->class;
+				if (count( $this->createMode )) {
+					$refl = new ReflectionClass( $class );
+					$this->record = $refl->newInstanceArgs( $this->createMode );
+				} else {
+					$this->record = new $class( );
+				}
+			}
+
+			// Setting values for ActiveRecord
+			foreach ($this->values as $name => $value) {
+				$this->record->$name = $value;
+			}
+
+			// Trying to save
+			try {
+				$this->record->save();
+			}
+			catch (PDOException $e) {
+				$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
+				throw $e;
+			}
+
 		}
-		catch (PDOException $e) {
-			$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
+		catch (Exception $e) {
+			O_Db_Manager::getConnection()->rollBack();
+			if (!isset( $this->errors[ "_" ] ))
+				$this->errors[ "_" ] = $e->getMessage();
 			return $this->handleResult = 0;
 		}
-		
+
+		O_Db_Manager::getConnection()->commit();
 		// Succeed
 		return $this->handleResult = 1;
 	}
@@ -112,12 +126,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 		$response = Array ("status" => "");
 		if ($this->handle()) {
 			$response[ "status" ] = "SUCCEED";
-			
+
 			if ($refreshOrLocation === 1 || $refreshOrLocation === true) {
 				$response[ "refresh" ] = 1;
 			} elseif ($refreshOrLocation) {
 				$response[ "redirect" ] = $refreshOrLocation;
-			
+
 			} elseif (!$showOnSuccess) {
 				ob_start();
 				$this->record->show( $this->layout, $this->showType );

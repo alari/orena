@@ -35,7 +35,7 @@ class O_Dao_Field_File extends O_Dao_Field_Atomic {
 		$file = $_FILES[ $this->name ];
 		// Check file size
 		if(isset($params["max_size"]) && $file["size"] > $params["max_size"]) {
-			return false;
+			throw new O_Ex_WrongArgument("File is too large.");
 		}
 
 		// Check file extension
@@ -43,16 +43,16 @@ class O_Dao_Field_File extends O_Dao_Field_Atomic {
 
 		$ext = isset($p[1]) ? strtolower($p[1]) : null;
 		if(!$ext) {
-			return false;
+			throw new O_Ex_WrongArgument("No extension in uploaded file.");
 		}
 
 		// Ext is not allowed
 		if(isset($params["ext_allow"]) && strpos($params["ext_allow"], $ext) === false) {
-			return false;
+			throw new O_Ex_WrongArgument("File extension is not in allowed list.");
 		}
 		// Ext denied
 		if(isset($params["ext_deny"]) && strpos($params["ext_deny"], $ext) !== false) {
-			return false;
+			throw new O_Ex_WrongArgument("File extension is denied.");
 		}
 
 		// Delete old file
