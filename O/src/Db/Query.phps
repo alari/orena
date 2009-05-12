@@ -494,7 +494,7 @@ class O_Db_Query {
 	 *
 	 * @return PDOStatement
 	 */
-	public function select()
+	public function select( $mode = PDO::FETCH_ASSOC )
 	{
 		$this->stmt = $this->prepareStmt( $this->prepareSelect() );
 
@@ -506,7 +506,7 @@ class O_Db_Query {
 			$this->found_rows = $this->getFoundRows();
 		}
 
-		$this->stmt->setFetchMode( PDO::FETCH_ASSOC );
+		$this->stmt->setFetchMode( $mode );
 
 		return $this->stmt;
 	}
