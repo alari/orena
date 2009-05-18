@@ -60,7 +60,6 @@ class O_EntryPoint {
 			return self::makeResponse();
 		}
 		catch (Exception $e) {
-			// TODO: get exception handler class from registry
 			$errTpl = O_Registry::get("app/err_tpl");
 			$tpl = new $errTpl( $e );
 			if ($tpl instanceof O_Html_Template) {
