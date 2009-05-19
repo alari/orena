@@ -17,7 +17,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 <?
 		}
 		?>
-<input type="text" name="<?=$params->fieldName()?>"
+<input class="text" type="text" name="<?=$params->fieldName()?>"
 	value="<?=htmlspecialchars( $params->value() )?>" /></div>
 <?
 
@@ -38,7 +38,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 <?
 		}
 		?>
-<input type="file" name="<?=$params->fieldName()?>"/></div>
+<input class="file" type="file" name="<?=$params->fieldName()?>"/></div>
 <?
 
 	}
@@ -69,6 +69,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 		}
 		?>
 </select>
+</div>
 			<?
 
 	}
@@ -236,9 +237,8 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 			else
 				$echoed = 1;
 			?>
-	<label><input type="<?=$type?>" name="<?=$name?>" value="<?=$obj->id?>"
-	<?=(isset( $value[ $obj->id ] ) ? ' checked="yes"' : '')?>> &ndash; <?=$obj->$displayField?></label>
-<?
+	<label><input class="<?=$type?>" type="<?=$type?>" name="<?=$name?>" value="<?=$obj->id?>"
+	<?=(isset( $value[ $obj->id ] ) ? ' checked="yes"' : '')?>> &ndash; <?=$obj->$displayField."</label>";
 		}
 		?>
 </div>

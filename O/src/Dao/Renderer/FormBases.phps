@@ -341,12 +341,14 @@ _getEl();
 
 		?>
 
-<input type="submit"
+<div class="oo-renderer-buttons"><input type="submit"
 	value="<?=htmlspecialchars( $this->submitButtonValue )?>" />
 <?
 		if ($this->resetButtonValue) {
 			?><input type="reset"
-	value="<?=htmlspecialchars( $this->resetButtonValue )?>" /><?
+	value="<?=htmlspecialchars( $this->resetButtonValue )?>" />
+
+			</div><?
 		}
 		?></fieldset>
 </form>
