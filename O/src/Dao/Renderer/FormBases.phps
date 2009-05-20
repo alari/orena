@@ -341,7 +341,15 @@ _getEl();
 
 		?>
 
-<div class="oo-renderer-buttons"><input type="submit"
+<div class="oo-renderer-buttons">
+
+<?php 
+	if(isset($this->errors['_'])){
+		?><div class="oo-renderer-error"><?=$this->errors['_']?></div><?
+	}
+?>
+
+<input type="submit"
 	value="<?=htmlspecialchars( $this->submitButtonValue )?>" />
 <?
 		if ($this->resetButtonValue) {

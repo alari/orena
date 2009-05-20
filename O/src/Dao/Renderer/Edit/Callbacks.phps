@@ -29,6 +29,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
 <?=$params->title()?>:</div>
+<input class="file" type="file" name="<?=$params->fieldName()?>"/>
 <?
 		if ($params->error()) {
 			?>
@@ -38,7 +39,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 <?
 		}
 		?>
-<input class="file" type="file" name="<?=$params->fieldName()?>"/></div>
+</div>
 <?
 
 	}
@@ -50,6 +51,15 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
 <?=$params->title()?>:</div>
+<select name="<?=$params->fieldName()?>">
+	<?
+		foreach ($fieldInfo->getParam( "enum", 1 ) as $v) {
+			?>
+		<option <?=($v == $params->value() ? ' selected="yes"' : "")?>><?=$v?></option>
+	<?
+		}
+		?>
+</select>
 <?
 		if ($params->error()) {
 			?>
@@ -60,15 +70,6 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 		}
 
 		?>
-<select name="<?=$params->fieldName()?>">
-	<?
-		foreach ($fieldInfo->getParam( "enum", 1 ) as $v) {
-			?>
-		<option <?=($v == $params->value() ? ' selected="yes"' : "")?>><?=$v?></option>
-	<?
-		}
-		?>
-</select>
 </div>
 			<?
 
@@ -178,15 +179,6 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
 <?=$params->title()?>:</div>
-<?
-		if ($params->error()) {
-			?>
-<div class="oo-renderer-error">
-<?=$params->error()?>
-</div>
-<?
-		}
-		?>
 <select class="oo-renderer-selectRelation"
 	name="<?=($params->fieldName() . ($multiply ? "[]" : ""))?>"
 	size="<?=$size?>" <?=($multiply ? ' multiple="yes"' : '')?>>
@@ -196,7 +188,17 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 		<?=(isset( $value[ $obj->id ] ) || $value == $obj ? ' selected="yes"' : '')?>><?=$obj->$displayField?></option><?
 		}
 		?>
-</select></div>
+</select>
+<?
+		if ($params->error()) {
+			?>
+<div class="oo-renderer-error">
+<?=$params->error()?>
+</div>
+<?
+		}
+		?>
+</div>
 <?
 	}
 
@@ -220,15 +222,6 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
 <?=$params->title()?>:</div>
-<?
-		if ($params->error()) {
-			?>
-<div class="oo-renderer-error">
-<?=$params->error()?>
-</div>
-<?
-		}
-		?>
 <div class="oo-renderer-selectRelation">
 <?
 		foreach ($_params[ "query" ] as $obj) {
@@ -242,6 +235,15 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 		}
 		?>
 </div>
+<?
+		if ($params->error()) {
+			?>
+<div class="oo-renderer-error">
+<?=$params->error()?>
+</div>
+<?
+		}
+		?>
 </div>
 <?
 	}
