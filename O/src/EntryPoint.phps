@@ -246,9 +246,9 @@ class O_EntryPoint {
 			if (!$url) {
 				$cmd_name = "Default";
 			} else {
-				$cmd_name = str_replace( " ", "", ucfirst( str_replace( "-", " ", $url ) ) );
+				$cmd_name = str_replace( " ", "", ucwords( str_replace( "-", " ", $url ) ) );
 				$cmd_name = str_replace( array (".", "/"), array (" ", " "), $cmd_name );
-				$cmd_name = str_replace( " ", "_", ucfirst( $cmd_name ) );
+				$cmd_name = str_replace( " ", "_", ucwords( $cmd_name ) );
 			}
 		}
 		
