@@ -55,14 +55,7 @@ class O_OpenId_Provider_UserPlugin extends Zend_OpenId_Provider_User implements 
 	 */
 	public function setLoggedInUser( $id )
 	{
-		$user = self::getByIdentity( $id );
-		if ($user->session) {
-			session_id( $user->session->ses_id );
-			setcookie( session_name(), $user->session->ses_id, 0, "/" );
-		} else {
-			call_user_func( array (O_Registry::get( "app/classnames/session" ), "setUser"), 
-					self::getByIdentity( $id ) );
-		}
+		call_user_func( array (O_Registry::get( "app/classnames/session" ), "setUser"), self::getByIdentity( $id ) );
 	}
 
 	/**
