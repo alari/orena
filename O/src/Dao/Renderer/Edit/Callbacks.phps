@@ -20,16 +20,16 @@ class O_Dao_Renderer_Edit_Callbacks {
 <input class="text" type="text" name="<?=$params->fieldName()?>"
 	value="<?=htmlspecialchars( $params->value() )?>" /></div>
 <?
-
+	
 	}
 
-static public function file( O_Dao_Renderer_Edit_Params $params )
+	static public function file( O_Dao_Renderer_Edit_Params $params )
 	{
 		?>
 <div class="oo-renderer-field">
 <div class="oo-renderer-title">
 <?=$params->title()?>:</div>
-<input class="file" type="file" name="<?=$params->fieldName()?>"/>
+<input class="file" type="file" name="<?=$params->fieldName()?>" />
 <?
 		if ($params->error()) {
 			?>
@@ -41,7 +41,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 		?>
 </div>
 <?
-
+	
 	}
 
 	static public function enum( O_Dao_Renderer_Edit_Params $params )
@@ -68,11 +68,11 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 </div>
 <?
 		}
-
+		
 		?>
 </div>
-			<?
-
+<?
+	
 	}
 
 	static public function recordField( O_Dao_Renderer_Edit_Params $params )
@@ -84,8 +84,7 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 		$value = $params->value();
 		$title = $params->title();
 		$error = $params->error();
-		$params = new O_Dao_Renderer_Edit_Params( $params->fieldName(), $params->className(), $subparams,
-				$params->record() );
+		$params = new O_Dao_Renderer_Edit_Params( $params->fieldName(), $params->className(), $subparams, $params->record() );
 		if ($value instanceof O_Dao_ActiveRecord)
 			$params->setValue( $value->$field );
 		$params->setTitle( $title );
@@ -108,13 +107,15 @@ static public function file( O_Dao_Renderer_Edit_Params $params )
 			//
 			$customConfig = O_Registry::get( "app/js/fckeditor/config_path" );
 			$toolbarSet = $params->params();
-			if(!$toolbarSet) $toolbarSet = O_Registry::get( "app/js/fckeditor/toolbar_set" );
-			O_Js_Middleware::getFramework()->addDomreadyCode(
-					"
+			$height = 0;
+			if (!$toolbarSet)
+				$toolbarSet = O_Registry::get( "app/js/fckeditor/toolbar_set" );
+			elseif (strpos( $toolbarSet, " " )) {
+				list ($toolbarSet, $height) = explode( " ", $toolbarSet, 2 );
+			}
+			O_Js_Middleware::getFramework()->addDomreadyCode( "
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
-						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") .
-						 "oFCKeditor.ReplaceTextarea();", $params->layout() );
+oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' . $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" . $toolbarSet . "';" : "") . ($height ? "oFCKeditor.Height = '" . $height . "';" : "") . "oFCKeditor.ReplaceTextarea();", $params->layout() );
 		}
 		?>
 <div class="oo-renderer-field">
@@ -134,8 +135,8 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 <?
 		}
 		?>
-<textarea class="fckeditor fck-<?=$toolbarSet?>" id="oo-r-w-<?=$params->fieldName()?>"
-	name="<?=$params->fieldName()?>"><?=$params->value()?></textarea></div>
+<textarea class="fckeditor fck-<?=$toolbarSet?>"
+	id="oo-r-w-<?=$params->fieldName()?>" name="<?=$params->fieldName()?>"><?=$params->value()?></textarea></div>
 <?
 	}
 
@@ -205,7 +206,7 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 	static public function selectRelationBox( O_Dao_Renderer_Edit_Params $params )
 	{
 		$_params = $params->params();
-
+		
 		$displayField = $_params[ "displayField" ];
 		$multiply = $_params[ "multiply" ];
 		$value = $params->value();
@@ -216,7 +217,7 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 			$type = "radio";
 			$name = $params->fieldName();
 		}
-
+		
 		$echoed = 0;
 		?>
 <div class="oo-renderer-field">
@@ -230,10 +231,9 @@ oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';
 			else
 				$echoed = 1;
 			?>
-	<label><input class="<?=$type?>" type="<?=$type?>" name="<?=$name?>" value="<?=$obj->id?>"
-	<?=(isset( $value[ $obj->id ] ) ? ' checked="yes"' : '')?>> &ndash; <?=$obj->$displayField."</label>";
-		}
-		?>
+	<label><input class="<?=$type?>" type="<?=$type?>" name="<?=$name?>"
+	value="<?=$obj->id?>"
+	<?=(isset( $value[ $obj->id ] ) ? ' checked="yes"' : '')?>> &ndash; <?=$obj->$displayField . "</label>";}?>
 </div>
 <?
 		if ($params->error()) {
