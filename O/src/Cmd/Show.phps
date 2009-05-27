@@ -15,7 +15,8 @@ class O_Cmd_Show extends O_Command {
 
 	public function process()
 	{
-		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
+		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( 
+				O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
 		$tpl->obj = O_Registry::get( O_Registry::get( "app/cmd/show/source" ) );
 		if (!$tpl->obj instanceof O_Dao_ActiveRecord) {
 			throw new O_Ex_NotFound( "Object not found.", 404 );

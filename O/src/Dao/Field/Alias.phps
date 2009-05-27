@@ -59,8 +59,8 @@ class O_Dao_Field_Alias extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	{
 		if (!$this->query) {
 			list ($name, $subreq) = explode( ".", $this->alias, 2 );
-			$this->testField = O_Dao_TableInfo::get( $this->fieldInfo->getClass() )->getFieldInfo( $name )->prepareMappedQuery( 
-					$this->query, $subreq );
+			$this->testField = O_Dao_TableInfo::get( $this->fieldInfo->getClass() )->getFieldInfo( 
+					$name )->prepareMappedQuery( $this->query, $subreq );
 			
 			if ($this->fieldInfo->getParam( "where" ) && $this->query instanceof O_Dao_Query) {
 				$this->query->where( $this->fieldInfo->getParam( "where" ) );

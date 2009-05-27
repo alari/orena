@@ -184,7 +184,8 @@ class O_Html_Layout {
 	 */
 	public function addHeadLink( $rel, $href, $type = null, $title = null )
 	{
-		$this->headLinks[] = Array ("rel" => $rel, "href" => $href, "type" => $type, "title" => $title);
+		$this->headLinks[] = Array ("rel" => $rel, "href" => $href, "type" => $type, 
+									"title" => $title);
 	}
 
 	/**

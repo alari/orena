@@ -20,10 +20,11 @@ class O_Dao_Renderer_LoopShower extends O_Dao_Renderer_Commons {
 	public function display()
 	{
 		// If full envelop callback is available, we need to do output bufferization
-		$callback = $this->getEnvelopCallback( O_Dao_Renderer::KEY_LOOP, O_Dao_Renderer::CALLBACK_SHOW, 
-				parent::SUFF_CALLBACK );
+		$callback = $this->getEnvelopCallback( O_Dao_Renderer::KEY_LOOP, 
+				O_Dao_Renderer::CALLBACK_SHOW, parent::SUFF_CALLBACK );
 		if ($callback) {
-			$env_params = new O_Dao_Renderer_Show_Params( null, $this->class, $callback[ "params" ] );
+			$env_params = new O_Dao_Renderer_Show_Params( null, $this->class, 
+					$callback[ "params" ] );
 			$env_params->setValue( $this->query );
 			if ($this->layout)
 				$env_params->setLayout( $this->layout );
@@ -42,7 +43,8 @@ class O_Dao_Renderer_LoopShower extends O_Dao_Renderer_Commons {
 			
 		// Calling envelop callback
 		if (is_array( $envelopCallback )) {
-			$env_params = new O_Dao_Renderer_Show_Params( null, $this->class, $envelopCallback[ "params" ] );
+			$env_params = new O_Dao_Renderer_Show_Params( null, $this->class, 
+					$envelopCallback[ "params" ] );
 			$env_params->setValue( ob_get_clean() );
 			if ($this->layout)
 				$env_params->setLayout( $this->layout );

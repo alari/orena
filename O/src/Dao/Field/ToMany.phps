@@ -73,14 +73,16 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 		$this->class = $fieldInfo->getClass();
 		$this->orderBy = $fieldInfo->getParam( "order-by" );
 		$this->targetBase = $target;
-		if ($this->targetBase[ 0 ] == "{" && $this->targetBase[ strlen( $this->targetBase ) - 1 ] == "}") {
-			$this->target = O_Registry::get( "app/" . substr( $this->targetBase, 1, -1 ) );
+		if ($this->targetBase[ 0 ] == "{" && $this->targetBase[ strlen( $this->targetBase ) - 1 ] ==
+			 "}") {
+				$this->target = O_Registry::get( "app/" . substr( $this->targetBase, 1, -1 ) );
 		} else {
 			$this->target = $this->targetBase;
 		}
 		$this->inverse = $fieldInfo->getParam( "inverse" );
 		if (!$this->inverse)
-			throw new O_Ex_Config( "Inverse field must be specified for whatever-to-many relations." );
+			throw new O_Ex_Config( 
+					"Inverse field must be specified for whatever-to-many relations." );
 	
 	}
 
@@ -121,7 +123,8 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 		if (!$fieldValue)
 			$fieldValue = Array ();
 		if (!is_array( $fieldValue ))
-			throw new O_Ex_WrongArgument( "Cannot assign non-array/query to base-to-many relation." );
+			throw new O_Ex_WrongArgument( 
+					"Cannot assign non-array/query to base-to-many relation." );
 		$relation = $this->getRelation( $obj->id );
 		foreach ($relation as $_el) {
 			if (!array_key_exists( $_el->id, $fieldValue ))
@@ -175,7 +178,8 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 	public function getInverse()
 	{
 		if (!$this->inverseField)
-			$this->inverseField = O_Dao_TableInfo::get( $this->target )->getFieldInfo( $this->inverse );
+			$this->inverseField = O_Dao_TableInfo::get( $this->target )->getFieldInfo( 
+					$this->inverse );
 		return $this->inverseField;
 	}
 
@@ -191,12 +195,14 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->isRelationMany()) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
-				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( $this->target, 
-						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
+				$this->relation[ $obj_id ] = new O_Dao_Relation_ManyToMany( 
+						$this->target, $this->inverse, $obj_id, $this->class, $this->name, 
+						$this->orderBy );
 			} else {
 				// Has many with inverse
-				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target, 
-						$this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
+				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( 
+						$this->target, $this->inverse, $obj_id, $this->class, $this->name, 
+						$this->orderBy );
 			}
 		}
 		return clone $this->relation[ $obj_id ];

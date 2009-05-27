@@ -22,9 +22,9 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 		if (!$fieldExists && $this->type) {
 			$this->addFieldToTable();
 		}
-
+		
 		$params = $this->fieldInfo->getParam( "image", 1 );
-
+		
 		if ($fieldValue instanceof O_Image_Resizer) {
 			$resizer = $fieldValue;
 		} else {
@@ -34,20 +34,20 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 				}
 				return;
 			}
-
+			
 			$file = $_FILES[ $this->name ];
 			$resizer = new O_Image_Resizer( $file[ "tmp_name" ] );
 		}
-
-		$this->deleteThis($obj);
-
-		$resizer->resize( isset( $params[ "width" ] ) ? $params[ "width" ] : 0,
-				isset( $params[ "height" ] ) ? $params[ "height" ] : 0,
+		
+		$this->deleteThis( $obj );
+		
+		$resizer->resize( isset( $params[ "width" ] ) ? $params[ "width" ] : 0, 
+				isset( $params[ "height" ] ) ? $params[ "height" ] : 0, 
 				$this->getFilePath( $obj, $resizer->getExtension() ) );
-
+		
 		if ($this->type)
 			$obj[ $this->name ] = $this->getValueByExt( $obj, $resizer->getExtension() );
-
+		
 		if (isset( $params[ "cascade" ] )) {
 			$fields = explode( ",", $params[ "cascade" ] );
 			foreach ($fields as $field) {
@@ -137,10 +137,10 @@ class O_Dao_Field_Image extends O_Dao_Field_Atomic {
 		$filepath = $this->getFilePath( $obj );
 		if (is_file( $filepath ))
 			unlink( $filepath );
-
+		
 		if ($this->type)
 			$obj[ $this->name ] = $this->getValueByExt( $obj );
-
+		
 		$params = $this->fieldInfo->getParam( "image", 1 );
 		if (isset( $params[ "cascade" ] )) {
 			$fields = explode( ",", $params[ "cascade" ] );

@@ -99,7 +99,8 @@ class O_Dao_TableInfo {
 		}
 		
 		// Inherited injections
-		foreach (O_Dao_ActiveRecord::getInjectedMethods( $reflection->getParentClass()->getName() ) as $name => $callback) {
+		foreach (O_Dao_ActiveRecord::getInjectedMethods( 
+				$reflection->getParentClass()->getName() ) as $name => $callback) {
 			O_Dao_ActiveRecord::injectMethod( $class, $name, $callback );
 		}
 		
@@ -137,10 +138,12 @@ class O_Dao_TableInfo {
 		}
 		
 		// Override
-		$docCommentLines = array_merge( $docCommentLines, explode( "\n", $reflection->getDocComment() ) );
+		$docCommentLines = array_merge( $docCommentLines, 
+				explode( "\n", $reflection->getDocComment() ) );
 		for ($line = current( $docCommentLines ); $line; $line = next( $docCommentLines )) {
 			$matches = Array ();
-			preg_match( "/@(table|field|index|tail|field:config|field:replace|registry) (.*)/", $line, $matches );
+			preg_match( "/@(table|field|index|tail|field:config|field:replace|registry) (.*)/", 
+					$line, $matches );
 			if ($matches) {
 				$lineDirective = $matches[ 1 ];
 				$lineContent = trim( $matches[ 2 ] );
@@ -148,7 +151,8 @@ class O_Dao_TableInfo {
 				// Processing multiline config
 				while ($lineContent[ strlen( $lineContent ) - 1 ] == '\\') {
 					$line = next( $docCommentLines );
-					$lineContent = substr( $lineContent, 0, -1 ) . " " . trim( substr( $line, 2 ) );
+					$lineContent = substr( $lineContent, 0, -1 ) . " " . trim( 
+							substr( $line, 2 ) );
 				}
 				
 				// Processing tail directive before parsing subkeys (tail have no subkeys)
@@ -180,7 +184,8 @@ class O_Dao_TableInfo {
 						$type = null;
 						if (strpos( $name, " " ))
 							list ($name, $type) = explode( " ", $value, 2 );
-						$this->fields[ $name ] = new O_Dao_FieldInfo( $this->class, $name, $type, $subkeys );
+						$this->fields[ $name ] = new O_Dao_FieldInfo( $this->class, $name, 
+								$type, $subkeys );
 					break;
 					
 					case "field:config" :
@@ -199,7 +204,8 @@ class O_Dao_TableInfo {
 						list ($field1, $field2) = explode( ",", $value, 2 );
 						$field1 = trim( $field1 );
 						$field2 = trim( $field2 );
-						if (!isset( $this->fields[ $field1 ] ) || !isset( $this->fields[ $field2 ] ))
+						if (!isset( $this->fields[ $field1 ] ) || !isset( 
+								$this->fields[ $field2 ] ))
 							throw new O_Ex_Config( "field:replace for unexistent field." );
 						$tmp_fields = $this->fields;
 						$this->fields = array ();
@@ -280,7 +286,8 @@ class O_Dao_TableInfo {
 			$query->index( $fields, $indexType, isset( $keys[ "name" ] ) ? $keys[ "name" ] : null );
 		}
 		
-		return $query->create( $this->tail ? $this->tail : O_Registry::get( "app/dao-params/default_tail" ) );
+		return $query->create( 
+				$this->tail ? $this->tail : O_Registry::get( "app/dao-params/default_tail" ) );
 	}
 
 	/**

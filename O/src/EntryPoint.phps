@@ -137,13 +137,15 @@ class O_EntryPoint {
 							$app_ext = O_ClassManager::DEFAULT_EXTENSION;
 						
 						if (!$app_prefix)
-							throw new O_Ex_Config( "Application without name or class prefix cannot be processed." );
+							throw new O_Ex_Config( 
+									"Application without name or class prefix cannot be processed." );
 						
 						foreach (self::$appConfigXml->xpath( "//Condition" ) as $cond) {
 							if (self::processAppSelectionCondition( $cond )) {
 								
 								$app_name = $f;
-								O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name, $app_ext );
+								O_ClassManager::registerPrefix( $app_prefix, 
+										"./Apps/" . $app_name, $app_ext );
 								O_Registry::set( "app/class_prefix", $app_prefix );
 								O_Registry::set( "app/name", $app_name );
 								O_Registry::set( "app/mode", (string)$cond[ "mode" ] );
@@ -166,7 +168,9 @@ class O_EntryPoint {
 			}
 		}
 		if ($app_name) {
-			O_Registry::set( "app/env/process_url", substr( O_Registry::get( "app/env/request_url" ), strlen( O_Registry::get( "app/env/base_url" ) ) ) );
+			O_Registry::set( "app/env/process_url", 
+					substr( O_Registry::get( "app/env/request_url" ), 
+							strlen( O_Registry::get( "app/env/base_url" ) ) ) );
 			return;
 		}
 		throw new O_Ex_Critical( "Neither app-selecting config nor app config found." );
@@ -219,7 +223,8 @@ class O_EntryPoint {
 			if ($registry->getName() == "Registry") {
 				self::processRegistry( $registry, "fw" );
 			} else
-				throw new O_Ex_Config( "Framework configuration file should contain only registry values!" );
+				throw new O_Ex_Config( 
+						"Framework configuration file should contain only registry values!" );
 		}
 	}
 
@@ -306,9 +311,11 @@ class O_EntryPoint {
 			break;
 			// Condition based on mode name and plugin name
 			case "If" :
-				if ((string)$node[ "mode" ] && (string)$node[ "mode" ] != O_Registry::get( "app/mode" ))
+				if ((string)$node[ "mode" ] && (string)$node[ "mode" ] != O_Registry::get( 
+						"app/mode" ))
 					break;
-				if ((string)$node[ "plugin" ] && (string)$node[ "plugin" ] != O_Registry::get( "app/plugin_name" ))
+				if ((string)$node[ "plugin" ] && (string)$node[ "plugin" ] != O_Registry::get( 
+						"app/plugin_name" ))
 					break;
 				foreach ($node as $n)
 					self::processAppConfigPart( $n, $pockets );
@@ -317,7 +324,8 @@ class O_EntryPoint {
 			// Parses hostname with pattern, processes child nodes if matches
 			case "Host" :
 				$pattern = (string)$node[ "pattern" ];
-				if (preg_match( "#^$pattern$#i", O_Registry::get( "app/env/http_host" ), $pockets )) {
+				if (preg_match( "#^$pattern$#i", O_Registry::get( "app/env/http_host" ), 
+						$pockets )) {
 					foreach ($node as $n)
 						self::processAppConfigPart( $n, $pockets );
 				}
@@ -378,12 +386,14 @@ class O_EntryPoint {
 			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
 		
 		if (!$app_name || !$app_prefix)
-			throw new O_Ex_Config( "Application without name or class prefix cannot be processed." );
+			throw new O_Ex_Config( 
+					"Application without name or class prefix cannot be processed." );
 		
 		foreach ($app as $cond) {
 			if ($cond->getName() == "Condition") {
 				if (self::processAppSelectionCondition( $cond )) {
-					O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name, $app_ext );
+					O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name, 
+							$app_ext );
 					O_Registry::set( "app/class_prefix", $app_prefix );
 					O_Registry::set( "app/name", $app_name );
 					O_Registry::set( "app/mode", (string)$cond[ "mode" ] );
@@ -423,7 +433,8 @@ class O_EntryPoint {
 					}
 					$pattern = (string)$condPart[ "pattern" ];
 					if (!$pattern) {
-						throw new O_Ex_Config( "App-selecting Url condition must have 'base' or 'pattern' attribute." );
+						throw new O_Ex_Config( 
+								"App-selecting Url condition must have 'base' or 'pattern' attribute." );
 					}
 					if (preg_match( "#^$pattern$#i", O_Registry::get( "app/env/request_url" ) ))
 						continue;
@@ -433,15 +444,18 @@ class O_EntryPoint {
 				// Checks if hostname is equal with "value" attribute or matches "pattern"
 				case "Host" :
 					$value = (string)$condPart[ "value" ];
-					if ($value && (O_Registry::get( "app/env/http_host" ) == $value || O_Registry::get( "app/env/http_host" ) == "www." . $value))
+					if ($value && (O_Registry::get( "app/env/http_host" ) == $value || O_Registry::get( 
+							"app/env/http_host" ) == "www." . $value))
 						continue;
 					$pattern = (string)$condPart[ "pattern" ];
-					if ($pattern && preg_match( "#^$pattern$#i", O_Registry::get( "app/env/http_host" ) ))
+					if ($pattern && preg_match( "#^$pattern$#i", 
+							O_Registry::get( "app/env/http_host" ) ))
 						continue;
 					return false;
 				break;
 				default :
-					throw new O_Ex_Config( "Wrong node in app-selection condition: " . $condPart->getName() );
+					throw new O_Ex_Config( 
+							"Wrong node in app-selection condition: " . $condPart->getName() );
 			}
 		}
 		return true;
@@ -472,7 +486,8 @@ class O_EntryPoint {
 				throw O_Ex_Config( "Wrong class given in registry." );
 			}
 			$method = (string)$registry[ "method" ];
-			$value = $method ? call_user_func( array ($class, $method), $value ) : O_Dao_ActiveRecord::getById( $value, $class );
+			$value = $method ? call_user_func( array ($class, $method), $value ) : O_Dao_ActiveRecord::getById( 
+					$value, $class );
 			// Add to default acl checker
 			if ((string)$registry[ "can" ]) {
 				O_Registry::add( "app/cmd/can", $registry[ "can" ] . "#" . $rootkey . "/" . $key );

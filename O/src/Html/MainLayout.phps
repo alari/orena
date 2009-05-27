@@ -112,7 +112,8 @@ todo: add interface for right col generator
 	protected function displayHead()
 	{
 		$this->addCssSrc( 
-				$this->mainCssHref ? $this->mainCssHref : O_Registry::get( "fw/html/static_root" ) . "css/main.css" );
+				$this->mainCssHref ? $this->mainCssHref : O_Registry::get( "fw/html/static_root" ) .
+															 "css/main.css" );
 		parent::displayHead();
 	}
 

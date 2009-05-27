@@ -75,7 +75,8 @@ class O_Acl_Admin_Cmd {
 			$response[ "status" ] = $role->save() ? "SAVED" : "NO DAO CHANGES";
 			echo json_encode( $response );
 			return null;
-		} elseif (O_Registry::get( "app/env/request_method" ) == "POST" && $cmd->getParam( "new_role" )) {
+		} elseif (O_Registry::get( "app/env/request_method" ) == "POST" && $cmd->getParam( 
+				"new_role" )) {
 			O_Acl_Role::getByName( $cmd->getParam( "new_role" ) );
 			return $cmd->redirect( O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) ) );
 		}

@@ -37,7 +37,8 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 	static public function getByRule( $name, $type = self::TYPE_ALLOW )
 	{
 		if (!isset( self::$objs[ $name ][ $type ] )) {
-			self::$objs[ $name ][ $type ] = O_Dao_Query::get( __CLASS__ )->test( "name", $name )->test( "type", $type )->getOne();
+			self::$objs[ $name ][ $type ] = O_Dao_Query::get( __CLASS__ )->test( "name", $name )->test( 
+					"type", $type )->getOne();
 			if (!self::$objs[ $name ][ $type ]) {
 				self::$objs[ $name ][ $type ] = new self( $name, $type );
 			}

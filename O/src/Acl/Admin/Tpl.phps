@@ -33,12 +33,15 @@ abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 	 *
 	 * @var array
 	 */
-	protected $phrases = Array ("allow" => "Allow", "deny" => "Deny", "clear" => "Inherit", "ed_role" => "Editing role", 
-								"action" => "Action", "parent" => "Parent role", "no_parent" => "no parent", 
+	protected $phrases = Array ("allow" => "Allow", "deny" => "Deny", "clear" => "Inherit", 
+								"ed_role" => "Editing role", "action" => "Action", 
+								"parent" => "Parent role", "no_parent" => "no parent", 
 								"submit" => "Save changes", "reset" => "Reset", 
-								"success" => "Saved successfully.", "choose_role" => "Choose the role from list", 
-								"failure" => "Errors during saving the role.", "add_new" => "Add new role", 
-								"sbm_new" => "Add", "set_visitor" => "Set as visitors role");
+								"success" => "Saved successfully.", 
+								"choose_role" => "Choose the role from list", 
+								"failure" => "Errors during saving the role.", 
+								"add_new" => "Add new role", "sbm_new" => "Add", 
+								"set_visitor" => "Set as visitors role");
 	/**
 	 * Css file source
 	 *
@@ -88,7 +91,8 @@ abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 	protected function showRole()
 	{
 		$radio = Array (O_Acl_Action::TYPE_ALLOW => $this->phrases[ "allow" ], 
-						O_Acl_Action::TYPE_DENY => $this->phrases[ "deny" ], "clear" => $this->phrases[ "clear" ]);
+						O_Acl_Action::TYPE_DENY => $this->phrases[ "deny" ], 
+						"clear" => $this->phrases[ "clear" ]);
 		?>
 <form method="POST" id="role-form"
 	action="<?=O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) )?>">

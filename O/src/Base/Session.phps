@@ -41,8 +41,8 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	{
 		if (!$id)
 			$id = session_id();
-		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( self::getClassName() )->test( 
-				"ses_id", $id )->getOne();
+		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( 
+				self::getClassName() )->test( "ses_id", $id )->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
 			$obj = new $class( );
@@ -205,8 +205,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 		// Set framework session class as sessions handler
 		$ses_class = self::getClassName();
 		
-		session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), Array ($ses_class, "read"), 
-				Array ($ses_class, "write"), Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
+		session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), 
+				Array ($ses_class, "read"), Array ($ses_class, "write"), 
+				Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
 		// Set special session name
 		session_name( O_Registry::get( "app/session/name" ) );
 		// Start the session

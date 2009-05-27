@@ -22,44 +22,46 @@ class O_Dao_Field_File extends O_Dao_Field_Atomic {
 		if (!$fieldExists && $this->type) {
 			$this->addFieldToTable();
 		}
-
+		
 		$params = $this->fieldInfo->getParam( "file", 1 );
-
+		
 		if (!isset( $_FILES[ $this->name ] ) || !$_FILES[ $this->name ][ "size" ]) {
 			if (isset( $params[ "clear" ] )) {
 				$this->deleteThis( $obj );
 			}
 			return;
 		}
-
+		
 		$file = $_FILES[ $this->name ];
 		// Check file size
-		if(isset($params["max_size"]) && $file["size"] > $params["max_size"]) {
-			throw new O_Ex_WrongArgument("File is too large.");
+		if (isset( $params[ "max_size" ] ) && $file[ "size" ] > $params[ "max_size" ]) {
+			throw new O_Ex_WrongArgument( "File is too large." );
 		}
-
+		
 		// Check file extension
-		preg_match("#\\.([a-zA-Z]+)#i", $file["name"], $p);
-
-		$ext = isset($p[1]) ? strtolower($p[1]) : null;
-		if(!$ext) {
-			throw new O_Ex_WrongArgument("No extension in uploaded file.");
+		preg_match( "#\\.([a-zA-Z]+)#i", $file[ "name" ], $p );
+		
+		$ext = isset( $p[ 1 ] ) ? strtolower( $p[ 1 ] ) : null;
+		if (!$ext) {
+			throw new O_Ex_WrongArgument( "No extension in uploaded file." );
 		}
-
+		
 		// Ext is not allowed
-		if(isset($params["ext_allow"]) && strpos($params["ext_allow"], $ext) === false) {
-			throw new O_Ex_WrongArgument("File extension is not in allowed list.");
+		if (isset( $params[ "ext_allow" ] ) && strpos( $params[ "ext_allow" ], $ext ) ===
+						 false) {
+							throw new O_Ex_WrongArgument( 
+									"File extension is not in allowed list." );
 		}
 		// Ext denied
-		if(isset($params["ext_deny"]) && strpos($params["ext_deny"], $ext) !== false) {
-			throw new O_Ex_WrongArgument("File extension is denied.");
+		if (isset( $params[ "ext_deny" ] ) && strpos( $params[ "ext_deny" ], $ext ) !== false) {
+			throw new O_Ex_WrongArgument( "File extension is denied." );
 		}
-
+		
 		// Delete old file
-		$this->deleteThis($obj);
-
-		move_uploaded_file($file["tmp_name"], $this->getFilePath( $obj, $ext ));
-
+		$this->deleteThis( $obj );
+		
+		move_uploaded_file( $file[ "tmp_name" ], $this->getFilePath( $obj, $ext ) );
+		
 		if ($this->type)
 			$obj[ $this->name ] = $this->getValueByExt( $obj, $ext );
 	}

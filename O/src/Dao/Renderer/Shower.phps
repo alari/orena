@@ -9,15 +9,16 @@ class O_Dao_Renderer_Shower extends O_Dao_Renderer_Commons {
 	{
 		// Cannot display anything
 		if (!$this->record) {
-			throw new O_Ex_NotFound( "Nothing to render: there's no ActiveRecord provided for renderer." );
+			throw new O_Ex_NotFound( 
+					"Nothing to render: there's no ActiveRecord provided for renderer." );
 		}
 		
 		// If full envelop callback is available, we need to do output bufferization
-		$callback = $this->getEnvelopCallback( O_Dao_Renderer::KEY_SHOW, O_Dao_Renderer::CALLBACK_SHOW, 
-				parent::SUFF_CALLBACK );
+		$callback = $this->getEnvelopCallback( O_Dao_Renderer::KEY_SHOW, 
+				O_Dao_Renderer::CALLBACK_SHOW, parent::SUFF_CALLBACK );
 		if ($callback) {
-			$env_params = new O_Dao_Renderer_Show_Params( null, get_class( $this->record ), $callback[ "params" ], 
-					$this->record );
+			$env_params = new O_Dao_Renderer_Show_Params( null, get_class( $this->record ), 
+					$callback[ "params" ], $this->record );
 			if ($this->layout)
 				$env_params->setLayout( $this->layout );
 			call_user_func( $callback[ "callback" ], $env_params );
@@ -34,7 +35,8 @@ class O_Dao_Renderer_Shower extends O_Dao_Renderer_Commons {
 		// Handle every field to display it
 		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_SHOW ) as $name => $params) {
 			// Get provided callback
-			$callback = $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_SHOW );
+			$callback = $this->getCallbackByParams( $params, 
+					O_Dao_Renderer::CALLBACK_SHOW );
 			// Find a default callback according with the field type
 			if (!$callback) {
 				$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
@@ -52,7 +54,8 @@ class O_Dao_Renderer_Shower extends O_Dao_Renderer_Commons {
 				$callback = $callback[ "callback" ];
 			}
 			
-			$call_params = new O_Dao_Renderer_Show_Params( $name, get_class( $this->record ), $params, $this->record );
+			$call_params = new O_Dao_Renderer_Show_Params( $name, get_class( $this->record ), 
+					$params, $this->record );
 			if ($this->layout)
 				$call_params->setLayout( $this->layout );
 			$call_params->setValue( $this->record->$name );

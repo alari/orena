@@ -32,8 +32,9 @@ class O_Dao_Filter {
 
 	public function addRelation( $fieldName, $title, O_Dao_Query $query, $showField = "id", $size = 1, $class = null )
 	{
-		$this->fields[ $fieldName ] = array ("type" => self::TYPE_RELATION, "title" => $title, "query" => $query, 
-											"showField" => $showField, "size" => $size, "class" => $class);
+		$this->fields[ $fieldName ] = array ("type" => self::TYPE_RELATION, "title" => $title, 
+											"query" => $query, "showField" => $showField, 
+											"size" => $size, "class" => $class);
 	}
 
 	public function process()
@@ -44,7 +45,8 @@ class O_Dao_Filter {
 			if ($params[ "type" ] == self::TYPE_PLAIN) {
 				$params[ "value" ] = O_Registry::get( "app/env/params/$name" );
 				if ($params[ "value" ])
-					$this->query->test( $name, "%" . $params[ "value" ] . "%", O_Dao_Query::LIKE );
+					$this->query->test( $name, "%" . $params[ "value" ] . "%", 
+							O_Dao_Query::LIKE );
 			} elseif ($params[ "type" ] == self::TYPE_INTDATE) {
 				if ($params[ "asInterval" ]) {
 					$left = O_Registry::get( "app/env/params/$name.left" );
@@ -68,8 +70,8 @@ class O_Dao_Filter {
 					if ($value) {
 						$_value = strtotime( $value );
 						if ($_value) {
-							$this->query->test( $name, $_value, O_Dao_Query::GT_EQ )->test( $name, 
-									$_value + 86400, O_Dao_Query::LT );
+							$this->query->test( $name, $_value, O_Dao_Query::GT_EQ )->test( 
+									$name, $_value + 86400, O_Dao_Query::LT );
 							$params[ "value" ] = $value;
 						}
 					}
@@ -103,7 +105,8 @@ class O_Dao_Filter {
 
 	public function getPaginator( $url_callback, $perpage = null, $page_registry = "paginator/page", array $orders = array(), $order_registry = "paginator/order" )
 	{
-		return new O_Dao_Paginator( $this->query, $url_callback, $perpage, $page_registry, $orders, $order_registry );
+		return new O_Dao_Paginator( $this->query, $url_callback, $perpage, $page_registry, $orders, 
+				$order_registry );
 	}
 
 }

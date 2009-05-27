@@ -28,7 +28,8 @@ class O_Cmd_Create extends O_Cmd_Edit {
 
 	public function process()
 	{
-		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
+		$tpl = O_Registry::get( "app/cmd/template" ) ? $this->getTemplate( 
+				O_Registry::get( "app/cmd/template" ), true ) : $this->getTemplate();
 		
 		$form = new O_Dao_Renderer_FormProcessor( );
 		$form->setClass( O_Registry::get( "app/cmd/create/class" ) );
@@ -72,7 +73,8 @@ class O_Cmd_Create extends O_Cmd_Edit {
 			if ($form->handle()) {
 				if ($redirect == "-obj:url")
 					$redirect = $form->getActiveRecord()->url();
-				$form->responseAjax( $redirect, O_Registry::get( "app/cmd/create/show_on_success" ) );
+				$form->responseAjax( $redirect, 
+						O_Registry::get( "app/cmd/create/show_on_success" ) );
 				return null;
 			}
 			// Plain request handling

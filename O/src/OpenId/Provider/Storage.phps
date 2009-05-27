@@ -31,8 +31,9 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 	{
 		$assoc = O_Db_Query::get( self::TABLE_ASSOC );
 		if (!$assoc->tableExists()) {
-			$assoc->field( "handle", "varchar(255) not null" )->field( "mac_func", "varchar(16) not null" )->field( 
-					"secret", "varchar(255) not null" )->field( "expires", "int not null" )->create();
+			$assoc->field( "handle", "varchar(255) not null" )->field( "mac_func", 
+					"varchar(16) not null" )->field( "secret", "varchar(255) not null" )->field( 
+					"expires", "int not null" )->create();
 		}
 	}
 
@@ -48,8 +49,8 @@ class O_OpenId_Provider_Storage extends Zend_OpenId_Provider_Storage {
 	public function addAssociation( $handle, $macFunc, $secret, $expires )
 	{
 		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
-		O_Db_Query::get( self::TABLE_ASSOC )->field( "handle", $handle )->field( "mac_func", $macFunc )->field( 
-				"secret", $secret )->field( "expires", $expires )->insert();
+		O_Db_Query::get( self::TABLE_ASSOC )->field( "handle", $handle )->field( "mac_func", 
+				$macFunc )->field( "secret", $secret )->field( "expires", $expires )->insert();
 	}
 
 	/**

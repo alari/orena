@@ -33,7 +33,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 * @var Array
 	 */
 	private static $injected_methods = Array ();
-
+	
 	/**
 	 * Array of SQL field values of a database record
 	 *
@@ -80,14 +80,15 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 				throw $e;
 			}
 		}
-
+		
 		$this->reload();
 		$class = get_class( $this );
 		self::$objs[ $class ][ $this->fields[ "id" ] ] = $this;
-
+		
 		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, O_Dao_TableInfo::get( $class )->getParam( "signal" ),
-					$class, $this, $this->fields[ "id" ] );
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_CREATE, 
+					O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class, $this, 
+					$this->fields[ "id" ] );
 		}
 	}
 
@@ -103,12 +104,12 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 			return $this->fields[ "id" ];
 		if (strpos( $name, "." )) {
 			list ($name, $subreq) = explode( ".", $name, 2 );
-			return $this->getFieldInfo( $name )->getMappedQuery( $this,
+			return $this->getFieldInfo( $name )->getMappedQuery( $this, 
 					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, $subreq );
 		}
-
-		return $this->getFieldInfo( $name )->getValue( $this,
-				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null,
+		
+		return $this->getFieldInfo( $name )->getValue( $this, 
+				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null, 
 				array_key_exists( $name, $this->fields ) );
 	}
 
@@ -122,7 +123,8 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		if ($name == "id")
 			return;
-		$this->getFieldInfo( $name )->setValue( $this, $value, array_key_exists( $name, $this->fields ) );
+		$this->getFieldInfo( $name )->setValue( $this, $value, 
+				array_key_exists( $name, $this->fields ) );
 	}
 
 	/**
@@ -172,7 +174,8 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		$query = new O_Dao_Query( $this );
 		if ($query->test( "id", $this->fields[ "id" ] )->field( $name, $value, true )->update()) {
-			$this->fields[ $name ] = $query->clearFields()->field( $name )->select()->fetch( PDO::FETCH_OBJ )->$name;
+			$this->fields[ $name ] = $query->clearFields()->field( $name )->select()->fetch( 
+					PDO::FETCH_OBJ )->$name;
 			return true;
 		}
 		return false;
@@ -189,7 +192,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		$fieldInfo = O_Dao_TableInfo::get( get_class( $this ) )->getFieldInfo( $name );
 		if (!$fieldInfo)
 			throw new O_Ex_NotFound( "Unknown field: $name." );
-
+		
 		return $fieldInfo;
 	}
 
@@ -202,21 +205,21 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		if (!count( $this->changed ))
 			return true;
-
+		
 		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] );
-
+		
 		foreach ($this->changed as $name => $value) {
 			$query->field( $name, $value );
 		}
-
+		
 		if ($query->update()) {
 			foreach ($this->changed as $name => $value)
 				$this->fields[ $name ] = $value;
 			$this->changed = array ();
 			return true;
 		}
-
+		
 		return false;
 	}
 
@@ -248,8 +251,9 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		if (isset( self::$objs[ $class ][ $id ] ))
 			return self::$objs[ $class ][ $id ];
-
-		self::$objs[ $class ][ $id ] = unserialize( sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
+		
+		self::$objs[ $class ][ $id ] = unserialize( 
+				sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
 		if (!isset( $row[ "id" ] )) {
 			$query = new O_Dao_Query( $class );
 			try {
@@ -291,15 +295,17 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		$this->__is_deleted = 1;
 		$fields = O_Dao_TableInfo::get( $this )->getFields();
 		foreach ($fields as $name => $field)
-			$field->deleteThis( $this, isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
-
+			$field->deleteThis( $this, 
+					isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null );
+		
 		$query = new O_Dao_Query( $this );
 		$query->test( "id", $this->fields[ "id" ] )->delete();
-
+		
 		$class = get_class( $this );
 		if (O_Dao_TableInfo::get( $class )->getParam( "signal" )) {
-			O_Dao_Signals::fire( O_Dao_Signals::EVENT_DELETE, O_Dao_TableInfo::get( $class )->getParam( "signal" ),
-					$class, $this, $this->fields[ "id" ] );
+			O_Dao_Signals::fire( O_Dao_Signals::EVENT_DELETE, 
+					O_Dao_TableInfo::get( $class )->getParam( "signal" ), $class, $this, 
+					$this->fields[ "id" ] );
 		}
 	}
 
@@ -360,7 +366,8 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		if (isset( self::$injected_methods[ get_class( $this ) ][ $name ] )) {
 			array_unshift( $arguments, $this );
-			return call_user_func_array( self::$injected_methods[ get_class( $this ) ][ $name ], $arguments );
+			return call_user_func_array( self::$injected_methods[ get_class( $this ) ][ $name ], 
+					$arguments );
 		}
 		return "";
 	}
@@ -399,8 +406,8 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	public function getParam( $paramName, $fieldName = null, $parseAsArray = 0 )
 	{
 		$tableInfo = O_Dao_TableInfo::get( get_class( $this ) );
-		return $fieldName ? $tableInfo->getFieldInfo( $fieldName )->getParam( $paramName, $parseAsArray ) : $tableInfo->getParam(
-				$fieldName, $parseAsArray );
+		return $fieldName ? $tableInfo->getFieldInfo( $fieldName )->getParam( $paramName, 
+				$parseAsArray ) : $tableInfo->getParam( $fieldName, $parseAsArray );
 	}
 
 	/**

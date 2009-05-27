@@ -6,7 +6,7 @@ class O_Db_Manager {
 	 * @var PDO
 	 */
 	private static $connections = Array ();
-
+	
 	const CONN_DEFAULT = "default";
 
 	/**
@@ -25,7 +25,7 @@ class O_Db_Manager {
 		foreach ($conf as $k => $v)
 			if ($k != "engine" && $k != "user" && $k != "password")
 				$dsn .= $k . '=' . $v . ';';
-
+		
 		return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
 	}
 
@@ -43,7 +43,8 @@ class O_Db_Manager {
 				self::connect( $conf )->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				self::$connections[ $conn_id ]->query( "SET character_set_client='utf8'" );
 				self::$connections[ $conn_id ]->query( "SET character_set_results='utf8'" );
-				self::$connections[ $conn_id ]->query( "SET collation_connection='utf8_general_ci'" );
+				self::$connections[ $conn_id ]->query( 
+						"SET collation_connection='utf8_general_ci'" );
 			}
 		}
 		return isset( self::$connections[ $conn_id ] ) ? self::$connections[ $conn_id ] : null;

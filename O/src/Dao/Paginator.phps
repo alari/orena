@@ -106,7 +106,8 @@ class O_Dao_Paginator {
 					$this->order_desc = 1;
 				}
 			} elseif (isset( $this->orders_list[ $this->order ] )) {
-				$this->query->clearOrders()->orderBy( $this->orders_list[ $this->order ][ "field" ] );
+				$this->query->clearOrders()->orderBy( 
+						$this->orders_list[ $this->order ][ "field" ] );
 			}
 		}
 		
@@ -209,11 +210,15 @@ class O_Dao_Paginator {
 			$range = (int)O_Registry::get( "app/paginator/range" );
 		if (is_null( $tailsRange ))
 			$tailsRange = (int)O_Registry::get( "app/paginator/tails_range" );
-		$pages = range( max( 1, $this->page - $range ), min( $this->page + $range, $this->numPages() ) );
+		$pages = range( max( 1, $this->page - $range ), 
+				min( $this->page + $range, $this->numPages() ) );
 		if ($tailsRange) {
 			$pages = array_merge( 
-					range( 1, 1 + $tailsRange > $this->numPages() ? $this->numPages() : 1 + $tailsRange ), $pages, 
-					range( $this->numPages() - $tailsRange > 1 ? $this->numPages() - $tailsRange : 1, 
+					range( 1, 
+							1 + $tailsRange > $this->numPages() ? $this->numPages() : 1 + $tailsRange ), 
+					$pages, 
+					range( 
+							$this->numPages() - $tailsRange > 1 ? $this->numPages() - $tailsRange : 1, 
 							$this->numPages() ) );
 			$pages = array_unique( $pages );
 			sort( $pages );
@@ -249,7 +254,8 @@ class O_Dao_Paginator {
 			if ($page == $this->page) {
 				$html[ $page ] = "<b>" . $v . "</b>";
 			} else {
-				$url = call_user_func( $this->url_callback, $page, $this->order . ($this->order_desc ? "-desc" : "") );
+				$url = call_user_func( $this->url_callback, $page, 
+						$this->order . ($this->order_desc ? "-desc" : "") );
 				if ($this->ajax_id) {
 					$html[ $page ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
 							$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>";

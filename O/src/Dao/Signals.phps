@@ -38,8 +38,8 @@ class O_Dao_Signals {
 		if (!count( $signals ))
 			$signals = array ("-");
 		foreach ($signals as $s) {
-			if (!O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) || !in_array( $callback, 
-					O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) ))
+			if (!O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) || !in_array( 
+					$callback, O_Registry::get( self::REGISTRY_KEY . "/$event/$s/$class" ) ))
 				O_Registry::add( self::REGISTRY_KEY . "/$event/$s/$class", $callback );
 		}
 	}
@@ -95,7 +95,8 @@ class O_Dao_Signals {
 		foreach ($events as $e) {
 			foreach ($signals as $s) {
 				foreach ($classes as $c) {
-					if (isset( $av_listeners[ $e ][ $s ][ $c ] ) && is_array( $av_listeners[ $e ][ $s ][ $c ] )) {
+					if (isset( $av_listeners[ $e ][ $s ][ $c ] ) && is_array( 
+							$av_listeners[ $e ][ $s ][ $c ] )) {
 						$listeners = array_merge( $listeners, $av_listeners[ $e ][ $s ][ $c ] );
 					}
 				}

@@ -6,10 +6,10 @@
  *
  */
 abstract class O_Dao_Renderer_Commons {
-
+	
 	const SUFF_CALLBACK = "callback";
 	const SUFF_ENVELOP = "envelop";
-
+	
 	/**
 	 * Active record to handle
 	 *
@@ -183,21 +183,21 @@ abstract class O_Dao_Renderer_Commons {
 	{
 		if ($params === 1)
 			return "";
-
+		
 		$subparams = "";
 		if (strpos( $params, " " )) {
 			list ($callback, $subparams) = explode( " ", $params, 2 );
 		} else {
 			$callback = $params;
 		}
-
+		
 		if (!strpos( $callback, "::" )) {
 			$callback = $callback_type . "::" . $callback;
 		}
-
+		
 		if (!is_callable( $callback ))
 			return "";
-
+		
 		return array ("callback" => $callback, "params" => $subparams);
 	}
 
@@ -217,19 +217,20 @@ abstract class O_Dao_Renderer_Commons {
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 		$params = "";
-
+		
 		if ($this->type) {
 			$params = $tableInfo->getParam( $key . "-" . $this->type . ":" . $suffix );
 		}
-
+		
 		if (!$params) {
 			$class = str_replace( "_Mdl_", "_Fr_", $this->class );
-			$method = $key . str_replace( " ", "", ucwords( str_replace( "-", " ", $this->type . " " . $suffix ) ) );
-
+			$method = $key . str_replace( " ", "", 
+					ucwords( str_replace( "-", " ", $this->type . " " . $suffix ) ) );
+			
 			if (is_callable( $class . "::" . $method )) {
 				return array ("callback" => $class . "::" . $method, "params" => "");
 			}
-
+			
 			$params = $tableInfo->getParam( $key . ":" . $suffix );
 			if (!$params) {
 				$method = $key . ucfirst( $suffix );
@@ -238,7 +239,7 @@ abstract class O_Dao_Renderer_Commons {
 				}
 			}
 		}
-
+		
 		return $this->getCallbackByParams( $params, $callback_type );
 	}
 }

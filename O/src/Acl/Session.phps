@@ -11,6 +11,7 @@ class O_Acl_Session extends O_Base_Session {
 	 */
 	static public function can( $action, O_Dao_ActiveRecord $resourse = null, $id = null )
 	{
-		return self::getUser( $id ) instanceof O_Acl_iUser && self::getUser( $id )->can( $action, $resourse );
+		return self::getUser( $id ) instanceof O_Acl_iUser && self::getUser( $id )->can( $action, 
+				$resourse );
 	}
 }

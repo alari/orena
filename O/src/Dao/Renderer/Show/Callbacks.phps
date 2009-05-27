@@ -63,7 +63,8 @@ class O_Dao_Renderer_Show_Callbacks {
 	 */
 	static public function linkInContainer( O_Dao_Renderer_Show_Params $params )
 	{
-		$params->setValue( "<a href=\"" . $params->record()->url() . "\">" . $params->value() . "</a>" );
+		$params->setValue( 
+				"<a href=\"" . $params->record()->url() . "\">" . $params->value() . "</a>" );
 		self::container( $params );
 	}
 

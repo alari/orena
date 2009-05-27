@@ -142,8 +142,8 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	static public function getByName( $name )
 	{
 		if (!isset( self::$objs[ $name ] )) {
-			self::$objs[ $name ] = O_Dao_Query::get( O_Registry::get( "app/classnames/acl_role" ) )->test( "name", 
-					$name )->getOne();
+			self::$objs[ $name ] = O_Dao_Query::get( O_Registry::get( "app/classnames/acl_role" ) )->test( 
+					"name", $name )->getOne();
 			if (!self::$objs[ $name ]) {
 				self::$objs[ $name ] = new self( $name );
 			}

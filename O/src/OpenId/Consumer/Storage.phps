@@ -34,22 +34,24 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	{
 		$nonce = O_Db_Query::get( self::TABLE_NONCE );
 		if (!$nonce->tableExists()) {
-			$nonce->field( "nonce", "varchar(255) not null" )->index( "nonce", "unique" )->field( "created", 
-					"int not null" )->create();
+			$nonce->field( "nonce", "varchar(255) not null" )->index( "nonce", "unique" )->field( 
+					"created", "int not null" )->create();
 		}
 		
 		$assoc = O_Db_Query::get( self::TABLE_ASSOC );
 		if (!$assoc->tableExists()) {
-			$assoc->field( "url", "varchar(255) not null" )->field( "handle", "varchar(255) not null" )->field( 
-					"mac_func", "varchar(16) not null" )->field( "secret", "varchar(255) not null" )->field( 
-					"expires", "int not null" )->index( "url", "unique" )->create();
+			$assoc->field( "url", "varchar(255) not null" )->field( "handle", 
+					"varchar(255) not null" )->field( "mac_func", "varchar(16) not null" )->field( 
+					"secret", "varchar(255) not null" )->field( "expires", "int not null" )->index( 
+					"url", "unique" )->create();
 		}
 		
 		$discovery = O_Db_Query::get( self::TABLE_DISCOVERY );
 		if (!$discovery->tableExists()) {
-			$discovery->field( "disc_id", "varchar(255) not null" )->field( "real_id", "varchar(255) not null" )->field( 
-					"server", "varchar(255) not null" )->field( "version", "float default 0" )->field( "expires", 
-					"int not null" )->index( "disc_id", "unique" )->create();
+			$discovery->field( "disc_id", "varchar(255) not null" )->field( "real_id", 
+					"varchar(255) not null" )->field( "server", "varchar(255) not null" )->field( 
+					"version", "float default 0" )->field( "expires", "int not null" )->index( 
+					"disc_id", "unique" )->create();
 		}
 	}
 
@@ -66,8 +68,8 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	public function addAssociation( $url, $handle, $macFunc, $secret, $expires )
 	{
 		$secret = base64_encode( $secret );
-		O_Db_Query::get( self::TABLE_ASSOC )->field( "url", $url )->field( "handle", $handle )->field( "mac_func", 
-				$macFunc )->field( "secret", $secret )->field( "expires", $expires )->insert();
+		O_Db_Query::get( self::TABLE_ASSOC )->field( "url", $url )->field( "handle", $handle )->field( 
+				"mac_func", $macFunc )->field( "secret", $secret )->field( "expires", $expires )->insert();
 	}
 
 	/**
@@ -146,8 +148,9 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	 */
 	public function addDiscoveryInfo( $id, $realId, $server, $version, $expires )
 	{
-		O_Db_Query::get( self::TABLE_DISCOVERY )->field( "disc_id", $id )->field( "real_id", $realId )->field( 
-				"server", $server )->field( "version", $version )->field( "expires", $expires )->insert();
+		O_Db_Query::get( self::TABLE_DISCOVERY )->field( "disc_id", $id )->field( "real_id", 
+				$realId )->field( "server", $server )->field( "version", $version )->field( 
+				"expires", $expires )->insert();
 	}
 
 	/**
@@ -197,7 +200,8 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	public function isUniqueNonce( $provider, $nonce )
 	{
 		try {
-			O_Db_Query::get( self::TABLE_NONCE )->field( "nonce", $nonce )->field( "created", time() )->insert();
+			O_Db_Query::get( self::TABLE_NONCE )->field( "nonce", $nonce )->field( "created", 
+					time() )->insert();
 		}
 		catch (PDOException $e) {
 			return false;

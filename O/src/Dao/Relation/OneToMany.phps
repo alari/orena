@@ -65,8 +65,8 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 			$objOrId = $objOrId->id;
 		if (!is_numeric( $objOrId ))
 			return false;
-		return O_Dao_Query::get( $this->targetClass )->test( $this->targetField, $this->baseId )->test( "id", $objOrId )->getFunc( 
-				"id" );
+		return O_Dao_Query::get( $this->targetClass )->test( $this->targetField, $this->baseId )->test( 
+				"id", $objOrId )->getFunc( "id" );
 	}
 
 	/**
@@ -75,7 +75,8 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
-		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
+		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( 
+				$this->baseId );
 	}
 
 	/**

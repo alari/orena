@@ -48,8 +48,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		parent::__construct( $this->targetClass );
 		
 		$this->join( $this->relationTbl, 
-				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
-					 "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " .
+					 $this->relationTbl . "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
 	}
@@ -61,8 +61,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function count()
 	{
-		return $this->getRelationQuery()->clearFields()->field( "COUNT($this->targetFieldName) AS c" )->select()->fetchColumn( 
-				0 );
+		return $this->getRelationQuery()->clearFields()->field( 
+				"COUNT($this->targetFieldName) AS c" )->select()->fetchColumn( 0 );
 	}
 
 	/**
@@ -142,7 +142,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		
 		if (!O_Db_Query::get( $r )->tableExists()) {
 			$q = O_Db_Query::get( $r );
-			$q->field( $this->targetFieldName, "int NOT NULL" )->field( $this->baseFieldName, "int NOT NULL" )->index( 
+			$q->field( $this->targetFieldName, "int NOT NULL" )->field( $this->baseFieldName, 
+					"int NOT NULL" )->index( 
 					$this->targetFieldName . ", " . $this->baseFieldName, "PRIMARY KEY" )->create();
 		}
 		
@@ -157,7 +158,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
-		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( $this->baseId );
+		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( 
+				$this->baseId );
 	}
 
 	/**
@@ -169,8 +171,9 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	{
 		$q = new O_Dao_Query( $this->targetClass );
 		$q->join( $this->relationTbl, 
-				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " . $this->relationTbl .
-					 "." . $this->baseFieldName . "=" . $this->baseId, "CROSS" );
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " .
+					 $this->relationTbl . "." . $this->baseFieldName . "=" . $this->baseId, 
+					"CROSS" );
 		if ($this->orderBy)
 			$q->orderBy( $this->targetTbl . "." . $this->orderBy );
 		return $q;
@@ -192,8 +195,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		if (!$this->has( $object->id ))
 			return false;
 		
-		O_Db_Query::get( $this->relationTbl )->test( $this->targetFieldName, $object->id )->test( $this->baseFieldName, 
-				$this->baseId )->delete();
+		O_Db_Query::get( $this->relationTbl )->test( $this->targetFieldName, $object->id )->test( 
+				$this->baseFieldName, $this->baseId )->delete();
 		if ($this->targetClass == $this->baseClass && $this->targetField == $this->baseField) {
 			O_Db_Query::get( $this->relationTbl )->test( $this->targetFieldName, $this->baseId )->test( 
 					$this->baseFieldName, $object->id )->delete();
@@ -217,9 +220,10 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	private function fireEvent( O_Dao_ActiveRecord $targetObject, $event )
 	{
-		$signal = O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->getParam( "signal" );
-		$signalInverse = O_Dao_TableInfo::get( $this->targetClass )->getFieldInfo( $this->targetField )->getParam( 
+		$signal = O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->getParam( 
 				"signal" );
+		$signalInverse = O_Dao_TableInfo::get( $this->targetClass )->getFieldInfo( 
+				$this->targetField )->getParam( "signal" );
 		if ($signal || $signalInverse) {
 			$baseObj = O_Dao_ActiveRecord::getById( $this->baseId, $this->baseClass );
 		}
@@ -227,7 +231,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			O_Dao_Signals::fire( $event, $signal, $this->baseClass, $baseObj, $targetObject );
 		}
 		if ($signalInverse) {
-			O_Dao_Signals::fire( $event, $signalInverse, $this->targetClass, $targetObject, $baseObj );
+			O_Dao_Signals::fire( $event, $signalInverse, $this->targetClass, $targetObject, 
+					$baseObj );
 		}
 	}
 
@@ -265,8 +270,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 			return true;
 		}
 		
-		O_Db_Query::get( $this->relationTbl )->field( $this->targetFieldName, $obj->id )->field( $this->baseFieldName, 
-				$this->baseId )->insert();
+		O_Db_Query::get( $this->relationTbl )->field( $this->targetFieldName, $obj->id )->field( 
+				$this->baseFieldName, $this->baseId )->insert();
 		if ($this->targetClass == $this->baseClass && $this->targetField == $this->baseField) {
 			O_Db_Query::get( $this->relationTbl )->field( $this->targetFieldName, $this->baseId )->field( 
 					$this->baseFieldName, $obj->id )->insert();
