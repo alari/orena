@@ -721,11 +721,11 @@ class Zend_OpenId_Provider
                     $signed .= ',';
                 }
                 $signed .= $key;
-                $data .= $key . ':' . $val . ",";
+                $data .= $key . ':' . $val . "\n";
             }
         }
-        //$signed .= ',signed';
-        $data .= /*'signed:' . */$signed /*. "\n"*/;
+        $signed .= ',signed';
+        $data .= 'signed:' . $signed . "\n";
         $ret['openid.signed'] = $signed;
 
         $ret['openid.sig'] = base64_encode(
