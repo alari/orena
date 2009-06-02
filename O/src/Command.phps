@@ -81,9 +81,7 @@ abstract class O_Command {
 	 */
 	public function redirect( $href = null )
 	{
-		// TODO: add redirect shortcut
-		if (is_null( $href ))
-			$href = O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) );
+		$href = O_UrlBuilder::get( is_null($href) ? O_Registry::get( "app/env/process_url" ) : $href );
 		Header( "Location: $href" );
 		return null;
 	}
