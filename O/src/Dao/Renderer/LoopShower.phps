@@ -33,7 +33,7 @@ class O_Dao_Renderer_LoopShower extends O_Dao_Renderer_Commons {
 		}
 		// If envelop callback is available, we need to do output bufferization
 		$envelopCallback = $this->getEnvelopCallback( O_Dao_Renderer::KEY_LOOP, 
-				O_Dao_Renderer::CALLBACK_SHOW );
+				O_Dao_Renderer::CALLBACK_SHOW, parent::SUFF_ENVELOP );
 		if ($envelopCallback) {
 			ob_start();
 		}
