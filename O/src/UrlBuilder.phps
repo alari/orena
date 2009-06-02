@@ -22,6 +22,8 @@ class O_UrlBuilder {
 			$url = $r;
 		} elseif ($url[ 0 ] == "/") {
 			$url = $r . substr( $url, 1 );
+		} elseif (strpos( $url, "http://" ) === 0) {
+			$url = $url;
 		} else {
 			$url = $r . $url;
 		}
