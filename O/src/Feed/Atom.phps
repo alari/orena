@@ -27,14 +27,14 @@ class O_Feed_Atom {
 	{
 		header( "Content-type: application/atom+xml; charset=utf-8" );
 		echo '<?xml version="1.0" encoding="utf-8"?>';
+		$date = date("Y-m-d", $this->updated)."T".date("H:i:s", $this->updated)."Z";
 		?>
    <feed xmlns="http://www.w3.org/2005/Atom">
      <title type="text"><?=$this->title?></title>
      <subtitle type="html"><?=$this->subtitle?></subtitle>
-     <updated><?=date("Y-m-dTH:i:sZ", $this->updated)?></updated>
+     <updated><?=$date?></updated>
      <id><?=$this->link?></id>
      <link rel="alternate" type="text/html" href="<?=$this->link?>"/>
-     <rights>Copyright (c) 2003, Mark Pilgrim</rights>
      <generator uri="http://orena.org/" version="1.0">
        Orena Framework
      </generator>
