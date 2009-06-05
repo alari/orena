@@ -25,7 +25,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 <input class="text" type="text" name="<?=$params->fieldName()?>"
 	value="<?=htmlspecialchars( $params->value() )?>" /></div>
 <?
-
+	
 	}
 
 	/**
@@ -72,7 +72,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	name="<?=$params->fieldName()?>[i]" maxlength="2" size="2"
 	value="<?=$date[ "i" ]?>" /></div>
 <?
-
+	
 	}
 
 	/**
@@ -98,7 +98,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 		?>
 </div>
 <?
-
+	
 	}
 
 	/**
@@ -108,7 +108,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function enum( O_Dao_Renderer_Edit_Params $params )
 	{
-		$fieldInfo = O_Dao_TableInfo::get( $params->className() )->getFieldInfo(
+		$fieldInfo = O_Dao_TableInfo::get( $params->className() )->getFieldInfo( 
 				$params->fieldName() );
 		?>
 <div class="oo-renderer-field">
@@ -131,7 +131,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 </div>
 <?
 		}
-
+		
 		?>
 </div>
 <?
@@ -146,7 +146,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 		$value = $params->value();
 		$title = $params->title();
 		$error = $params->error();
-		$params = new O_Dao_Renderer_Edit_Params( $params->fieldName(), $params->className(),
+		$params = new O_Dao_Renderer_Edit_Params( $params->fieldName(), $params->className(), 
 				$subparams, $params->record() );
 		if ($value instanceof O_Dao_ActiveRecord)
 			$params->setValue( $value->$field );
@@ -165,9 +165,9 @@ class O_Dao_Renderer_Edit_Callbacks {
 	static public function wysiwyg( O_Dao_Renderer_Edit_Params $params )
 	{
 		if ($params->layout()) {
-			$params->layout()->addJavaScriptSrc(
+			$params->layout()->addJavaScriptSrc( 
 					$params->layout()->staticUrl( "fckeditor/fckeditor.js", 1 ) );
-
+			
 			$customConfig = O_Registry::get( "app/js/fckeditor/config_path" );
 			$toolbarSet = $params->params();
 			$height = 0;
@@ -176,11 +176,10 @@ class O_Dao_Renderer_Edit_Callbacks {
 			elseif (strpos( $toolbarSet, " " )) {
 				list ($toolbarSet, $height) = explode( " ", $toolbarSet, 2 );
 			}
-			O_Js_Middleware::getFramework()->addDomreadyCode(
+			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'oo-r-w-" . $params->fieldName() . "' );
-oFCKeditor.BasePath = '" .
-						 $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" . $params->layout()->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" .
 						 $toolbarSet . "';" : "") . ($height ? "oFCKeditor.Height = '" . $height .
 						 "';" : "") . "oFCKeditor.ReplaceTextarea();", $params->layout() );
@@ -284,7 +283,7 @@ oFCKeditor.BasePath = '" .
 	static public function selectRelationBox( O_Dao_Renderer_Edit_Params $params )
 	{
 		$_params = $params->params();
-
+		
 		$displayField = $_params[ "displayField" ];
 		$multiply = $_params[ "multiply" ];
 		$value = $params->value();
@@ -295,7 +294,7 @@ oFCKeditor.BasePath = '" .
 			$type = "radio";
 			$name = $params->fieldName();
 		}
-
+		
 		$echoed = 0;
 		?>
 <div class="oo-renderer-field">

@@ -11,7 +11,7 @@
  *
  * @author Dmitry Kourinski
  */
-abstract class O_Command {
+abstract class O_Command extends O_Locale_Access {
 
 	/**
 	 * Runs the command, processes result
@@ -81,7 +81,8 @@ abstract class O_Command {
 	 */
 	public function redirect( $href = null )
 	{
-		$href = O_UrlBuilder::get( is_null($href) ? O_Registry::get( "app/env/process_url" ) : $href );
+		$href = O_UrlBuilder::get( 
+				is_null( $href ) ? O_Registry::get( "app/env/process_url" ) : $href );
 		Header( "Location: $href" );
 		return null;
 	}

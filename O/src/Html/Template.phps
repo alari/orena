@@ -2,12 +2,12 @@
 /**
  * Templates abstraction.
  *
- * Notise that you could simply tune up default templates via defining "app/layout_class"
+ * Notice that you could simply tune up default templates via defining "app/layout_class"
  * registry key.
  *
  * @author Dmitry Kourinski
  */
-abstract class O_Html_Template {
+abstract class O_Html_Template extends O_Locale_Access {
 	/**
 	 * Classname of layout assotiated with current template
 	 *

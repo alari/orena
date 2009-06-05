@@ -40,7 +40,8 @@ class O_Dao_Renderer_Show_Callbacks {
 	static public function loop( O_Dao_Renderer_Show_Params $params )
 	{
 		if ($params->value() instanceof O_Dao_Query) {
-			$params->value()->show( $params->layout(), $params->params() ? $params->params() : O_Dao_Renderer::TYPE_LOOP );
+			$params->value()->show( $params->layout(), 
+					$params->params() ? $params->params() : O_Dao_Renderer::TYPE_LOOP );
 		} else {
 			echo "<!-- error -->";
 		}
@@ -64,7 +65,8 @@ class O_Dao_Renderer_Show_Callbacks {
 	 */
 	static public function linkInContainer( O_Dao_Renderer_Show_Params $params )
 	{
-		$params->setValue( "<a href=\"" . $params->record()->url() . "\">" . $params->value() . "</a>" );
+		$params->setValue( 
+				"<a href=\"" . $params->record()->url() . "\">" . $params->value() . "</a>" );
 		self::container( $params );
 	}
 
@@ -105,6 +107,7 @@ class O_Dao_Renderer_Show_Callbacks {
 	static public function activeRecord( O_Dao_Renderer_Show_Params $params )
 	{
 		if ($params->value() instanceof O_Dao_ActiveRecord)
-			$params->value()->show( $params->layout(), $params->params() ? $params->params() : O_Dao_Renderer::TYPE_DEF );
+			$params->value()->show( $params->layout(), 
+					$params->params() ? $params->params() : O_Dao_Renderer::TYPE_DEF );
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 
-class O_Html_Layout {
+class O_Html_Layout extends O_Locale_Access {
 	/**
 	 * Template object to display
 	 *
@@ -277,5 +277,4 @@ class O_Html_Layout {
 	{
 		return O_UrlBuilder::get( $url, $params );
 	}
-
 }

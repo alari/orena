@@ -1,28 +1,22 @@
 <?php
-
-class O_Locale_Dictionary {
+abstract class O_Locale_Dictionary {
 	protected $lang;
-	protected $default;
-	protected $override;
-	
-	public function __get($name) {
-		;
+	protected $params;
+
+	public function __construct( $lang, $params )
+	{
+		$this->lang = $lang;
+		$this->params = $params;
 	}
-	
-	public function __set($name, $phrase) {
-		;
-	}
-	
-	public function getDefaultStorage() {
-		;
-	}
-	
-	public function getOverrideStorage() {
-		;
-	}
-	
-	public function setLang($lang) {
-		;
-	}
-	
+
+	abstract public function getPhrase( $name );
+
+	abstract public function getTechPhrase( $name );
+
+	abstract public function setPhrase( $name, $value );
+
+	abstract public function setTechPhrase( $name, $value );
+
+	abstract public function getPhrases();
+
 }
