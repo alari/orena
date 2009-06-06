@@ -46,6 +46,8 @@ abstract class O_Html_Template extends O_Locale_Access {
 	{
 		if (!$this->layoutObject) {
 			$class = $this->layoutClass;
+			if (!class_exists( $class, true ))
+				$class = "O_Html_Layout";
 			$this->layoutObject = new $class( $this );
 		}
 		return $this->layoutObject;
