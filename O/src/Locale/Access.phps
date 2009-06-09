@@ -2,6 +2,13 @@
 
 abstract class O_Locale_Access implements ArrayAccess {
 
+	static public function _() {
+		$loc = O_Locale::getInstance();
+		$params = func_get_args();
+		return call_user_func_array( array($loc, "getPhrase"), $params );
+	}
+
+
 	/**
 	 * Returns phrase from default locale. First argument is name
 	 *
