@@ -1,5 +1,5 @@
 <?php
-abstract class O_Locale_Dictionary {
+abstract class O_Dict_Storage {
 	protected $lang;
 	protected $params;
 

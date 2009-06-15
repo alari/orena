@@ -1,24 +1,24 @@
 <?php
-class O_Locale {
+class O_Dict_Collection {
 	protected $dicts = Array ();
-	
+
 	protected static $instances = Array ();
-	
+
 	const DEFAULT_DICT_SET = "default";
-	const DEFAULT_DICT_CLASS = "O_Locale_Dict_File";
+	const DEFAULT_DICT_CLASS = "O_Dict_Storage_IniFile";
 
 	/**
 	 * Returns Locale instance -- with dictionaries configured
 	 *
 	 * @param string $name
 	 * @param array $params
-	 * @return O_Locale
+	 * @return O_Dict_Collection
 	 */
 	static public function getInstance( $name = self::DEFAULT_DICT_SET, $params = null )
 	{
 		if (!isset( self::$instances[ $name ] )) {
 			if (!$params)
-				$params = O_Registry::get( "app/locale/" . $name );
+				$params = O_Registry::get( "app/dict/" . $name );
 			if (!is_array( $params ) || !count( $params )) {
 				throw new O_Ex_Config( "Locale is used but not described in configs: '$name'" );
 			}
@@ -37,7 +37,7 @@ class O_Locale {
 		foreach ($params as $k => $v) {
 			$lang = isset( $v[ "lang" ] ) ? $v[ "lang" ] : null;
 			$class = isset( $v[ "class" ] ) ? $v[ "class" ] : self::DEFAULT_DICT_CLASS;
-			$params = isset( $v[ "params" ] ) ? (array)$v[ "params" ] : array ();
+			$params = $v;
 			if (!class_exists( $class, true )) {
 				throw new O_Ex_Config( "Dictionary class not given for $k dictionary." );
 			}
@@ -52,12 +52,11 @@ class O_Locale {
 	 * Returns phrase by its technical name (and any number of params)
 	 *
 	 * @param string $name
+	 * @param array $params
 	 * @return string
 	 */
-	public function getPhrase( $name )
+	public function getPhrase( $name, Array $params = Array() )
 	{
-		$params = func_get_args();
-		$name = array_shift( $params );
 		$phrase = null;
 		if (count( $params ) == 1 && is_integer( current( $params ) )) {
 			$num = current( $params );
@@ -88,9 +87,9 @@ class O_Locale {
 	/**
 	 * Adds additional dictionary to locale, which would override all others
 	 *
-	 * @param O_Locale_Dictionary $dict
+	 * @param O_Dict_Storage $dict
 	 */
-	public function addDictionary( O_Locale_Dictionary $dict )
+	public function addDictionary( O_Dict_Storage $dict )
 	{
 		array_unshift( $this->dicts, $dict );
 	}
@@ -98,7 +97,7 @@ class O_Locale {
 	/**
 	 * Returns all bundled dictionaries
 	 *
-	 * @return O_Locale_Dictionary[]
+	 * @return O_Dict_Storage[]
 	 */
 	public function getDictionaries()
 	{

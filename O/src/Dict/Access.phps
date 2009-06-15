@@ -1,24 +1,21 @@
 <?php
-
-abstract class O_Locale_Access implements ArrayAccess {
-
-	static public function _() {
-		$loc = O_Locale::getInstance();
-		$params = func_get_args();
-		return call_user_func_array( array($loc, "getPhrase"), $params );
-	}
-
+abstract class O_Dict_Access implements ArrayAccess {
 
 	/**
-	 * Returns phrase from default locale. First argument is name
+	 * The main method to access dictionaries.
 	 *
+	 * @param string phrase, may be in "dict:phrase" format
+	 * @param [] Other phrase parameters
 	 * @return string
 	 */
-	protected function getPhrase()
+	static public function _()
 	{
-		$loc = O_Locale::getInstance();
 		$params = func_get_args();
-		return call_user_func_array( array($loc, "getPhrase"), $params );
+		$dict = O_Dict_Collection::DEFAULT_DICT_SET;
+		$phrase = array_shift( $params );
+		if (strpos( $phrase, ":" ))
+			list ($dict, $phrase) = explode( ":", $phrase, 2 );
+		return O_Dict_Collection::getInstance( $dict )->getPhrase( $phrase, $params );
 	}
 
 	/**
@@ -29,7 +26,7 @@ abstract class O_Locale_Access implements ArrayAccess {
 	 */
 	public function offsetGet( $name )
 	{
-		return O_Locale::getInstance()->getPhrase( $name );
+		return $this->_( $name );
 	}
 
 	/**

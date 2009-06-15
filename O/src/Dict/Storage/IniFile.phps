@@ -1,6 +1,6 @@
 <?php
 
-class O_Locale_Dictionary_IniFile extends O_Locale_Dictionary {
+class O_Dict_Storage_IniFile extends O_Dict_Storage {
 	
 	protected $phrases;
 	protected $techPhrases;

@@ -1,7 +1,7 @@
 <?php
 
-class O_Locale_Dictionary_DbTable extends O_Locale_Dictionary {
-
+class O_Dict_Storage_DbTable extends O_Dict_Storage {
+	
 	protected $phrases;
 	protected $techPhrases;
 	protected $initiated;
@@ -70,7 +70,7 @@ class O_Locale_Dictionary_DbTable extends O_Locale_Dictionary {
 	 */
 	public function setTechPhrase( $name, $value )
 	{
-		$q = O_Db_Query::get( $this->tableName )->field( "tech_phrase", $value )->test( "name",
+		$q = O_Db_Query::get( $this->tableName )->field( "tech_phrase", $value )->test( "name", 
 				$name );
 		if ($this->lang)
 			$q->test( "lang", $this->lang );
@@ -90,10 +90,10 @@ class O_Locale_Dictionary_DbTable extends O_Locale_Dictionary {
 			throw new O_Ex_Config( "Table name not specified for DB-stored dictionary." );
 		}
 		$this->tableName = $this->params[ "table" ];
-
+		
 		$q = O_Db_Query::get( $this->tableName );
 		if (!$q->tableExists()) {
-			$q->field( "phrase", "TEXT" )->field( "tech_phrase", "TEXT" )->field( "lang",
+			$q->field( "phrase", "TEXT" )->field( "tech_phrase", "TEXT" )->field( "lang", 
 					"VARCHAR(16) DEFAULT ''" );
 			$q->field( "name", "VARCHAR(64) NOT NULL" );
 			$q->index( "name,lang", "UNIQUE" );

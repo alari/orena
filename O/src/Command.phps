@@ -11,7 +11,7 @@
  *
  * @author Dmitry Kourinski
  */
-abstract class O_Command extends O_Locale_Access {
+abstract class O_Command extends O_Dict_Access {
 
 	/**
 	 * Runs the command, processes result
@@ -54,7 +54,7 @@ abstract class O_Command extends O_Locale_Access {
 		if (is_array( $can )) {
 			foreach ($can as $acl) {
 				list ($action, $resourse) = strpos( $acl, "#" ) ? explode( "#", $acl, 2 ) : array (
-																									$acl, 
+																									$acl,
 																									null);
 				if ($resourse)
 					$resourse = O_Registry::get( $resourse );
@@ -81,7 +81,7 @@ abstract class O_Command extends O_Locale_Access {
 	 */
 	public function redirect( $href = null )
 	{
-		$href = O_UrlBuilder::get( 
+		$href = O_UrlBuilder::get(
 				is_null( $href ) ? O_Registry::get( "app/env/process_url" ) : $href );
 		Header( "Location: $href" );
 		return null;

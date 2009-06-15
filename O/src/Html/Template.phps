@@ -7,7 +7,7 @@
  *
  * @author Dmitry Kourinski
  */
-abstract class O_Html_Template extends O_Locale_Access {
+abstract class O_Html_Template extends O_Dict_Access {
 	/**
 	 * Classname of layout assotiated with current template
 	 *
