@@ -841,7 +841,7 @@ class O_Db_Query {
 						$where .= ($k && $was_or != 2 ? " AND " : "") . "(" . $v[ "cond" ] . ")";
 						if (isset( $v[ "params" ] ) && count( $v[ "params" ] )) {
 							foreach ($v[ "params" ] as $p)
-								$this->params[] = $p instanceof O_Dao_ActiveRecord ? $p->id : $p;
+								$this->params[] = $p instanceof O_Dao_ActiveRecord ? (int)($p->id) : $p;
 						}
 						if ($was_or == 2)
 							$was_or = 1;
@@ -866,7 +866,7 @@ class O_Db_Query {
 							$where .= ")";
 						} else {
 							$where .= "?";
-							$this->params[] = $v[ "param" ] instanceof O_Dao_ActiveRecord ? $v[ "param" ]->id : $v[ "param" ];
+							$this->params[] = $v[ "param" ] instanceof O_Dao_ActiveRecord ? (int)($v[ "param" ]->id) : $v[ "param" ];
 						}
 						$where .= ")";
 						if ($was_or == 2)
