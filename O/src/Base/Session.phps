@@ -23,7 +23,7 @@
  * @index time
  */
 class O_Base_Session extends O_Dao_ActiveRecord {
-	
+
 	/**
 	 * Cached objects with session ID as array keys
 	 *
@@ -39,14 +39,22 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function get( $id = null )
 	{
-		if (!$id)
+		if (!$id) {
 			$id = session_id();
-		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get( 
+		}
+		if (!$id) {
+			if (!session_start() || !session_id())
+				throw new O_Ex_Critical( "Unable to start session" );
+			$id = session_id();
+		}
+		if (!$id)
+			throw new O_Ex_Critical( "Session ID is undefined or inaccessible" );
+		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get(
 				self::getClassName() )->test( "ses_id", $id )->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
 			$obj = new $class( );
-			$obj->ses_id = $id ? $id : session_id();
+			$obj->ses_id = $id;
 			$obj->started = time();
 			$obj->time = time();
 			$obj->save();
@@ -107,7 +115,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	public function user()
 	{
-		return $this->user ? $this->user : call_user_func( 
+		return $this->user ? $this->user : call_user_func(
 				array (O_Registry::get( "app/classnames/visitor" ), "getInstance") );
 	}
 
@@ -183,7 +191,12 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function gc( $maxlifetime )
 	{
-		return O_Dao_Query::get( __CLASS__ )->test( "time", time() - $maxlifetime, O_Dao_Query::LT )->delete();
+		$d = O_Dao_Query::get( self::getClassName() )->test( "time", time() - $maxlifetime,
+				O_Dao_Query::LT )->delete();
+		// FIXME: unauthorized users should have theirs own session lifetime
+		$d += O_Dao_Query::get( self::getClassName() )->test( "time",
+				time() - round( $maxlifetime / 10 ), O_Dao_Query::LT )->test( "user", null )->delete();
+		return $d;
 	}
 
 	/**
@@ -204,9 +217,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	{
 		// Set framework session class as sessions handler
 		$ses_class = self::getClassName();
-		
-		session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"), 
-				Array ($ses_class, "read"), Array ($ses_class, "write"), 
+
+		session_set_save_handler( Array ($ses_class, "open"), Array ($ses_class, "close"),
+				Array ($ses_class, "read"), Array ($ses_class, "write"),
 				Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
 		// Set special session name
 		session_name( O_Registry::get( "app/session/name" ) );
@@ -216,5 +229,5 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 
 }
 
-O_ClassManager::registerClassLoadedCallback( array ("O_Base_Session", "registerHandler"), 
+O_ClassManager::registerClassLoadedCallback( array ("O_Base_Session", "registerHandler"),
 		O_Registry::get( "app/classnames/session" ) );
