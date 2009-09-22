@@ -6,7 +6,7 @@
  * @see O_Dao_Relation_ManyToMany
  * @see O_Dao_Relation_OneToMany
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countable {
 

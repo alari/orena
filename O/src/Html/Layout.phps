@@ -7,14 +7,14 @@ class O_Html_Layout extends O_Dict_Access {
 	 * @var O_Html_Template
 	 */
 	protected $tpl;
-
+	
 	/**
 	 * Page title -- can be externally modified
 	 *
 	 * @var string
 	 */
 	public $title;
-
+	
 	/**
 	 * Array of metatags
 	 *
@@ -57,7 +57,7 @@ class O_Html_Layout extends O_Dict_Access {
 	 * @var Array
 	 */
 	protected $headLinks = Array ();
-
+	
 	/**
 	 * HTTP response code
 	 *
@@ -90,12 +90,12 @@ class O_Html_Layout extends O_Dict_Access {
 		Header( "HTTP/1.1 " . $this->responseCode . " " . $this->responseMessage );
 		if ($this->contentType)
 			Header( "Content-type: " . $this->contentType );
-
+			
 		// TODO find the way to avoid output bufferization
 		ob_start();
 		$this->displayBody();
 		$body = ob_get_clean();
-
+		
 		$this->displayDoctype();
 		?>
 <html>
@@ -184,7 +184,7 @@ class O_Html_Layout extends O_Dict_Access {
 	 */
 	public function addHeadLink( $rel, $href, $type = null, $title = null )
 	{
-		$this->headLinks[] = Array ("rel" => $rel, "href" => $href, "type" => $type,
+		$this->headLinks[] = Array ("rel" => $rel, "href" => $href, "type" => $type, 
 									"title" => $title);
 	}
 

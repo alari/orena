@@ -7,7 +7,7 @@
  *
  * @see O_Acl_Admin_Cmd
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 	/**
@@ -31,6 +31,7 @@ abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 	/**
 	 * Dictionary of phrases used in template
 	 *
+	 * @todo integrate with O_Dict
 	 * @var array
 	 */
 	protected $phrases = Array ("allow" => "Allow", "deny" => "Deny", "clear" => "Inherit", 

@@ -2,7 +2,7 @@
 /**
  * Class to store request environment information.
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Registry {
 	/**

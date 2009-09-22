@@ -1,9 +1,9 @@
 <?php
 class O_Dict_Collection {
 	protected $dicts = Array ();
-
+	
 	protected static $instances = Array ();
-
+	
 	const DEFAULT_DICT_SET = "default";
 	const DEFAULT_DICT_CLASS = "O_Dict_Storage_IniFile";
 

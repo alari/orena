@@ -2,7 +2,7 @@
 /**
  * Simple URL builder for static files and commands.
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_UrlBuilder {
 

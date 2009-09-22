@@ -17,7 +17,7 @@
  *
  * Notify that you must register all plugins BEFORE base class will be loaded (and handled by O_Dao_TableInfo).
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 interface O_Dao_iPlugin {
 }

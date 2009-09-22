@@ -10,7 +10,7 @@
  * "app/dao-listeners/$event/$signal/$class" = $callback
  * use "-" subkey to add signal handler for all events or signal types or classes.
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_Signals {
 	

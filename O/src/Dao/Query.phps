@@ -8,7 +8,7 @@
  * @see O_Dao_Renderer
  * @see O_Dao_Query::display()
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	/**

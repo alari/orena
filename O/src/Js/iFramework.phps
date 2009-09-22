@@ -2,7 +2,7 @@
 /**
  * Allows to use different frameworks solving the simpliest JS tasks.
  *
- * @copyright Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 interface O_Js_iFramework {
 

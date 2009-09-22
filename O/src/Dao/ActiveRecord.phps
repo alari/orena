@@ -17,7 +17,7 @@
  * To retrieve O_Dao_ActiveRecord objects, use
  * @see O_Dao_Query
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	/**

@@ -5,7 +5,7 @@
  * @see O_Js_Middleware
  * @see O_Js_iFramework
  *
- * @copyright Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Js_Mootools implements O_Js_iFramework {
 

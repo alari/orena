@@ -17,7 +17,7 @@ require_once 'ClassManager.phps';
  *
  * Configuration files formats could be seen in ./O/static/dtd/
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_EntryPoint {
 	static $appConfigXml;

@@ -5,7 +5,7 @@
  * @see O_Dao_Renderer_FormProcessor
  * @see O_Dao_Renderer_Shower
  *
- * @copyright Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_Renderer {
 	const CALLBACK_SHOW = "O_Dao_Renderer_Show_Callbacks";

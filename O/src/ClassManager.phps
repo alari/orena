@@ -11,7 +11,7 @@ require_once 'Registry.phps';
  * @todo set up and document simple interface to add class prefixes by Registry config
  * @todo realize "selection is initialization" paradigm
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_ClassManager {
 	const DEFAULT_EXTENSION = "php";

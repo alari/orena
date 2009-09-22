@@ -24,7 +24,7 @@
  * Description of fields declaration:
  * @see O_Dao_FieldInfo
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_TableInfo {
 	/**

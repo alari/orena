@@ -48,13 +48,15 @@
  * Next, you can create pseudo-field by going throught one or several to-one relations:
  * @field fieldname -relative field.itsField.relativeField->fieldToLinkAsPseudo
  *
+ * You can use YOUR OWN field types of interface O_Dao_Field_iFace by setting -custom-field-type $class key
+ *
  * Also FieldInfo provides signals support for fields changes:
  * @see O_Dao_Signals
  *
  * Finally, you can extend the field with
  * @field:config $name -params
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_FieldInfo {
 	/**
@@ -120,8 +122,19 @@ class O_Dao_FieldInfo {
 			
 			}
 		} else {
-			// Alias field
-			if (isset( $params[ "alias" ] ) && strpos( $params[ "alias" ], "." )) {
+			// Custom field
+			if (isset( $params[ "custom-field-type" ] )) {
+				$fieldType = $params[ "custom-field-type" ];
+				if (!class_exists( $fieldType )) {
+					throw new O_Ex_Config( "Field type custom class not found" );
+				}
+				$this->fieldInstance = new $fieldType( $this, $type, $this->name );
+				if (!$this->fieldInstance instanceof O_Dao_Field_iFace) {
+					throw new O_Ex_Config( "Wrong field type interface" );
+				}
+				// Alias field
+			} elseif (isset( $params[ "alias" ] ) && strpos( $params[ "alias" ], 
+					"." )) {
 				$this->fieldInstance = new O_Dao_Field_Alias( $this, $params[ "alias" ] );
 				// Alias for a number of other fields
 			} elseif (isset( $params[ "one-of" ] ) && strpos( 

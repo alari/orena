@@ -2,7 +2,10 @@
 /**
  * Visitor pseudo-user.
  *
- * @copyright Dmitry Kourinski
+ * Registry:
+ * "app/classnames/visitor" - visitor classname
+ *
+ * @author Dmitry Kurinskiy
  */
 class O_Base_Visitor {
 	protected static $singleton;

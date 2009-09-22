@@ -1,5 +1,12 @@
 <?php
-
+/**
+ * Really not suggested yet how to build automatic query filters
+ *
+ * Please do not use this.
+ *
+ * @deprecated
+ * @author Dmitry Kourinski
+ */
 class O_Dao_Filter {
 	/**
 	 * Query to process

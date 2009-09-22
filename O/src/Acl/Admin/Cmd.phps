@@ -4,7 +4,7 @@
  *
  * @see O_Acl_Admin_Tpl
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Acl_Admin_Cmd {
 

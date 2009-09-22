@@ -1,4 +1,12 @@
 <?php
+/**
+ * Class for Visitor pseudo-user with ACL support
+ *
+ * Override visitor's class in registry if you want to extend it:
+ * "app/classnames/visitor"
+ *
+ * @author Dmitry Kurinskiy
+ */
 class O_Acl_Visitor extends O_Base_Visitor implements O_Acl_iUser {
 
 	/**

@@ -1,5 +1,14 @@
 <?php
 /**
+ * User pattern with ACL.
+ *
+ * Resourse context for acl is stored in resourse's "acl" registry section.
+ * @see O_Acl_User::getAccessByNode()
+ *
+ * Classname is stored in "app/classnames/user" registry.
+ *
+ * @author Dmitry Kurinskiy
+ *
  * @field role -has one {classnames/acl_role} -inverse users
  */
 class O_Acl_User extends O_Base_User implements O_Acl_iUser {
@@ -37,6 +46,14 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 
 	/**
 	 * Returns access by rules given in registry simplexml
+	 *
+	 * Nodes:
+	 * Role.name -- set access rules as for this role
+	 * User-In.field -- process inner instructions if user is in .field of resourse
+	 * (User|Resourse).related -- take related object to process
+	 * (User|Resourse).field -- field of user, resourse or related object to be checked
+	 * (User|Resourse).value -- value to compare field with
+	 * (User|Resourse).type -- type of comparing: "GT" "LT" "NOT" or equivalence, if type is not specified
 	 *
 	 * @param string $action
 	 * @param SimpleXMLElement $node

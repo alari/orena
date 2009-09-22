@@ -2,7 +2,7 @@
 /**
  * Simple class to provide pages on O_Dao_Query
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_Paginator {
 	/**

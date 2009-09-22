@@ -21,7 +21,7 @@
  *
  * Notice: you can use "layout_class" registry key to easily change formatting of default templates
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Cmd_ShowLoop extends O_Command {
 	
@@ -46,7 +46,7 @@ class O_Cmd_ShowLoop extends O_Command {
 				if (!$resourse instanceof O_Dao_ActiveRecord) {
 					throw new O_Ex_NotFound( "Resourse not found.", 404 );
 				}
-				$field = O_Registry::get( O_Registry::get( "app/cmd/show/field" ) );
+				$field = O_Registry::get( "app/cmd/show/field" );
 				$query = $resourse->$field;
 				$this->resourse = $resourse;
 			break;

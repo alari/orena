@@ -5,7 +5,7 @@
  * Notice that you could simply tune up default templates via defining "app/layout_class"
  * registry key.
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 abstract class O_Html_Template extends O_Dict_Access {
 	/**

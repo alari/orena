@@ -5,7 +5,7 @@
  * @see O_Dao_Relation_BaseToMany
  * @see O_Dao_FieldInfo
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	private $targetClass;

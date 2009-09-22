@@ -4,7 +4,7 @@
  *
  * @see O_Js_iFramework
  *
- * @copyright Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Js_Middleware {
 	/**

@@ -2,7 +2,7 @@
 /**
  * Image resizer class.
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Image_Resizer {
 	private $src;

@@ -21,7 +21,7 @@
  *
  * Notice: you can use "layout_class" registry key to easily change formatting of default templates
  *
- * @author Dmitry Kourinski
+ * @author Dmitry Kurinskiy
  */
 class O_Cmd_Edit extends O_Command {
 
