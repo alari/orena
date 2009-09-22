@@ -15,9 +15,9 @@
  * @category   Zend
  * @package    Zend_Service
  * @subpackage Twitter
- * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
- * @version    $Id: $
+ * @version    $Id: Twitter.php 16971 2009-07-22 18:05:45Z mikaelkael $
  */
 
 
@@ -35,7 +35,7 @@ require_once 'Zend/Rest/Client/Result.php';
  * @category   Zend
  * @package    Zend_Service
  * @subpackage Twitter
- * @copyright  Copyright (c) 2005-2008 Zend Technologies USA Inc. (http://www.zend.com)
+ * @copyright  Copyright (c) 2005-2009 Zend Technologies USA Inc. (http://www.zend.com)
  * @license    http://framework.zend.com/license/new-bsd     New BSD License
  */
 class Zend_Service_Twitter extends Zend_Rest_Client
@@ -55,7 +55,7 @@ class Zend_Service_Twitter extends Zend_Rest_Client
      * Date format for 'since' strings
      * @var string
      */
-    protected $_dateFormat = 'D, d M Y H:i:s e';
+    protected $_dateFormat = 'D, d M Y H:i:s T';
 
     /**
      * Username
@@ -251,7 +251,9 @@ class Zend_Service_Twitter extends Zend_Rest_Client
      *
      * $params may include one or more of the following keys
      * - id: ID of a friend whose timeline you wish to receive
+     * - count: how many statuses to return
      * - since: return results only after the date specified
+     * - since_id: return results only after the specific tweet
      * - page: return page X of results
      *
      * @param  array $params
@@ -264,6 +266,18 @@ class Zend_Service_Twitter extends Zend_Rest_Client
         $_params = array();
         foreach ($params as $key => $value) {
             switch (strtolower($key)) {
+                case 'count':
+                    $count = (int) $value;
+                    if (0 >= $count) {
+                        $count = 1;
+                    } elseif (200 < $count) {
+                        $count = 200;
+                    }
+                    $_params['count'] = (int) $count;
+                    break;
+                case 'since_id':
+                    $_params['since_id'] = (int) $value;
+                    break;
                 case 'since':
                     $this->_setDate($value);
                     break;
@@ -417,7 +431,7 @@ class Zend_Service_Twitter extends Zend_Rest_Client
     public function statusDestroy($id)
     {
         $this->_init();
-        $path = '/statuses/destroy/' . (int) $id . '.xml';
+        $path = '/statuses/destroy/' . $id . '.xml';
 
         $response = $this->restPost($path);
         return new Zend_Rest_Client_Result($response->getBody());
@@ -743,7 +757,7 @@ class Zend_Service_Twitter extends Zend_Rest_Client
     public function favoriteCreate($id)
     {
         $this->_init();
-        $path = '/favorites/create/' . (int) $id . '.xml';
+        $path = '/favorites/create/' . $id . '.xml';
 
         $response = $this->restPost($path);
         return new Zend_Rest_Client_Result($response->getBody());
@@ -758,7 +772,7 @@ class Zend_Service_Twitter extends Zend_Rest_Client
     public function favoriteDestroy($id)
     {
         $this->_init();
-        $path = '/favorites/destroy/' . (int) $id . '.xml';
+        $path = '/favorites/destroy/' . $id . '.xml';
 
         $response = $this->restPost($path);
         return new Zend_Rest_Client_Result($response->getBody());
