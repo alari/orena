@@ -124,7 +124,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 
 		// For OpenID 1, send a redirect.  For OpenID 2, use a Javascript
 		// form to send a POST request to the server.
-		if ($auth_request->shouldSendRedirect()) {echo "A";
+		if ($auth_request->shouldSendRedirect()) {
 			$redirect_url = $auth_request->redirectURL( $this->getTrustRoot(),
 					$this->getReturnTo() );
 
@@ -136,7 +136,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 				// Send redirect.
 				return $this->redirect( $redirect_url );
 			}
-		} else {echo "B";
+		} else {
 			// Generate form markup and render it.
 			$form_id = 'openid_message';
 			$form_html = $auth_request->htmlMarkup( $this->getTrustRoot(), $this->getReturnTo(),

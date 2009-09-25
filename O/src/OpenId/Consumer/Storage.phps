@@ -254,11 +254,14 @@ class O_OpenId_Consumer_Storage extends Auth_OpenID_OpenIDStore {
 		global $Auth_OpenID_SKEW;
 
 		if (abs( $timestamp - time() ) > $Auth_OpenID_SKEW) {
-			return False;
+			echo "F1";
+			return false;
 		}
 
-		return O_Db_Query::get( self::TABLE_NONCE )->field( "server_url", $server_url )->field(
+		$tmp = O_Db_Query::get( self::TABLE_NONCE )->field( "server_url", $server_url )->field(
 				"timestamp", $timestamp )->field( "salt", $salt )->insert() ? true : false;
+		if(!$tmp) echo "F2";
+		return $tmp;
 	}
 
 	/**
