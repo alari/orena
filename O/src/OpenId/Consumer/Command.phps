@@ -178,10 +178,10 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	/**
 	 * Authentication completed successfull
 	 *
-	 * @param Auth_OpenID_ConsumerResponse $response
+	 * @param Auth_OpenID_SuccessResponse $response
 	 * @return O_Html_Template or mixed
 	 */
-	abstract protected function authSuccess( $response );
+	abstract protected function authSuccess( Auth_OpenID_SuccessResponse $response );
 
 	/**
 	 * Authentication was cancelled; display error message
