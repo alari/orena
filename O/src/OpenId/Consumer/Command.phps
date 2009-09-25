@@ -181,7 +181,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 * @param Auth_OpenID_ConsumerResponse $response
 	 * @return O_Html_Template or mixed
 	 */
-	abstract protected function authSuccess( Auth_OpenID_ConsumerResponse $response );
+	abstract protected function authSuccess( $response );
 
 	/**
 	 * Authentication was cancelled; display error message
@@ -217,7 +217,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 *
 	 * @return O_Html_Template
 	 */
-	public function startAuth() {
+	protected function startAuth() {
 		$tpl = $this->getTemplate();
 		$tpl->mode = O_OpenId_Consumer_Template::MODE_AUTH;
 		return $tpl;

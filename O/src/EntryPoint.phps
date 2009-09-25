@@ -53,7 +53,7 @@ class O_EntryPoint {
 			setlocale( LC_ALL, "ru_RU.UTF8" );
 
 			if (O_Registry::get( "app/mode" ) == "development") {
-				//set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
+				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
 			}
 
 			// Prepare and echo response
