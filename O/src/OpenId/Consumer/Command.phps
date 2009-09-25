@@ -46,7 +46,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 */
 	protected function getReturnTo()
 	{
-		return "http://" . O_Registry::get( "app/env/http_host" ) . "/" . O_Registry::get(
+		return "http://" . O_Registry::get( "app/env/http_host" ) . O_Registry::get(
 				"app/env/request_url" );
 	}
 
