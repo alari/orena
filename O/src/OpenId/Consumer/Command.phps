@@ -92,6 +92,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 */
 	protected function handleAuthExtensions( Auth_OpenID_ConsumerResponse $response )
 	{
+		include_once 'Auth/OpenID/SReg.php';
 		$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse( $response );
 
 		return $sreg_resp->contents();
