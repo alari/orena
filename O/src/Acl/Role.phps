@@ -16,14 +16,14 @@
  * @index name
  */
 class O_Acl_Role extends O_Dao_ActiveRecord {
-	
+
 	/**
 	 * Cached visitor role
 	 *
 	 * @var O_Acl_Role
 	 */
 	protected static $visitor_role = null;
-	
+
 	/**
 	 * Roles by its names
 	 *
@@ -58,7 +58,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	public function allow( $action )
 	{
 		$this->clear( $action );
-		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"), 
+		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"),
 				array ($action, O_Acl_Action::TYPE_ALLOW) );
 	}
 
@@ -70,7 +70,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	public function deny( $action )
 	{
 		$this->clear( $action );
-		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"), 
+		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"),
 				array ($action, O_Acl_Action::TYPE_DENY) );
 	}
 
@@ -124,7 +124,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	static public function getVisitorRole()
 	{
 		if (!self::$visitor_role) {
-			self::$visitor_role = O_Dao_Query::get( self::getClassName() )->test( "visitor_role", 
+			self::$visitor_role = O_Dao_Query::get( self::getClassName() )->test( "visitor_role",
 					1 )->getOne();
 		}
 		return self::$visitor_role;
@@ -164,7 +164,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	 *
 	 * @return string
 	 */
-	public function getClassName()
+	static public function getClassName()
 	{
 		return O_Registry::get( "app/classnames/acl_role" );
 	}

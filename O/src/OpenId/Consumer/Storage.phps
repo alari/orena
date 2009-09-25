@@ -1,18 +1,19 @@
 <?php
+
+require_once 'Auth/OpenID/Interface.php';
 /**
  *
  */
-class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
+class O_OpenId_Consumer_Storage extends Auth_OpenID_OpenIDStore {
 	/**
 	 * Singleton pattern
 	 *
 	 * @var O_OpenId_Consumer_Storage
 	 */
 	private static $singleton;
-	
-	const TABLE_NONCE = "o_openid_nonce";
-	const TABLE_ASSOC = "o_openid_assoc";
-	const TABLE_DISCOVERY = "o_openid_discovery";
+
+	const TABLE_NONCE = "o_openid_nonce2";
+	const TABLE_ASSOC = "o_openid_assoc2";
 
 	/**
 	 * Returns instance of storage
@@ -34,188 +35,239 @@ class O_OpenId_Consumer_Storage extends Zend_OpenId_Consumer_Storage {
 	{
 		$nonce = O_Db_Query::get( self::TABLE_NONCE );
 		if (!$nonce->tableExists()) {
-			$nonce->field( "nonce", "varchar(255) not null" )->index( "nonce", "unique" )->field( 
-					"created", "int not null" )->create();
+			$nonce->field( "server_url", "VARCHAR(2047) NOT NULL" )->field( "timestamp",
+					"INT NOT NULL" )->field( "salt", "CHAR(40) NOT NULL" )->index(
+					"server_url(255), timestamp, salt", "unique" )->create( "ENGINE=InnoDB" );
 		}
-		
+
 		$assoc = O_Db_Query::get( self::TABLE_ASSOC );
 		if (!$assoc->tableExists()) {
-			$assoc->field( "url", "varchar(255) not null" )->field( "handle", 
-					"varchar(255) not null" )->field( "mac_func", "varchar(16) not null" )->field( 
-					"secret", "varchar(255) not null" )->field( "expires", "int not null" )->index( 
-					"url", "unique" )->create();
-		}
-		
-		$discovery = O_Db_Query::get( self::TABLE_DISCOVERY );
-		if (!$discovery->tableExists()) {
-			$discovery->field( "disc_id", "varchar(255) not null" )->field( "real_id", 
-					"varchar(255) not null" )->field( "server", "varchar(255) not null" )->field( 
-					"version", "float default 0" )->field( "expires", "int not null" )->index( 
-					"disc_id", "unique" )->create();
+			$assoc->field( "server_url", "BLOB NOT NULL" )->field( "handle",
+					"VARCHAR(255) NOT NULL" )->field( "secret", "BLOB NOT NULL" )->field(
+					"issued", "INT NOT NULL" )->field( "lifetime", "INT NOT NULL" )->field(
+					"assoc_type", "VARCHAR(64) NOT NULL" )->index( "server_url(255), handle",
+					"PRIMARY KEY" )->create( "ENGINE=InnoDB" );
 		}
 	}
 
 	/**
-	 * Stores information about association identified by $url/$handle
+	 * This method puts an Association object into storage,
+	 * retrievable by server URL and handle.
 	 *
-	 * @param string $url OpenID server URL
-	 * @param string $handle assiciation handle
-	 * @param string $macFunc HMAC function (sha1 or sha256)
-	 * @param string $secret shared secret
-	 * @param long $expires expiration UNIX time
-	 * @return void
+	 * @param string $server_url The URL of the identity server that
+	 * this association is with. Because of the way the server portion
+	 * of the library uses this interface, don't assume there are any
+	 * limitations on the character set of the input string. In
+	 * particular, expect to see unescaped non-url-safe characters in
+	 * the server_url field.
+	 *
+	 * @param Auth_OpenID_Association $association The Association to store.
 	 */
-	public function addAssociation( $url, $handle, $macFunc, $secret, $expires )
+	function storeAssociation( $server_url, $association )
 	{
-		$secret = base64_encode( $secret );
-		O_Db_Query::get( self::TABLE_ASSOC )->field( "url", $url )->field( "handle", $handle )->field( 
-				"mac_func", $macFunc )->field( "secret", $secret )->field( "expires", $expires )->insert();
+		O_Db_Query::get( self::TABLE_ASSOC )->field( "server_url", $server_url )->field( "handle",
+				$association->handle )->field( "secret", $association->secret )->field( "issued",
+				$association->issued )->field( "lifetime", $association->lifetime )->field(
+				"assoc_type", $association->assoc_type )->insert();
+
+	}
+
+	/*
+     * Remove expired nonces from the store.
+     *
+     * Discards any nonce from storage that is old enough that its
+     * timestamp would not pass useNonce().
+     *
+     * This method is not called in the normal operation of the
+     * library.  It provides a way for store admins to keep their
+     * storage from filling up with expired data.
+     *
+     * @return the number of nonces expired
+     */
+	function cleanupNonces()
+	{
+		global $Auth_OpenID_SKEW;
+
+		return O_Db_Query::get( self::TABLE_NONCE )->test( "timestamp", time() - $Auth_OpenID_SKEW,
+				O_Db_Query::LT )->delete();
+	}
+
+	/*
+     * Remove expired associations from the store.
+     *
+     * This method is not called in the normal operation of the
+     * library.  It provides a way for store admins to keep their
+     * storage from filling up with expired data.
+     *
+     * @return the number of associations expired.
+     */
+	function cleanupAssociations()
+	{
+		return O_Db_Query::get( self::TABLE_ASSOC )->where( "issued + lifetime < UNIX_TIMESTAMP()" )->delete();
+	}
+
+	/*
+     * Shortcut for cleanupNonces(), cleanupAssociations().
+     *
+     * This method is not called in the normal operation of the
+     * library.  It provides a way for store admins to keep their
+     * storage from filling up with expired data.
+     */
+	function cleanup()
+	{
+		return array ($this->cleanupNonces(), $this->cleanupAssociations());
 	}
 
 	/**
-	 * Gets information about association identified by $url
-	 * Returns true if given association found and not expired and false
-	 * otherwise
-	 *
-	 * @param string $url OpenID server URL
-	 * @param string &$handle assiciation handle
-	 * @param string &$macFunc HMAC function (sha1 or sha256)
-	 * @param string &$secret shared secret
-	 * @param long &$expires expiration UNIX time
-	 * @return bool
+	 * Report whether this storage supports cleanup
 	 */
-	public function getAssociation( $url, &$handle, &$macFunc, &$secret, &$expires )
+	function supportsCleanup()
 	{
-		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
-		$assoc = O_Db_Query::get( self::TABLE_ASSOC )->test( "url", $url )->select()->fetch();
-		if ($assoc) {
-			$handle = $assoc[ "handle" ];
-			$macFunc = $assoc[ "mac_func" ];
-			$secret = base64_decode( $assoc[ "secret" ] );
-			$expires = $assoc[ "expires" ];
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Gets information about association identified by $handle
-	 * Returns true if given association found and not expired and false
-	 * othverwise
-	 *
-	 * @param string $handle assiciation handle
-	 * @param string &$url OpenID server URL
-	 * @param string &$macFunc HMAC function (sha1 or sha256)
-	 * @param string &$secret shared secret
-	 * @param long &$expires expiration UNIX time
-	 * @return bool
-	 */
-	public function getAssociationByHandle( $handle, &$url, &$macFunc, &$secret, &$expires )
-	{
-		
-		O_Db_Query::get( self::TABLE_ASSOC )->test( "expires", time(), O_Db_Query::LT )->delete();
-		$assoc = O_Db_Query::get( self::TABLE_ASSOC )->test( "handle", $handle )->select()->fetch();
-		if ($assoc) {
-			$url = $assoc[ "url" ];
-			$macFunc = $assoc[ "mac_func" ];
-			$secret = base64_decode( $assoc[ "secret" ] );
-			$expires = $assoc[ "expires" ];
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Deletes association identified by $url
-	 *
-	 * @param string $url OpenID server URL
-	 * @return void
-	 */
-	public function delAssociation( $url )
-	{
-		O_Db_Query::get( self::TABLE_ASSOC )->test( "url", $url )->delete();
-	}
-
-	/**
-	 * Stores information discovered from identity $id
-	 *
-	 * @param string $id identity
-	 * @param string $realId discovered real identity URL
-	 * @param string $server discovered OpenID server URL
-	 * @param float $version discovered OpenID protocol version
-	 * @param long $expires expiration UNIX time
-	 * @return void
-	 */
-	public function addDiscoveryInfo( $id, $realId, $server, $version, $expires )
-	{
-		O_Db_Query::get( self::TABLE_DISCOVERY )->field( "disc_id", $id )->field( "real_id", 
-				$realId )->field( "server", $server )->field( "version", $version )->field( 
-				"expires", $expires )->insert();
-	}
-
-	/**
-	 * Gets information discovered from identity $id
-	 * Returns true if such information exists and false otherwise
-	 *
-	 * @param string $id identity
-	 * @param string &$realId discovered real identity URL
-	 * @param string &$server discovered OpenID server URL
-	 * @param float &$version discovered OpenID protocol version
-	 * @param long &$expires expiration UNIX time
-	 * @return bool
-	 */
-	public function getDiscoveryInfo( $id, &$realId, &$server, &$version, &$expires )
-	{
-		O_Db_Query::get( self::TABLE_DISCOVERY )->test( "expires", time(), O_Db_Query::LT )->delete();
-		$disc = O_Db_Query::get( self::TABLE_DISCOVERY )->test( "disc_id", $id )->select()->fetch();
-		if ($disc) {
-			$realId = $disc[ "real_id" ];
-			$server = $disc[ "server" ];
-			$version = $disc[ "version" ];
-			$expires = $disc[ "expires" ];
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Removes cached information discovered from identity $id
-	 *
-	 * @param string $id identity
-	 * @return bool
-	 */
-	public function delDiscoveryInfo( $id )
-	{
-		O_Db_Query::get( self::TABLE_DISCOVERY )->test( "disc_id", $id )->delete();
 		return true;
 	}
 
 	/**
-	 * The function checks the uniqueness of openid.response_nonce
+	 * This method returns an Association object from storage that
+	 * matches the server URL and, if specified, handle. It returns
+	 * null if no such association is found or if the matching
+	 * association is expired.
 	 *
-	 * @param string $provider openid.openid_op_endpoint field from authentication response
-	 * @param string $nonce openid.response_nonce field from authentication response
-	 * @return bool
+	 * If no handle is specified, the store may return any association
+	 * which matches the server URL. If multiple associations are
+	 * valid, the recommended return value for this method is the one
+	 * most recently issued.
+	 *
+	 * This method is allowed (and encouraged) to garbage collect
+	 * expired associations when found. This method must not return
+	 * expired associations.
+	 *
+	 * @param string $server_url The URL of the identity server to get
+	 * the association for. Because of the way the server portion of
+	 * the library uses this interface, don't assume there are any
+	 * limitations on the character set of the input string.  In
+	 * particular, expect to see unescaped non-url-safe characters in
+	 * the server_url field.
+	 *
+	 * @param mixed $handle This optional parameter is the handle of
+	 * the specific association to get. If no specific handle is
+	 * provided, any valid association matching the server URL is
+	 * returned.
+	 *
+	 * @return Association The Association for the given identity
+	 * server.
 	 */
-	public function isUniqueNonce( $provider, $nonce )
+	function getAssociation( $server_url, $handle = null )
 	{
+		$assocs = Array ();
+		$q = O_Db_Query::get( self::TABLE_ASSOC )->test( "server_url", $server_url );
+		if ($handle !== null) {
+			$q->test( "handle", $handle );
+		}
 		try {
-			O_Db_Query::get( self::TABLE_NONCE )->field( "nonce", $nonce )->field( "created", 
-					time() )->insert();
+			$assocs = $q->select()->fetchAll();
 		}
 		catch (PDOException $e) {
-			return false;
+			$assocs = null;
 		}
-		return true;
+
+		if (!$assocs || (count( $assocs ) == 0)) {
+			return null;
+		} else {
+			$associations = array ();
+
+			foreach ($assocs as $assoc_row) {
+				$assoc = new Auth_OpenID_Association( $assoc_row[ 'handle' ],
+						$assoc_row[ 'secret' ], $assoc_row[ 'issued' ], $assoc_row[ 'lifetime' ],
+						$assoc_row[ 'assoc_type' ] );
+
+				if ($assoc->getExpiresIn() == 0) {
+					$this->removeAssociation( $server_url, $assoc->handle );
+				} else {
+					$associations[] = array ($assoc->issued, $assoc);
+				}
+			}
+
+			if ($associations) {
+				$issued = array ();
+				$assocs = array ();
+				foreach ($associations as $key => $assoc) {
+					$issued[ $key ] = $assoc[ 0 ];
+					$assocs[ $key ] = $assoc[ 1 ];
+				}
+
+				array_multisort( $issued, SORT_DESC, $assocs, SORT_DESC, $associations );
+
+				// return the most recently issued one.
+				list ($issued, $assoc) = $associations[ 0 ];
+				return $assoc;
+			} else {
+				return null;
+			}
+		}
 	}
 
 	/**
-	 * Removes data from the uniqueness database that is older then given date
+	 * This method removes the matching association if it's found, and
+	 * returns whether the association was removed or not.
 	 *
-	 * @param string $date Date of expired data
+	 * @param string $server_url The URL of the identity server the
+	 * association to remove belongs to. Because of the way the server
+	 * portion of the library uses this interface, don't assume there
+	 * are any limitations on the character set of the input
+	 * string. In particular, expect to see unescaped non-url-safe
+	 * characters in the server_url field.
+	 *
+	 * @param string $handle This is the handle of the association to
+	 * remove. If there isn't an association found that matches both
+	 * the given URL and handle, then there was no matching handle
+	 * found.
+	 *
+	 * @return mixed Returns whether or not the given association existed.
 	 */
-	public function purgeNonces( $date = null )
+	function removeAssociation( $server_url, $handle )
 	{
-		O_Db_Query::get( self::TABLE_NONCE )->test( "created", strtotime( $date ), O_Db_Query::LT )->delete();
+		return O_Db_Query::get( self::TABLE_ASSOC )->test( "server_url", $server_url )->test(
+				"handle", $handle )->delete() ? true : false;
 	}
+
+	/**
+	 * Called when using a nonce.
+	 *
+	 * This method should return C{True} if the nonce has not been
+	 * used before, and store it for a while to make sure nobody
+	 * tries to use the same value again.  If the nonce has already
+	 * been used, return C{False}.
+	 *
+	 * Change: In earlier versions, round-trip nonces were used and a
+	 * nonce was only valid if it had been previously stored with
+	 * storeNonce.  Version 2.0 uses one-way nonces, requiring a
+	 * different implementation here that does not depend on a
+	 * storeNonce call.  (storeNonce is no longer part of the
+	 * interface.
+	 *
+	 * @param string $nonce The nonce to use.
+	 *
+	 * @return bool Whether or not the nonce was valid.
+	 */
+	function useNonce( $server_url, $timestamp, $salt )
+	{
+		global $Auth_OpenID_SKEW;
+
+		if (abs( $timestamp - time() ) > $Auth_OpenID_SKEW) {
+			return False;
+		}
+
+		return O_Db_Query::get( self::TABLE_NONCE )->field( "server_url", $server_url )->field(
+				"timestamp", $timestamp )->field( "salt", $salt )->insert() ? true : false;
+	}
+
+	/**
+	 * Removes all entries from the store; implementation is optional.
+	 */
+	function reset()
+	{
+		O_Db_Query::get( self::TABLE_ASSOC )->delete();
+		O_Db_Query::get( self::TABLE_NONCE )->delete();
+	}
+
 }

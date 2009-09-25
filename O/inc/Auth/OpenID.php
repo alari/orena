@@ -120,9 +120,9 @@ class Auth_OpenID {
      *
      * @access private
      */
-    function isFailure($thing)
+    static public function isFailure($thing)
     {
-        return is_a($thing, 'Auth_OpenID_FailureResponse');
+        return $thing instanceof Auth_OpenID_FailureResponse;
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 /**
- * @table core_model -signal -show:callback simple -show-loop:callback envelop loop
+ * @table core_model -signal -show:envelop simple -show-loop:envelop envelop loop
  * @field textfield text -edit wysiwyg \
  * 		-title Текстовое поле -signal test \
  * 		-show-def wysiwyg \
