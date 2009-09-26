@@ -26,7 +26,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 */
 	protected function getStore()
 	{
-		return O_OpenId_Consumer_Storage::getInstance();
+		return O_OpenId_Storage::getInstance();
 	}
 
 	/**
@@ -90,7 +90,7 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 	 *
 	 * @param Auth_OpenID_ConsumerResponse $response
 	 */
-	protected function handleAuthExtensions( Auth_OpenID_ConsumerResponse $response )
+	protected function getSRegResponse( Auth_OpenID_ConsumerResponse $response )
 	{
 		include_once 'Auth/OpenID/SReg.php';
 		$sreg_resp = Auth_OpenID_SRegResponse::fromSuccessResponse( $response );

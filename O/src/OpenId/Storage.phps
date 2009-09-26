@@ -4,7 +4,7 @@ require_once 'Auth/OpenID/Interface.php';
 /**
  *
  */
-class O_OpenId_Consumer_Storage extends Auth_OpenID_OpenIDStore {
+class O_OpenId_Storage extends Auth_OpenID_OpenIDStore {
 	/**
 	 * Singleton pattern
 	 *
