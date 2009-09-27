@@ -92,11 +92,16 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	 */
 	protected function handleServerRequest()
 	{
+		$realm=$this->getParam("openid_realm");
+		if(!isset($_SESSION[$realm])) {
+			$_SESSION[$realm] = http_build_query($_POST);
+		}
+
 		header( 'X-XRDS-Location: ' . $this->buildUrl( "idp-xrds" ) );
 
 		$oserver = new Auth_OpenID_Server( O_OpenId_Storage::getInstance(),
 				"http://centralis.name" );
-		$request = $oserver->decodeRequest();
+		$request = $oserver->decodeRequest($_SESSION[$realm]);
 
 		if(!$request) return $this->redirect("/");
 		if ($this->identity != str_replace(array("http://", "/"), array("", ""), $request->identity))
@@ -126,6 +131,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 
 		header( "Connection: close" );
 		print $webresponse->body;
+		unset($_SESSION[$realm]);
 		exit( 0 );
 	}
 
