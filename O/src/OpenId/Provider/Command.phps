@@ -94,7 +94,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	{
 		$realm=$this->getParam("openid_realm");
 		if(!isset($_SESSION[$realm])) {
-			$_SESSION[$realm] = http_build_query($_POST);
+			$_SESSION[$realm] = $_POST;
 		}
 
 		header( 'X-XRDS-Location: ' . $this->buildUrl( "idp-xrds" ) );
