@@ -5,8 +5,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	protected $identity;
 
 	public function process()
-	{error_reporting(E_ALL);function my_echo(){print_r(func_get_args());}
-set_error_handler("my_echo", E_ERROR);
+	{
 		$this->prepareIdentity();
 		$action = O_Registry::get( "app/current/action" );
 		switch ($action) {
