@@ -112,10 +112,12 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 			$must_user = O_OpenId_Provider_UserPlugin::getByIdentity( $request->identity );
 			$current_user = O_Base_Session::getUser();
 			if ($current_user && $user && $must_user && $current_user->id == $must_user->id && $must_user->id ==
-				 $user->id)
+				 $user->id) {
+				 	$_SESSION["notice"] = $current_user->id.":".$must_user->id.":".$user->id;
 					$response = $request->answer( true );
-			else
+			} else {
 				$response = $request->answer( false );
+			}
 			/*	} else if ($request->immediate) {
 				$response = $request->answer( false );
 			} else {
@@ -177,6 +179,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
     </Service>
   </XRD>
 </xrds:XRDS>
-', Auth_OpenID_TYPE_2_0, Auth_OpenID_TYPE_1_1, $this->buildURL() );
+', Auth_OpenID_TYPE_2_0,
+				Auth_OpenID_TYPE_1_1, $this->buildURL() );
 	}
 }
