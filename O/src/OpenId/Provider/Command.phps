@@ -82,7 +82,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 		return $tpl;
 	}
 
-	protected function buildUrl($action) {
+	protected function buildUrl($action="") {
 		return "http://".O_Registry::get("app/env/http_host")."/openid/provider".($action?"/".$action:"");
 	}
 
@@ -102,7 +102,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 		header( 'X-XRDS-Location: ' . $this->buildUrl( "idp-xrds" ) );
 
 		$oserver = new Auth_OpenID_Server( O_OpenId_Storage::getInstance(),
-				"http://centralis.name" );
+				$this->buildUrl() );
 		$request = $oserver->decodeRequest($_SESSION[$realm]);
 
 		if(!$request) return $this->redirect("/");
