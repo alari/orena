@@ -93,34 +93,27 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	 */
 	protected function handleServerRequest()
 	{
-		$realm=$this->getParam("openid_realm");
-		if(!isset($_SESSION[$realm])) {
-			$a = Array();
-			foreach($_POST as $k=>$v) $a[str_replace("openid_","openid.",$k)]=$v;
-			$_SESSION[$realm] = $a;
-		}
-
 		header( 'X-XRDS-Location: ' . $this->buildUrl( "idp-xrds" ) );
 
 		$oserver = new Auth_OpenID_Server( O_OpenId_Storage::getInstance(),
 				$this->buildUrl() );
-		$request = $oserver->decodeRequest($_SESSION[$realm]);
-
+		$request = $oserver->decodeRequest();
+/*
 		if(!$request) {
 			$_SESSION["notice"] = "no request given; ".print_r($_POST,1);
 			return $this->redirect("/");
 		}
 		if ($this->identity != str_replace(array("http://", "/"), array("", ""), $request->identity))
 			throw new O_Ex_Error( "Wrong identity: $this->identity != $request->identity"."<br/>".print_r($request,1) );
-
+*/
 		if (in_array( $request->mode, array ('checkid_immediate', 'checkid_setup') )) {
-			if ($this->decidedPositive( $request->trust_root )) {
+	//		if ($this->decidedPositive( $request->trust_root )) {
 				$response = $request->answer( true );
-			} else if ($request->immediate) {
+		/*	} else if ($request->immediate) {
 				$response = $request->answer( false );
 			} else {
 				return $this->showDecidePage( $request->trust_root );
-			}
+			}*/
 		} else {
 			$response = $oserver->handleRequest( $request );
 		}
