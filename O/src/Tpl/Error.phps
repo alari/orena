@@ -20,7 +20,7 @@ class O_Tpl_Error extends O_Html_Template {
 		$msg = $this->e->getMessage();
 		if (!$err || $isProduction)
 			$err = 500;
-		if (!$msg || $isProduction)
+		if (!$msg)
 			$msg = "Internal server error";
 		$this->layout()->setTitle( $err . ": " . $msg );
 		?>
