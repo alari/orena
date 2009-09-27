@@ -15,7 +15,7 @@ class O_Tpl_Error extends O_Html_Template {
 
 	public function displayContents()
 	{
-		$isProduction = O_Registry::get( "app/mode" ) == "production" || 1;
+		$isProduction = O_Registry::get( "app/mode" ) == "production" &&0;
 		$err = $this->e->getCode();
 		$msg = $this->e->getMessage();
 		if (!$err || $isProduction)
