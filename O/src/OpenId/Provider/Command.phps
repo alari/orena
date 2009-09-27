@@ -99,7 +99,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 		$request = $oserver->decodeRequest();
 
 		if(!$request) return $this->redirect("/");
-		if ($this->identity != $request->identity)
+		if ($this->identity != str_replace(array("http://", "/"), array("", ""), $request->identity))
 			throw new O_Ex_Error( "Wrong identity: $this->identity != $request->identity" );
 
 		if (in_array( $request->mode, array ('checkid_immediate', 'checkid_setup') )) {
