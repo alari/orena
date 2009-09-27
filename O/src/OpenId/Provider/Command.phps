@@ -114,10 +114,9 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 			if ($current_user && $user && $must_user && $current_user->id == $must_user->id && $must_user->id ==
 				 $user->id) {
 				 	$_SESSION["notice"] = $current_user->id.":".$must_user->id.":".$user->id;
-				 	die("answer true");
 					$response = $request->answer( true );
 			} else {
-				die("answer false");
+				$_SESSION["notice"] = "answer false";
 				$response = $request->answer( false );
 			}
 			/*	} else if ($request->immediate) {
