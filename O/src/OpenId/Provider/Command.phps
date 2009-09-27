@@ -31,6 +31,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	{
 		$user = O_OpenId_Provider_UserPlugin::getByIdentity( $this->identity );
 		if (!$user) {
+			$_SESSION["notice"] = "no base user";
 			return $this->redirect( "/" );
 		}
 
@@ -105,7 +106,10 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 				$this->buildUrl() );
 		$request = $oserver->decodeRequest($_SESSION[$realm]);
 
-		if(!$request) return $this->redirect("/");
+		if(!$request) {
+			$_SESSION["notice"] = "no request given; ".print_r($_POST,1);
+			return $this->redirect("/");
+		}
 		if ($this->identity != str_replace(array("http://", "/"), array("", ""), $request->identity))
 			throw new O_Ex_Error( "Wrong identity: $this->identity != $request->identity"."<br/>".print_r($request,1) );
 
