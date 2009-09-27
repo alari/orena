@@ -22,6 +22,7 @@ class O_Mail_Message extends O_Dao_ActiveRecord {
 		$this->subject = $subject;
 		$this->message = $message;
 		$this->add_headers = $add_headers;
+		$this->time = time();
 		$this->save();
 	}
 
