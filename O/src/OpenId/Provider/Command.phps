@@ -31,7 +31,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	{
 		$user = O_OpenId_Provider_UserPlugin::getByIdentity( $this->identity );
 		if (!$user) {
-			$_SESSION["notice"] = "no base user";
+			$_SESSION[ "notice" ] = "no base user";
 			return $this->redirect( "/" );
 		}
 
@@ -83,10 +83,11 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 		return $tpl;
 	}
 
-	protected function buildUrl($action="") {
-		return "http://".O_Registry::get("app/env/http_host")."/openid/provider".($action?"/".$action:"");
+	protected function buildUrl( $action = "" )
+	{
+		return "http://" . O_Registry::get( "app/env/http_host" ) . "/openid/provider" . ($action ? "/" .
+				 $action : "");
 	}
-
 
 	/**
 	 * Handle a standard OpenID server request
@@ -95,10 +96,9 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	{
 		header( 'X-XRDS-Location: ' . $this->buildUrl( "idp-xrds" ) );
 
-		$oserver = new Auth_OpenID_Server( O_OpenId_Storage::getInstance(),
-				$this->buildUrl() );
+		$oserver = new Auth_OpenID_Server( O_OpenId_Storage::getInstance(), $this->buildUrl() );
 		$request = $oserver->decodeRequest();
-/*
+		/*
 		if(!$request) {
 			$_SESSION["notice"] = "no request given; ".print_r($_POST,1);
 			return $this->redirect("/");
@@ -107,9 +107,16 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 			throw new O_Ex_Error( "Wrong identity: $this->identity != $request->identity"."<br/>".print_r($request,1) );
 */
 		if (in_array( $request->mode, array ('checkid_immediate', 'checkid_setup') )) {
-	//		if ($this->decidedPositive( $request->trust_root )) {
-				$response = $request->answer( true );
-		/*	} else if ($request->immediate) {
+			//		if ($this->decidedPositive( $request->trust_root )) {
+			$user = O_OpenId_Provider_UserPlugin::getByIdentity( $this->identity );
+			$must_user = O_OpenId_Provider_UserPlugin::getByIdentity( $request->identity );
+			$current_user = O_Base_Session::getUser();
+			if ($current_user && $user && $must_user && $current_user->id == $must_user->id && $must_user->id ==
+				 $user->id)
+					$response = $request->answer( true );
+			else
+				$response = $request->answer( false );
+			/*	} else if ($request->immediate) {
 				$response = $request->answer( false );
 			} else {
 				return $this->showDecidePage( $request->trust_root );
@@ -124,13 +131,13 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 			header( sprintf( "HTTP/1.1 %d ", $webresponse->code ), true, $webresponse->code );
 		}
 
-		if(count($webresponse->headers)) foreach ($webresponse->headers as $k => $v) {
-			header( "$k: $v" );
-		}
+		if (count( $webresponse->headers ))
+			foreach ($webresponse->headers as $k => $v) {
+				header( "$k: $v" );
+			}
 
 		header( "Connection: close" );
 		print $webresponse->body;
-		unset($_SESSION[$realm]);
 		exit( 0 );
 	}
 
@@ -170,7 +177,6 @@ abstract class O_OpenId_Provider_Command extends O_Command {
     </Service>
   </XRD>
 </xrds:XRDS>
-', Auth_OpenID_TYPE_2_0,
-				Auth_OpenID_TYPE_1_1, $this->buildURL() );
+', Auth_OpenID_TYPE_2_0, Auth_OpenID_TYPE_1_1, $this->buildURL() );
 	}
 }
