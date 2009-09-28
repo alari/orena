@@ -4,7 +4,8 @@ class O_Mail_Service {
 
 	static public function addToQueue( $to, $from, $subject, $message, $add_headers = "Content-type: text/plain; charset=utf-8" )
 	{
-		new O_Mail_Message( $to, $from, $subject, $message, $add_headers );
+		if ($to && $from)
+			new O_Mail_Message( $to, $from, $subject, $message, $add_headers );
 	}
 
 	static public function send( $to, $from, $subject, $message, $add_headers = "Content-type: text/plain; charset=utf-8" )
