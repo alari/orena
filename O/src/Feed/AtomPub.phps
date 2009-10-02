@@ -21,7 +21,7 @@ class O_Feed_AtomPub {
 			return self::error( curl_error( $curl ) );
 		}
 
-		if(strpos($ret,"<?xml") === 0) {
+		if(strpos($ret,"<?xml") !== 0) {
 			return self::setError("Invalid response: $ret");
 		}
 
