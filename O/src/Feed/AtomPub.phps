@@ -41,7 +41,8 @@ class O_Feed_AtomPub {
 			foreach (array_keys( $l[ 0 ] ) as $k) {
 				$params[ $l[ 1 ][ $k ] ] = $l[ 3 ][ $k ];
 			}
-			if (isset( $params[ "rel" ] ) && isset( $params[ "type" ] ) && isset( $params[ "href" ] )) {
+			if (isset( $params[ "rel" ] ) && isset( $params[ "type" ] ) && isset(
+					$params[ "href" ] )) {
 				if ($params[ "rel" ] == "alternate" && $params[ "type" ] == "text/html")
 					$return[ "post_url" ] = $params[ "href" ];
 				if ($params[ "rel" ] == "service.edit" && strpos( $params[ "type" ], "atom+xml" ))
@@ -122,8 +123,10 @@ class O_Feed_AtomPub {
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
-<content type="html">
-<?=htmlspecialchars( $data )?>
+<issued><?=$updated?></issued>
+<content type="application/xhtml+xml">
+<div xmlns="http://www.w3.org/1999/xhtml">
+<?=$data?></div>
 </content>
 </entry><?
 		return ob_get_clean();
