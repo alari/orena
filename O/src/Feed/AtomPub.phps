@@ -110,7 +110,7 @@ class O_Feed_AtomPub {
 		$data = str_replace( array ("\r", "\n"), array ("", ""), $data );
 		ob_start();
 		?>
-<entry xmlns="http://purl.org/atom/ns#">
+<entry xmlns="http://www.w3.org/2005/Atom">
 <title><?=htmlspecialchars( $title )?></title>
 <?
 		if ($id) {
