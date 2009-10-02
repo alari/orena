@@ -116,7 +116,7 @@ class O_Feed_AtomPub {
 		if ($id) {
 			?><id><?=$id?></id><?
 		}
-		if ($no_comments&&0) {
+		if ($no_comments) {
 			?>
 <allowComments xmlns="http://www.movabletype.org/atom/ns#">0</mt:allowComments><?
 		}
