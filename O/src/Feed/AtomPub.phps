@@ -124,7 +124,7 @@ class O_Feed_AtomPub {
 
 	static private function setError( $errmsg )
 	{
-		self::$error = $errmsg;
+		echo self::$error = $errmsg;
 		return false;
 	}
 
