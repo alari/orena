@@ -16,7 +16,7 @@ class O_Feed_AtomPub {
 		curl_setopt( $curl, CURLOPT_USERPWD, $userpwd );
 		curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
 		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-		echo $ret = curl_exec( $curl );
+		$ret = curl_exec( $curl );
 		if (!$ret) {
 			return self::error( curl_error( $curl ) );
 		}
@@ -124,7 +124,7 @@ class O_Feed_AtomPub {
 
 	static private function setError( $errmsg )
 	{
-		echo self::$error = $errmsg;
+		self::$error = $errmsg;
 		return false;
 	}
 
