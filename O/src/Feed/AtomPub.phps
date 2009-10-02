@@ -22,7 +22,7 @@ class O_Feed_AtomPub {
 		}
 
 		$d = new DOMDocument( );
-		if (!@$d->loadXml( $ret )) {
+		if (!@$d->loadXml( $ret )) {echo "$api_url<hr/>";echo $ret;
 			return self::setError( "Cannot load xml data $ret" );
 		}
 
