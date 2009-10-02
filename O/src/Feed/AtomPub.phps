@@ -125,9 +125,8 @@ class O_Feed_AtomPub {
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
 <issued><?=$updated?></issued>
-<content type="application/xhtml+xml">
-<div xmlns="http://www.w3.org/1999/xhtml">
-<?=$data?></div>
+<content type="html">
+<?=htmlspecialchars($data)?>
 </content>
 </entry><?
 		return ob_get_clean();
