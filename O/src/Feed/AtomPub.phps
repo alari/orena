@@ -101,22 +101,24 @@ class O_Feed_AtomPub {
 		$data = str_replace( array ("\r", "\n"), array ("", ""), $data );
 		ob_start();
 		?>
-<entry xmlns="http://purl.org/atom/ns#"
-	xmlns:mt="http://www.movabletype.org/atom/ns#">
+<entry xmlns="http://purl.org/atom/ns#">
 <title><?=htmlspecialchars( $title )?></title>
 <?
 		if ($id) {
 			?><id><?=$id?></id><?
 		}
 		if ($no_comments) {
-			?> <mt:allowComments>0</mt:allowComments><?
+			?>
+<mt:allowComments xmlns:mt="http://www.movabletype.org/atom/ns#">0</mt:allowComments><?
 		}
-		?><mt:allowComments>0</mt:allowComments>
+		?>
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
-<content type="html">
-<?=htmlspecialchars( $data )?>
+<content type="application/xhtml+xml">
+<div xmlns="http://www.w3.org/1999/xhtml">
+<?=htmlspecialchars( $data )?></div>
+div>
 </content>
 </entry><?
 		return ob_get_clean();
