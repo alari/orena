@@ -102,7 +102,7 @@ class O_Feed_AtomPub {
 		ob_start();
 		?>
 <entry xmlns="http://purl.org/atom/ns#"
-	xmlns:mt="http://www.movabletype.org/atom/ns#>
+	xmlns:mt="http://www.movabletype.org/atom/ns#">
 <title><?=htmlspecialchars( $title )?></title>
 <?
 		if ($id) {
