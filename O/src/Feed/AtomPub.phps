@@ -34,7 +34,7 @@ class O_Feed_AtomPub {
 
 		preg_match_all("#<link ([^>]+)/>#", $ret, $m);
 		foreach($m[1] as $link){
-			preg_match_all("#(rel|type|href)=([\\\"|'])(.+)(\\2)#", $link, $l);
+			preg_match_all("#(rel|type|href)=([\\\"|'])([^\\\"' ]+)(\\2)#", $link, $l);
 			print_r($l);
 		}
 exit;
