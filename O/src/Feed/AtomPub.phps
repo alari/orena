@@ -21,14 +21,21 @@ class O_Feed_AtomPub {
 			return self::error( curl_error( $curl ) );
 		}
 
-		$d = new DOMDocument( );
-		if (!@$d->loadXml( $ret )) {echo "$api_url<hr/>";echo $ret;
-			return self::setError( "Cannot load xml data $ret" );
+		if(strpos($ret,"<?xml") === 0) {
+			return self::setError("Invalid response: $ret");
 		}
 
 		$return = Array ();
 
-		$return[ "id" ] = $d->getElementsByTagName( "id" )->item( 0 )->textContent;
+		preg_match("#<id>([^<]+)</id>#", $ret, $m);
+		if(!isset($m[1])) {
+			return self::setError("id not found in $ret");
+		}
+		$return["id"]=$m[1];
+		$return["xml"]=$ret;
+		preg_match_all("#<link ([^>]+)/>#", $ret, $m);
+		print_r($m);exit;
+
 		$return[ "post_url" ] = "";
 		$return[ "edit_url" ] = "";
 
@@ -39,8 +46,6 @@ class O_Feed_AtomPub {
 					$link->getAttribute( "type" ), "atom+xml" ))
 				$return[ "edit_url" ] = $link->getAttribute( "href" );
 		}
-
-		$return[ "xml" ] = $ret;
 		return $return;
 	}
 
