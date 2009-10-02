@@ -28,7 +28,7 @@ class O_Feed_AtomPub {
 		$return = Array ();
 
 		preg_match("#<id>([^<]+)</id>#", $ret, $m);
-		if(!isset($m[1])) {
+		if(!isset($m[1])) {echo $ret;exit;
 			return self::setError("id not found in $ret");
 		}
 		$return["id"]=$m[1];
