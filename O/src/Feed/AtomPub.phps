@@ -116,15 +116,14 @@ class O_Feed_AtomPub {
 		if ($id) {
 			?><id><?=$id?></id><?
 		}
-		if ($no_comments) {
+		if ($no_comments&&0) {
 			?>
-<mt:allowComments xmlns:mt="http://www.movabletype.org/atom/ns#">0</mt:allowComments><?
+<allowComments xmlns="http://www.movabletype.org/atom/ns#">0</mt:allowComments><?
 		}
 		?>
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
-<issued><?=$updated?></issued>
 <content type="html">
 <?=htmlspecialchars($data)?>
 </content>
