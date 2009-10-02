@@ -72,7 +72,8 @@ class O_Feed_AtomPub {
 		return $ret;
 	}
 
-	static public function delete($edit_url, $userpwd) {
+	static public function delete( $edit_url, $userpwd )
+	{
 		$curl = curl_init( $edit_url );
 		curl_setopt( $curl, CURLOPT_CUSTOMREQUEST, "DELETE" );
 
@@ -88,19 +89,27 @@ class O_Feed_AtomPub {
 		return $ret;
 	}
 
-	static public function prepareEntry($title, $url, $published, $data, $updated=null, $id=null, $no_comments=1) {
-		if(!$published) $published = time();
+	static public function prepareEntry( $title, $url, $published, $data, $updated = null, $id = null, $no_comments = 1 )
+	{
+		if (!$published)
+			$published = time();
 		$published = date( "Y-m-d", $published ) . "T" . date( "H:i:s", $published );
-		if(!$updated) $updated = $published;
-		else $updated = date( "Y-m-d", $updated ) . "T" . date( "H:i:s", $updated );
+		if (!$updated)
+			$updated = $published;
+		else
+			$updated = date( "Y-m-d", $updated ) . "T" . date( "H:i:s", $updated );
 		$data = str_replace( array ("\r", "\n"), array ("", ""), $data );
 		ob_start();
 		?>
-<entry xmlns='http://www.w3.org/2005/Atom'>
+<entry xmlns="http://purl.org/atom/ns#"
+	xmlns:mt="http://www.movabletype.org/atom/ns#>
 <title><?=htmlspecialchars( $title )?></title>
 <?
 		if ($id) {
 			?><id><?=$id?></id><?
+		}
+		if ($no_comments) {
+			?> <mt:allowComments>0</mt:allowComments><?
 		}
 		?>
 <link rel="alternate" type="text/html" href="<?=$url?>" />
@@ -110,7 +119,7 @@ class O_Feed_AtomPub {
 <?=htmlspecialchars( $data )?>
 </content>
 </entry><?
-return ob_get_clean();
+		return ob_get_clean();
 	}
 
 	static private function setError( $errmsg )
