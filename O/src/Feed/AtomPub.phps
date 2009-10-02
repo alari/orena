@@ -33,8 +33,11 @@ class O_Feed_AtomPub {
 		$return["xml"]=$ret;
 
 		preg_match_all("#<link ([^>]+)/>#", $ret, $m);
-		print_r($m);exit;
-
+		foreach($m[1] as $link){
+			preg_match_all("#(rel|type|href)=([\\\"|'])(.+)(\\2)#", $link, $l);
+			print_r($l);
+		}
+exit;
 		$return[ "post_url" ] = "";
 		$return[ "edit_url" ] = "";
 
