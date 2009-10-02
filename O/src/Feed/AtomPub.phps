@@ -21,32 +21,32 @@ class O_Feed_AtomPub {
 			return self::error( curl_error( $curl ) );
 		}
 
-		if(strpos($ret,"<?xml") !== 0) {
-			return self::setError("Invalid response: $ret");
+		if (strpos( $ret, "<?xml" ) !== 0) {
+			return self::setError( "Invalid response: $ret" );
 		}
 
 		$return = Array ();
 
-		preg_match("#<id>([^<]+)</id>#", $ret, $m);
+		preg_match( "#<id>([^<]+)</id>#", $ret, $m );
 
-		$return["id"]=isset($m[1]) ? $m[1]:"";
-		$return["xml"]=$ret;
-
-		preg_match_all("#<link ([^>]+)/>#", $ret, $m);
-		foreach($m[1] as $link){
-			preg_match_all("#(rel|type|href)=([\\\"|'])([^\\\"' ]+)(\\2)#", $link, $l);
-			print_r($l);
-		}
-exit;
+		$return[ "id" ] = isset( $m[ 1 ] ) ? $m[ 1 ] : "";
+		$return[ "xml" ] = $ret;
 		$return[ "post_url" ] = "";
 		$return[ "edit_url" ] = "";
 
-		foreach ($d->getElementsByTagName( "link" ) as $link) {
-			if ($link->getAttribute( "rel" ) == "alternate" && $link->getAttribute( "type" ) == "text/html")
-				$return[ "post_url" ] = $link->getAttribute( "href" );
-			if ($link->getAttribute( "rel" ) == "service.edit" && strpos(
-					$link->getAttribute( "type" ), "atom+xml" ))
-				$return[ "edit_url" ] = $link->getAttribute( "href" );
+		preg_match_all( "#<link ([^>]+)/>#", $ret, $m );
+		foreach ($m[ 1 ] as $link) {
+			preg_match_all( "#(rel|type|href)=([\\\"|'])([^\\\"' ]+)(\\2)#", $link, $l );
+			$params = Array ();
+			foreach (array_keys( $l[ 0 ] ) as $k) {
+				$params[ $l[ 1 ][ $k ] ] = $l[ 3 ][ $k ];
+			}
+			if (isset( $params[ "rel" ] ) && isset( $params[ "type" ] ) && isset( $params[ "href" ] )) {
+				if ($params[ "rel" ] == "alternate" && $params[ "type" ] == "text/html")
+					$return[ "post_url" ] = $params[ "href" ];
+				if ($params[ "rel" ] == "service.edit" && strpos( $params[ "type" ], "atom+xml" ))
+					$return[ "edit_url" ] = $params[ "href" ];
+			}
 		}
 		return $return;
 	}
