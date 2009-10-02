@@ -115,10 +115,8 @@ class O_Feed_AtomPub {
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
-<content type="application/xhtml+xml">
-<div xmlns="http://www.w3.org/1999/xhtml">
-<?=htmlspecialchars( $data )?></div>
-div>
+<content type="html">
+<?=htmlspecialchars( $data )?>
 </content>
 </entry><?
 		return ob_get_clean();
