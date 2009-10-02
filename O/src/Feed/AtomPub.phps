@@ -28,11 +28,10 @@ class O_Feed_AtomPub {
 		$return = Array ();
 
 		preg_match("#<id>([^<]+)</id>#", $ret, $m);
-		if(!isset($m[1])) {echo $ret;exit;
-			return self::setError("id not found in $ret");
-		}
-		$return["id"]=$m[1];
+
+		$return["id"]=isset($m[1]) ? $m[1]:"";
 		$return["xml"]=$ret;
+
 		preg_match_all("#<link ([^>]+)/>#", $ret, $m);
 		print_r($m);exit;
 
