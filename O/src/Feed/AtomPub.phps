@@ -111,7 +111,7 @@ class O_Feed_AtomPub {
 		if ($no_comments) {
 			?> <mt:allowComments>0</mt:allowComments><?
 		}
-		?>
+		?><mt:allowComments>0</mt:allowComments>
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
