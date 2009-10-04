@@ -96,7 +96,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				if ((string)$node[ "related" ])
 					$obj = $obj->{(string)$node[ "related" ]};
 				$field = (string)$node[ "field" ];
-				$field = $obj->$field;echo "[$field/$value]";
+				$field = $obj[ $field ];
 				$value = (string)$node[ "value" ];
 				$type = (string)$node[ "type" ];
 				switch ($type) {
