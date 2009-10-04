@@ -26,7 +26,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
 			return $access;
 		}
-		
+
 		// Getting context role for resourse
 		if ($resourse) {
 			$registry = O_Registry::get( "acl", $resourse );
@@ -39,7 +39,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				}
 			}
 		}
-		
+
 		// No rules available et al
 		return null;
 	}
@@ -48,6 +48,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * Returns access by rules given in registry simplexml
 	 *
 	 * Nodes:
+	 * Delegate.target -- use resourse stored in resourse's .target to get access rights
 	 * Role.name -- set access rules as for this role
 	 * User-In.field -- process inner instructions if user is in .field of resourse
 	 * (User|Resourse).related -- take related object to process
@@ -64,6 +65,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	{
 		$is_true = 0;
 		switch ($node->getName()) {
+			case "Delegate" :
+				$res = $resourse->{(string)$node[ "target" ]};
+				return $this->can( $action, $res );
+			break;
 			case "Role" :
 				$name = (string)$node[ "name" ];
 				if ($name) {
