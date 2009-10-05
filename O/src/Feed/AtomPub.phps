@@ -115,6 +115,7 @@ class O_Feed_AtomPub {
 		?>
 <entry xmlns="http://www.w3.org/2005/Atom">
 <title><?=htmlspecialchars( $title )?></title>
+<url><?=$url?></url>
 <?
 		if ($id) {
 			?><id><?=$id?></id><?
