@@ -110,7 +110,7 @@ class O_Feed_AtomPub {
 		else
 			$updated = date( "Y-m-d", $updated ) . "T" . date( "H:i:s", $updated );
 		$data = str_replace( array ("\r", "\n"), array ("", ""), $data );
-		ob_start();
+		ob_start();echo "<?xml version='1.0' encoding='utf-8'?>";
 		?>
 <entry xmlns="http://www.w3.org/2005/Atom">
 <title><?=htmlspecialchars( $title )?></title>
