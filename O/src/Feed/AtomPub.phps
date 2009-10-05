@@ -16,10 +16,10 @@ class O_Feed_AtomPub {
 		curl_setopt( $curl, CURLOPT_USERPWD, $userpwd );
 		curl_setopt( $curl, CURLOPT_POSTFIELDS, $data );
 		curl_setopt( $curl, CURLOPT_RETURNTRANSFER, true );
-		curl_setopt($curl, CURLOPT_HTTPHEADER, Array("Content-type: application/atom+xml"));
+		curl_setopt( $curl, CURLOPT_HTTPHEADER, Array ("Content-type: application/atom+xml") );
 		$ret = curl_exec( $curl );
 		if (!$ret) {
-			return self::error( curl_error( $curl )."/$api_url" );
+			return self::setError( curl_error( $curl ) . "/$api_url" );
 		}
 
 		if (strpos( $ret, "<?xml" ) !== 0) {
@@ -77,8 +77,8 @@ class O_Feed_AtomPub {
 
 		if (!$ret)
 			return self::setError( curl_error( $curl ) );
-		if(!strpos($ret, "<?xml") !== 0)
-			return self::setError("Update error: $ret");
+		if (!strpos( $ret, "<?xml" ) !== 0)
+			return self::setError( "Update error: $ret" );
 
 		return $ret;
 	}
@@ -110,24 +110,27 @@ class O_Feed_AtomPub {
 		else
 			$updated = date( "Y-m-d", $updated ) . "T" . date( "H:i:s", $updated );
 		$data = str_replace( array ("\r", "\n"), array ("", ""), $data );
-		ob_start();echo "<?xml version='1.0' encoding='utf-8'?>";
+		ob_start();
+		echo "<?xml version='1.0' encoding='utf-8'?>";
 		?>
 <entry xmlns="http://www.w3.org/2005/Atom">
 <title><?=htmlspecialchars( $title )?></title>
 <?
-		if ($id&&0) {
+		if ($id) {
 			?><id><?=$id?></id><?
 		}
 		if ($no_comments) {
 			?>
-<allowComments xmlns="http://www.movabletype.org/atom/ns#">0</allowComments><?
+<allowComments xmlns="http://www.movabletype.org/atom/ns#">
+0
+</allowComments><?
 		}
 		?>
 <link rel="alternate" type="text/html" href="<?=$url?>" />
 <published><?=$published?></published>
 <updated><?=$updated?></updated>
 <content type="html">
-<?=htmlspecialchars($data)?>
+<?=htmlspecialchars( $data )?>
 </content>
 </entry><?
 		return ob_get_clean();
