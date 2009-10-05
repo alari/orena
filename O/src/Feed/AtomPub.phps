@@ -28,9 +28,9 @@ class O_Feed_AtomPub {
 
 		$return = Array ();
 
-		preg_match_all( "#<id>([^<]+)</id>#", $ret, $m );
+		preg_match( "#<id>([^<]+)</id>#", $ret, $m );
 
-		$return[ "id" ] = isset( $m[ 0 ] ) && isset( $m[ 0 ][ 1 ] ) ? $m[ 0 ][ 1 ] : "";
+		$return[ "id" ] = isset( $m[ 0 ] ) ? $m[ 0 ] : "";
 		$return[ "xml" ] = $ret;
 		$return[ "post_url" ] = "";
 		$return[ "edit_url" ] = "";
