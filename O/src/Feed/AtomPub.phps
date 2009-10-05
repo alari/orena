@@ -30,7 +30,7 @@ class O_Feed_AtomPub {
 
 		preg_match( "#<id[^>]*>([^<]+)</id>#", $ret, $m );
 
-		$return[ "id" ] = isset( $m[ 0 ] ) ? $m[ 0 ] : "";
+		$return[ "id" ] = isset( $m[ 1 ] ) ? $m[ 1 ] : "";
 		$return[ "xml" ] = $ret;
 		$return[ "post_url" ] = "";
 		$return[ "edit_url" ] = "";
