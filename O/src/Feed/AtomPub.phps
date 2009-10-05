@@ -19,7 +19,7 @@ class O_Feed_AtomPub {
 		curl_setopt($curl, CURLOPT_HTTPHEADER, Array("Content-type: application/atom+xml"));
 		$ret = curl_exec( $curl );
 		if (!$ret) {
-			return self::error( curl_error( $curl ) );
+			return self::error( curl_error( $curl )."/$api_url" );
 		}
 
 		if (strpos( $ret, "<?xml" ) !== 0) {
