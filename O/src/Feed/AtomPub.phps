@@ -115,7 +115,7 @@ class O_Feed_AtomPub {
 <entry xmlns="http://www.w3.org/2005/Atom">
 <title><?=htmlspecialchars( $title )?></title>
 <?
-		if ($id) {
+		if ($id&&0) {
 			?><id><?=$id?></id><?
 		}
 		if ($no_comments) {
