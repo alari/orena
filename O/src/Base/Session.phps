@@ -9,6 +9,7 @@
  * app/session/user_callback -- method to get user from session active record
  * app/classnames/user -- classname of user class
  * app/classnames/visitor -- classname of visitor singleton
+ * app/session/robots = handle -- handle sessions for robots or not (default is not)
  *
  * @author Dmitry Kurinskiy
  *
@@ -225,7 +226,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 				Array ($ses_class, "destroy"), Array ($ses_class, "gc") );
 		// Set special session name
 		session_name( O_Registry::get( "app/session/name" ) );
-		// Start the session
+		if (O_Registry::get( "app/session/robots" ) != "handle" && O_Base_SearchEngines::isBot())
+			return;
+			// Start the session
 		session_start();
 	}
 
