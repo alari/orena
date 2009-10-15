@@ -1,6 +1,6 @@
 <?php
 class O_Form_Row_Wysiwyg extends O_Form_Row_Field {
-	
+
 	protected $isVertical = true;
 
 	public function renderInner( O_Html_Layout $layout = null, $isAjax = false )
@@ -8,7 +8,7 @@ class O_Form_Row_Wysiwyg extends O_Form_Row_Field {
 		$toolbarSet = "";
 		if ($layout) {
 			$layout->addJavaScriptSrc( $layout->staticUrl( "fckeditor/fckeditor.js", 1 ) );
-			
+
 			$customConfig = O_Registry::get( "app/js/fckeditor/config_path" );
 			$toolbarSet = $this->params;
 			$height = 0;
@@ -17,9 +17,9 @@ class O_Form_Row_Wysiwyg extends O_Form_Row_Field {
 			} elseif (strpos( $toolbarSet, " " )) {
 				list ($toolbarSet, $height) = explode( " ", $toolbarSet, 2 );
 			}
-			O_Js_Middleware::getFramework()->addDomreadyCode( 
+			O_Js_Middleware::getFramework()->addDomreadyCode(
 					"
-var oFCKeditor = new FCKeditor( 'oo-r-w-" . $this->name . "' );
+var oFCKeditor = new FCKeditor( 'form-wysiwyg-" . $this->name . "' );
 oFCKeditor.BasePath = '" .
 						 $layout->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" .
