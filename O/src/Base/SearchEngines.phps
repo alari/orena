@@ -30,4 +30,9 @@ class O_Base_SearchEngines {
 		return self::$is_bot = false;
 	}
 
+	static public function isFromSerp() {
+		;
+	}
+
+
 }
