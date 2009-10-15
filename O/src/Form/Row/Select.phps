@@ -8,6 +8,7 @@ class O_Form_Row_Select extends O_Form_Row_Field {
 	public function setOptions( $options, $displayField=null )
 	{
 		$this->options = $options;
+		$this->displayField = $displayField;
 	}
 
 	public function setMultiply( $size = 4 )
