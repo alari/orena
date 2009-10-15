@@ -9,7 +9,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function simple( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_Text( $params->fieldName(), $params->params() );
+		$row = new O_Form_Row_String( $params->fieldName(), $params->params() );
 		$row->setTitle( $params->title() );
 		$row->setError( $params->error() );
 		$row->setValue( $params->value() );
