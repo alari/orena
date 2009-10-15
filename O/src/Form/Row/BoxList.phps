@@ -1,6 +1,6 @@
 <?php
 class O_Form_Row_BoxList extends O_Form_Row_Field {
-	
+
 	protected $variants = Array ();
 	protected $multiply = false;
 
@@ -36,7 +36,7 @@ class O_Form_Row_BoxList extends O_Form_Row_Field {
 	name="<?=$this->name . ($this->multiply ? "[]" : "")?>"
 	value="<?=htmlspecialchars( $k )?>"
 	<?=(isset( $this->value[ $k ] ) ? " checked=\"yes\"" : "")?> />
-			 &ndash; <?=$v?>
+			 &nbsp;&ndash;&nbsp;<?=$v?>
 			</label><?
 			$echoed = 1;
 		}

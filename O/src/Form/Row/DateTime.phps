@@ -14,23 +14,23 @@ class O_Form_Row_DateTime extends O_Form_Row_Field {
 		} elseif (is_array( $this->value )) {
 			$date = $this->value;
 		}
-		
+
 		?>
-<input class="form-row-time" type="text" name="<?=$this->name?>[d]"
+<input class="form-datetime" type="text" name="<?=$this->name?>[d]"
 	maxlength="2" size="2" value="<?=$date[ "d" ]?>" />
 .
-<input class="form-row-time" type="text" name="<?=$this->name?>[m]"
+<input class="form-datetime" type="text" name="<?=$this->name?>[m]"
 	maxlength="2" size="3" value="<?=$date[ "m" ]?>" />
 .
-<input class="form-row-time" type="text" name="<?=$this->name?>[Y]"
+<input class="form-datetime" type="text" name="<?=$this->name?>[Y]"
 	maxlength="4" size="4" value="<?=$date[ "Y" ]?>" />
 &nbsp;
-<input class="form-row-time" type="text" name="<?=$this->name?>[H]"
+<input class="form-datetime" type="text" name="<?=$this->name?>[H]"
 	maxlength="2" size="2" value="<?=$date[ "H" ]?>" />
 :
-<input class="form-row-time" type="text" name="<?=$this->name?>[i]"
+<input class="form-datetime" type="text" name="<?=$this->name?>[i]"
 	maxlength="2" size="2" value="<?=$date[ "i" ]?>" />
 <?
-	
+
 	}
 }

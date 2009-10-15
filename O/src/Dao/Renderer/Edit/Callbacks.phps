@@ -90,7 +90,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	static public function wysiwyg( O_Dao_Renderer_Edit_Params $params )
 	{
 		$row = new O_Form_Row_Wysiwyg( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
+		if($params->title() != 1) $row->setTitle( $params->title() );
 		$row->setError( $params->error() );
 		$row->setValue( $params->value() );
 		$row->render( $params->layout() );
