@@ -30,7 +30,6 @@ oFCKeditor.BasePath = '" .
 <textarea
 	class="fckeditor<?=($toolbarSet ? " fck-" . $toolbarSet : "")?>"
 	id="form-wysiwyg-<?=$this->name?>" name="<?=$this->name?>"><?=$this->value?></textarea>
-</div>
 <?
 	}
 }
