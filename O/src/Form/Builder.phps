@@ -93,6 +93,16 @@ class O_Form_Builder {
 		$this->getButtonsRow()->addReset( $title );
 	}
 
+	public function setFieldError( $fieldName, $error )
+	{
+		foreach ($this->fieldsets as $f)
+			if ($f->hasField( $fieldName )) {
+				$f->setFieldError( $fieldName, $error );
+				return true;
+			}
+		throw new O_Ex_WrongArgument( "Field $fieldName not found. Cannot assign error '$error'." );
+	}
+
 	public function render( O_Html_Layout $layout = null, $isAjax = false )
 	{
 		echo "<form action=\"$this->url\" method=\"$this->method\" enctype=\"$this->enctype\" accept-charset=\"$this->acceptCharset\"" .

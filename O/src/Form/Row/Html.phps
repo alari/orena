@@ -1,6 +1,6 @@
 <?php
 class O_Form_Row_Html extends O_Form_Row {
-
+	
 	protected $content;
 
 	public function setContent( $content )

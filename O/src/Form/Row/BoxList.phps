@@ -1,39 +1,44 @@
 <?php
-class O_Form_Row_BoxList extends O_Form_Row_Field {
+class O_Form_Row_BoxList extends O_Form_Row_Select {
 
-	protected $variants = Array ();
-	protected $multiply = false;
-
-	public function setVariants( $variants, $showField = null )
+	/**
+	 * Sets options for box list
+	 *
+	 * @param O_Dao_Query|Array $options
+	 * @param string $displayField
+	 */
+	public function setOptions( $options, $displayField = null )
 	{
-		if ($variants instanceof O_Dao_Query) {
-			if (!$showField) {
+		if ($options instanceof O_Dao_Query) {
+			if (!$displayField) {
 				throw new O_Ex_WrongArgument( "The field to show must be specified" );
 			}
-			foreach ($variants as $v) {
-				$this->variants[ $v[ "id" ] ] = $v->$showField;
+			foreach ($options as $v) {
+				$this->options[ $v[ "id" ] ] = $v->$displayField;
 			}
-		} elseif (is_array( $variants )) {
-			$this->variants = $variants;
+		} elseif (is_array( $options )) {
+			$this->options = $options;
 		} else {
-			throw new O_Ex_WrongArgument( "Variants must be of type Array or O_Dao_Query" );
+			throw new O_Ex_WrongArgument( "Options must be of type Array or O_Dao_Query" );
 		}
 	}
 
-	public function setMultiply( $multiply = true )
-	{
-		$this->multiply = $multiply;
-	}
-
+	/**
+	 * Renders inner contents of field
+	 *
+	 * @param O_Html_Layout $layout
+	 * @param bool $isAjax
+	 */
 	public function renderInner( O_Html_Layout $layout = null, $isAjax = false )
 	{
-		$type = $this->multiply ? "checkbox" : "radio";
+		$type = $this->multiple ? "checkbox" : "radio";
 		$echoed = 0;
-		foreach ($this->variants as $k => $v) {
-			if ($echoed)
+		foreach ($this->options as $k => $v) {
+			if ($echoed) {
 				echo ", ";
+			}
 			?><label> <input type="<?=$type?>"
-	name="<?=$this->name . ($this->multiply ? "[]" : "")?>"
+	name="<?=$this->name . ($this->multiple ? "[]" : "")?>"
 	value="<?=htmlspecialchars( $k )?>"
 	<?=(isset( $this->value[ $k ] ) ? " checked=\"yes\"" : "")?> />
 			 &nbsp;&ndash;&nbsp;<?=$v?>

@@ -14,7 +14,7 @@ class O_Form_Row_DateTime extends O_Form_Row_Field {
 		} elseif (is_array( $this->value )) {
 			$date = $this->value;
 		}
-
+		
 		?>
 <input class="form-datetime" type="text" name="<?=$this->name?>[d]"
 	maxlength="2" size="2" value="<?=$date[ "d" ]?>" />
@@ -31,6 +31,6 @@ class O_Form_Row_DateTime extends O_Form_Row_Field {
 <input class="form-datetime" type="text" name="<?=$this->name?>[i]"
 	maxlength="2" size="2" value="<?=$date[ "i" ]?>" />
 <?
-
+	
 	}
 }

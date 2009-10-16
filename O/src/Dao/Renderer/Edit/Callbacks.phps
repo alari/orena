@@ -9,10 +9,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function simple( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_String( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_String" );
 		$row->render( $params->layout() );
 	}
 
@@ -23,10 +20,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function timestamp( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_DateTime( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_DateTime" );
 		$row->render( $params->layout() );
 	}
 
@@ -37,10 +31,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function file( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_File( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_File" );
 		$row->render( $params->layout() );
 	}
 
@@ -51,14 +42,11 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function enum( O_Dao_Renderer_Edit_Params $params )
 	{
-			$fieldInfo = O_Dao_TableInfo::get( $params->className() )->getFieldInfo(
+		$fieldInfo = O_Dao_TableInfo::get( $params->className() )->getFieldInfo(
 				$params->fieldName() );
 
-		$row = new O_Form_Row_Select( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
-			$row->setOptions($fieldInfo->getParam( "enum", 1 ));
+		$row = $params->getFormRowField( "O_Form_Row_Select" );
+		$row->setOptions( $fieldInfo->getParam( "enum", 1 ) );
 		$row->render( $params->layout() );
 	}
 
@@ -89,10 +77,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function wysiwyg( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_Wysiwyg( $params->fieldName(), $params->params() );
-			if($params->title() != 1) $row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_Wysiwyg" );
 		$row->render( $params->layout() );
 	}
 
@@ -105,10 +90,7 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function area( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_Text( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_Text" );
 		$row->render( $params->layout() );
 	}
 
@@ -119,16 +101,13 @@ class O_Dao_Renderer_Edit_Callbacks {
 	 */
 	static public function selectRelation( O_Dao_Renderer_Edit_Params $params )
 	{
-		$row = new O_Form_Row_Select( $params->fieldName(), $params->params() );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
+		$row = $params->getFormRowField( "O_Form_Row_Select" );
 
-			$_params = $params->params();
-			if ($_params[ "multiply" ]) {
-				$row->setMultiply();
-			}
-			$row->setOptions( $_params[ "query" ], $_params[ "displayField" ] );
+		$_params = $params->params();
+		if ($_params[ "multiply" ]) {
+			$row->setMultiple();
+		}
+		$row->setOptions( $_params[ "query" ], $_params[ "displayField" ] );
 
 		$row->render( $params->layout() );
 	}
@@ -142,19 +121,12 @@ class O_Dao_Renderer_Edit_Callbacks {
 	{
 		$_params = $params->params();
 
-			$displayField = $_params[ "displayField" ];
-			$multiply = $_params[ "multiply" ];
-			$value = $params->value();
+		$row = $params->getFormRowField( "O_Form_Row_BoxList" );
+		$row->setOptions( $_params[ "query" ], $_params[ "displayField" ] );
+		if ($_params[ "multiply" ])
+			$row->setMultiple();
 
-		$row = new O_Form_Row_BoxList( $params->fieldName(), $params->params() );
-			$row->setVariants( $_params[ "query" ], $_params[ "displayField" ] );
-		$row->setTitle( $params->title() );
-		$row->setError( $params->error() );
-		$row->setValue( $params->value() );
-			if ($multiply)
-				$row->setMultiply();
-
-		$row->render($params->layout());
+		$row->render( $params->layout() );
 	}
 
 }

@@ -66,6 +66,15 @@ class O_Form_Fieldset {
 		return $this;
 	}
 
+	public function setFieldError( $fieldName, $error )
+	{
+		if (isset( $this->rows[ $fieldName ] ) && $this->rows[ $fieldName ] instanceof O_Form_Row_Field) {
+			$this->rows[ $fieldName ]->setError( $error );
+			return;
+		}
+		throw new O_Ex_WrongArgument( "Field $fieldName not found" );
+	}
+
 	public function render( O_Html_Layout $layout = null, $isAjax = false )
 	{
 		if ($this->legend) {

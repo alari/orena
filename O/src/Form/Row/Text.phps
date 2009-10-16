@@ -1,5 +1,7 @@
 <?php
 class O_Form_Row_Text extends O_Form_Row_Field {
+	
+	protected $isVertical = true;
 
 	public function renderInner( O_Html_Layout $layout = null, $isAjax = false )
 	{

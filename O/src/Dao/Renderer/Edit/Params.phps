@@ -23,4 +23,15 @@ class O_Dao_Renderer_Edit_Params extends O_Dao_Renderer_Params {
 		return $this->error;
 	}
 
+	/**
+	 * Enter description here...
+	 *
+	 * @param unknown_type $rowClass
+	 * @return O_Form_Row_Field
+	 */
+	public function getFormRowField($rowClass) {
+		return new $rowClass($this->fieldName, $this->title==1?"":$this->title, $this->params, $this->value, $this->error);
+	}
+
+
 }

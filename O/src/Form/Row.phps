@@ -18,11 +18,11 @@ abstract class O_Form_Row {
 		if ($this->title) {
 			echo "<div class=\"form-row-title\">$this->title</div>";
 		}
-
+		
 		echo "<div class=\"form-row-content\">";
 		$this->renderInner( $layout, $isAjax );
 		echo "</div>";
-
+		
 		if ($this->error) {
 			echo "<div class=\"form-row-error\">$this->error</div>";
 		}
@@ -30,6 +30,21 @@ abstract class O_Form_Row {
 			echo "<div class=\"form-row-remark\">$this->remark</div>";
 		}
 		echo "</div>";
+	}
+
+	public function setTitle( $title )
+	{
+		$this->title = $title;
+	}
+
+	public function setError( $error )
+	{
+		$this->error = $error;
+	}
+
+	public function setRemark( $remark )
+	{
+		$this->remark = $remark;
 	}
 
 }
