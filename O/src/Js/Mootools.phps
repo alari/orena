@@ -71,7 +71,7 @@ _getEl = function(){
 	}
 	el.getElements('input[type=submit]').addEvent("click", function(e){
 		 e.stop();
-	 	$(this).disabled = true;
+		 el.getElements('input[type=submit]').setProperty("disabled", true);
 
 	 	el.getElements('textarea.fckeditor').each(function(_el){
 			_el.value = FCKeditorAPI.GetInstance(_el.id). GetXHTML( 1 );
@@ -95,7 +95,7 @@ _getEl = function(){
 					err.set('html', response.errors[field]);
 					err.inject(erre, 'after');
 				}
-				el.getElement('input[type=submit]').disabled = false;
+				el.getElements('input[type=submit]').setProperty("disabled", false);
 			}
 	 	 }}).post(el);
 	 });
