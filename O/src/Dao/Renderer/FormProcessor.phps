@@ -302,4 +302,14 @@ class O_Dao_Renderer_FormProcessor {
 		return $this->handler->isFormRequest();
 	}
 
+	/**
+	 * Returns delegated object
+	 *
+	 * @return O_Form_Handler
+	 */
+	public function getHandler() {
+		return $this->handler;
+	}
+
+
 }
