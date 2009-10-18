@@ -2,14 +2,14 @@
 
 class O_Form_Generator extends O_Form_Builder {
 	const FORM_KEY = "edit";
-	
+
 	/**
 	 * Required to generate unique Instance ID
 	 *
 	 * @var int
 	 */
 	private static $instancesCounter = 0;
-	
+
 	/**
 	 * Handling DAO classname
 	 *
@@ -75,13 +75,13 @@ class O_Form_Generator extends O_Form_Builder {
 	public function generate( $type = "", Array $values = Array(), Array $errors = Array(), Array $excludeFields = Array() )
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
-		
+
 		// Prepare field rows
 		foreach ($tableInfo->getFieldsByKey( self::FORM_KEY, $type, $excludeFields ) as $name => $params) {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
 			$producer = new O_Form_Row_AutoProducer( $name, $params, $fieldInfo, $this->record );
 			if (isset( $this->relationQueries[ $name ] )) {
-				$producer->setRelationQuery( $this->relationQueries[ $name ][ "query" ], 
+				$producer->setRelationQuery( $this->relationQueries[ $name ][ "query" ],
 						$this->relationQueries[ $name ][ "displayField" ] );
 			}
 			if (isset( $values[ $name ] )) {
@@ -97,18 +97,18 @@ class O_Form_Generator extends O_Form_Builder {
 		if ($this->record) {
 			$this->addHidden( "id", $this->record->id );
 		}
-		
+
 		// Set forms texts
 		$submitTitle = $this->getFormText( "submit", $tableInfo );
 		if ($submitTitle) {
-			$this->addSubmitButton( $submitTitle );
+			$this->addSubmitButton( $submitTitle."(1)" );
 		}
-		
+
 		$resetTitle = $this->getFormText( "reset", $tableInfo );
 		if ($resetTitle) {
 			$this->addResetButton( $resetTitle );
 		}
-		
+
 		$legend = $this->getFormText( "title", $tableInfo );
 		if ($legend) {
 			$this->getFieldset()->setLegend( $legend );
@@ -148,7 +148,7 @@ class O_Form_Generator extends O_Form_Builder {
 	{
 		$paramFull = self::FORM_KEY . ":" . ($this->record ? "" : "create-") . $name;
 		$param = self::FORM_KEY . ":" . $name;
-		
+
 		$value = $tableInfo->getParam( $paramFull );
 		if (!$value && $paramFull != $param) {
 			$value = $tableInfo->getParam( $param );
@@ -165,7 +165,7 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id" )
 	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query, 
+		$this->relationQueries[ $fieldName ] = array ("query" => $query,
 														"displayField" => $displayField);
 	}
 
