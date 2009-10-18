@@ -57,7 +57,7 @@ class O_Form_Handler {
 		if ($classOrRecord) {
 			$this->setClassOrRecord( $classOrRecord );
 		}
-		$this->form = new O_Form_Generator( $this->record ? $this->record : $this->class );
+		$this->form = new O_Form_Generator( $classOrRecord );
 		$this->type = O_Dao_Renderer::TYPE_DEF;
 	}
 
@@ -76,6 +76,7 @@ class O_Form_Handler {
 			$this->record = null;
 		}
 		$this->showType = O_Dao_Renderer::TYPE_DEF;
+		$this->getForm()->setClassOrRecord($classOrRecord);
 	}
 
 	/**
