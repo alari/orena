@@ -331,6 +331,9 @@ _getEl();
 			foreach($this->relationQueries as $n=>$q) {
 				$generator->setRelationQuery($n, $q["query"], $q["displayField"]);
 			}
+			if($this->formTitle) {
+				$generator->getFieldset()->setLegend($this->formTitle);
+			}
 			$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
 			$generator->render( $layout, $this->isAjax );
 			return;
