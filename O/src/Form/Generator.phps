@@ -34,7 +34,17 @@ class O_Form_Generator extends O_Form_Builder {
 	 * @var bool
 	 */
 	protected $isGenerated;
+	/**
+	 * Type suffix of edit process
+	 *
+	 * @var string
+	 */
 	protected $type;
+	/**
+	 * Array of fields to exclude from the form
+	 *
+	 * @var unknown_type
+	 */
 	protected $excludeFields = Array ();
 
 	/**
@@ -80,7 +90,7 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function setClassOrRecord( $classOrRecord )
 	{
-		if (is_object( $classOrRecord )) {
+		if ( $classOrRecord instanceof O_Dao_ActiveRecord) {
 			$this->record = $classOrRecord;
 			$this->class = get_class( $classOrRecord );
 		} else {
@@ -89,7 +99,11 @@ class O_Form_Generator extends O_Form_Builder {
 		}
 	}
 
-
+	/**
+	 * Returns current active record, if available
+	 *
+	 * @return O_Dao_ActiveRecord
+	 */
 	public function getRecord() {
 		return $this->record;
 	}
@@ -121,7 +135,7 @@ class O_Form_Generator extends O_Form_Builder {
 			if (isset( $errors[ $name ] )) {
 				$row->setError( $errors[ $name ] );
 			}
-			$this->addRow( $row );
+			$this->addRow( $row, $name );
 		}
 		$this->addHidden( "o:sbm-form", "+1" );
 		if ($this->record) {

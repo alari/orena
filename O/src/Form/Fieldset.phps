@@ -1,30 +1,62 @@
 <?php
 
 class O_Form_Fieldset {
+	/**
+	 * Contents of <legend> tag
+	 *
+	 * @var string
+	 */
 	protected $legend;
+	/**
+	 * Array of rows inside fieldset
+	 *
+	 * @var O_Form_Row[]
+	 */
 	protected $rows = Array ();
 
+	/**
+	 * Creates a new fieldset
+	 *
+	 * @param string $legend
+	 */
 	public function __construct( $legend = null )
 	{
 		$this->legend = $legend;
 	}
 
+	/**
+	 * Sets <legend> contents of fieldset
+	 *
+	 * @param string $legend
+	 */
 	public function setLegend( $legend )
 	{
 		$this->legend = $legend;
 	}
 
-	public function addRow( O_Form_Row $row )
+	/**
+	 * Adds a row in the end of rows list
+	 *
+	 * @param O_Form_Row $row
+	 * @param string $fieldName to be used in addRowAfter() and addRowBefore() if a row is not an O_Form_Row_Field
+	 */
+	public function addRow( O_Form_Row $row, $fieldName=null )
 	{
 		if ($row instanceof O_Form_Row_Field) {
 			$this->rows[ $row->getName() ] = $row;
 		} else {
-			$this->rows[] = $row;
+			$this->rows[$fieldName] = $row;
 		}
-		return $this;
 	}
 
-	public function addRowAfter( O_Form_Row $row, $afterFieldName )
+	/**
+	 * Adds row after specified field
+	 *
+	 * @param O_Form_Row $row
+	 * @param string $afterFieldName
+	 * @param string $fieldName to be used in addRowAfter() and addRowBefore() if a row is not an O_Form_Row_Field
+	 */
+	public function addRowAfter( O_Form_Row $row, $afterFieldName, $fieldName=null )
 	{
 		$tmp_rows = Array ();
 		foreach ($this->rows as $k => $r) {
@@ -36,16 +68,22 @@ class O_Form_Fieldset {
 					if ($row instanceof O_Form_Row_Field) {
 						$tmp_rows[ $row->getName() ] = $row;
 					} else {
-						$tmp_rows[] = $row;
+						$tmp_rows[$fieldName] = $row;
 					}
 				}
 			}
 		}
 		$this->rows = $tmp_rows;
-		return $this;
 	}
 
-	public function addRowBefore( O_Form_Row $row, $beforeFieldName )
+	/**
+	 * Adds row before specified field
+	 *
+	 * @param O_Form_Row $row
+	 * @param string $afterFieldName
+	 * @param string $fieldName to be used in addRowAfter() and addRowBefore() if a row is not an O_Form_Row_Field
+	 */
+	public function addRowBefore( O_Form_Row $row, $beforeFieldName, $fieldName=null )
 	{
 		$tmp_rows = Array ();
 		foreach ($this->rows as $k => $r) {
@@ -56,16 +94,22 @@ class O_Form_Fieldset {
 					if ($row instanceof O_Form_Row_Field) {
 						$tmp_rows[ $row->getName() ] = $row;
 					} else {
-						$tmp_rows[] = $row;
+						$tmp_rows[$fieldName] = $row;
 					}
 				}
 				$tmp_rows[ $k ] = $r;
 			}
 		}
 		$this->rows = $tmp_rows;
-		return $this;
 	}
 
+	/**
+	 * Sets error msg to field
+	 *
+	 * @param string $fieldName
+	 * @param string $error
+	 * @throws O_Ex_WrongArgument
+	 */
 	public function setFieldError( $fieldName, $error )
 	{
 		if (isset( $this->rows[ $fieldName ] ) && $this->rows[ $fieldName ] instanceof O_Form_Row_Field) {
@@ -75,6 +119,12 @@ class O_Form_Fieldset {
 		throw new O_Ex_WrongArgument( "Field $fieldName not found" );
 	}
 
+	/**
+	 * Renders fieldset contents
+	 *
+	 * @param O_Html_Layout $layout
+	 * @param bool $isAjax
+	 */
 	public function render( O_Html_Layout $layout = null, $isAjax = false )
 	{
 		if ($this->legend) {
@@ -88,6 +138,12 @@ class O_Form_Fieldset {
 		}
 	}
 
+	/**
+	 * Returns true if a field is in fieldset, false elsewhere
+	 *
+	 * @param string $name
+	 * @return bool
+	 */
 	public function hasField( $name )
 	{
 		return array_key_exists( $name, $this->rows );
