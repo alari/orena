@@ -1,6 +1,6 @@
 <?php
 class O_Form_Row_Buttons extends O_Form_Row {
-	
+
 	protected $reset;
 	protected $submits = Array ();
 
@@ -8,11 +8,11 @@ class O_Form_Row_Buttons extends O_Form_Row {
 	{
 		echo "<div class=\"form-row-buttons\">";
 		foreach ($this->submits as $sbm) {
-			echo "<input class=\"form-button\" type=\"submit\" title=\"" . htmlspecialchars( 
+			echo "<input class=\"form-button\" type=\"submit\" value=\"" . htmlspecialchars(
 					$sbm[ 0 ] ) . "\"" . ($sbm[ 1 ] ? " name=\"{$sbm[1]}\"" : "") . "/>";
 		}
 		if ($this->reset) {
-			echo "<input class=\"form-button\" type=\"reset\" title=\"" . htmlspecialchars( 
+			echo "<input class=\"form-button\" type=\"reset\" value=\"" . htmlspecialchars(
 					$this->reset ) . "\"/>";
 		}
 		echo "</div>";
