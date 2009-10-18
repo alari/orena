@@ -334,6 +334,7 @@ _getEl();
 			if($this->formTitle) {
 				$generator->getFieldset()->setLegend($this->formTitle);
 			}
+			if($this->isAjax) $generator->addHidden("o:sbm-ajax", "+1");
 			$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
 			$generator->render( $layout, $this->isAjax );
 			return;
