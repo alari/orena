@@ -1,6 +1,6 @@
 <?php
 class O_Form_Row_Select extends O_Form_Row_Field {
-	
+
 	protected $multiple = null;
 	protected $options = Array ();
 	protected $displayField;
@@ -22,7 +22,7 @@ class O_Form_Row_Select extends O_Form_Row_Field {
 			$this->error = "Options were not set";
 			return;
 		}
-		
+
 		echo "<select class=\"form-select\" name=\"" . $this->name . ($this->multiple ? "[]" : "") .
 			 "\"" . ($this->multiple ? " multiple=\"yes\" size=\"{$this->multiple}\"" : "") . ">";
 			$this->renderOptions( $this->options );
@@ -37,8 +37,9 @@ class O_Form_Row_Select extends O_Form_Row_Field {
 					$this->renderOptions( $v );
 					echo "</optgroup>";
 				} else {
-					echo "<option value=\"" . htmlspecialchars( $k ) . "\"" . ($k == $this->value ? " selected=\"yes\"" : "") .
-							 ">" . (is_object( $v ) ? $v->{$this->displayField} : $v) . "</option>";
+					echo "<option value=\"" . htmlspecialchars( $k ) . "\"" . ($k == $this->value ||
+							 $v == $this->value ? " selected=\"yes\"" : "") . ">" . (is_object(
+									$v ) ? $v->{$this->displayField} : $v) . "</option>";
 					}
 				}
 			}
@@ -47,18 +48,18 @@ class O_Form_Row_Select extends O_Form_Row_Field {
 			{
 				parent::autoProduce( $producer );
 				if ($producer->getRelationQuery() instanceof O_Dao_Query) {
-					$this->setOptions( $producer->getRelationQuery(), 
+					$this->setOptions( $producer->getRelationQuery(),
 							$producer->getRelationDisplayField() );
 					if ($producer->getRelationMultiple()) {
-						$this->setMultiple( 
+						$this->setMultiple(
 								is_numeric( $producer->getParams() ) ? $producer->getParams() : 4 );
 					}
 				} elseif (is_array( $producer->getFieldInfo()->getParam( "enum", 1 ) )) {
 					$this->setOptions( $producer->getFieldInfo()->getParam( "enum", 1 ) );
 				} else {
-					throw new O_Ex_WrongArgument( 
+					throw new O_Ex_WrongArgument(
 							"Given producer is not well for list-choosing field" );
 				}
 			}
-		
+
 		}
