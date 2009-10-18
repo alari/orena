@@ -280,7 +280,7 @@ class O_Dao_Renderer_FormProcessor {
 			$generator->addHidden( "o:sbm-ajax", "+1" );
 		}
 		if ($this->submitButtonValue) {
-			$generator->addSubmitButton( $this->submitButtonValue."(2)" );
+			$generator->addSubmitButton( $this->submitButtonValue );
 		}
 		if ($this->resetButtonValue) {
 			$generator->addResetButton( $this->resetButtonValue );

@@ -102,7 +102,7 @@ class O_Form_Generator extends O_Form_Builder {
 		// Set forms texts
 		$submitTitle = $this->getFormText( "submit", $tableInfo );
 		if ($submitTitle) {
-			$this->addSubmitButton( $submitTitle."(1)" );
+			$this->addSubmitButton( $submitTitle );
 		}
 
 		$resetTitle = $this->getFormText( "reset", $tableInfo );
