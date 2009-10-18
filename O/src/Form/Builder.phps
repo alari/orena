@@ -54,9 +54,9 @@ class O_Form_Builder {
 		return $this->fieldsets[ $fieldsetName ];
 	}
 
-	public function addRow( O_Form_Row $row, $fieldsetName = self::BASE_FIELDSET )
-	{print_r($this->fieldsets);
-		$this->fieldsets[ $fieldsetName ]->addRow( $row );
+	public function addRow( O_Form_Row $row, $fieldsetName = self::BASE_FIELDSET, $fieldName=null )
+	{
+		$this->fieldsets[ $fieldsetName ]->addRow( $row, $fieldName );
 	}
 
 	public function addRowAfter( O_Form_Row $row, $afterFieldName )

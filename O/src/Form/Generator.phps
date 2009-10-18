@@ -135,7 +135,7 @@ class O_Form_Generator extends O_Form_Builder {
 			if (isset( $errors[ $name ] )) {
 				$row->setError( $errors[ $name ] );
 			}
-			$this->addRow( $row, $name );
+			$this->addRow( $row, parent::BASE_FIELDSET, $name );
 		}
 		$this->addHidden( "o:sbm-form", "+1" );
 		if ($this->record) {
