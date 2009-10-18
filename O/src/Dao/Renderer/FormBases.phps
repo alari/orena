@@ -328,6 +328,9 @@ _getEl();
 	{
 		if (isset( $_GET[ "test_new_builder" ] )) {
 			$generator = new O_Form_Generator( $this->record ? $this->record : $this->class );
+			foreach($this->relationQueries as $n=>$q) {
+				$generator->setRelationQuery($n, $q["query"], $q["displayField"]);
+			}
 			$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
 			$generator->render( $layout, $this->isAjax );
 			return;
