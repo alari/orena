@@ -1,9 +1,9 @@
 <?php
 class O_Form_Handler {
-	
+
 	protected $class;
 	protected $record;
-	
+
 	protected $type;
 	/**
 	 * Array of field values
@@ -11,7 +11,7 @@ class O_Form_Handler {
 	 * @var Array
 	 */
 	protected $values = Array ();
-	
+
 	/**
 	 * Was the form handled or not
 	 *
@@ -45,12 +45,14 @@ class O_Form_Handler {
 	 */
 	protected $form;
 
+	protected $showType;
+
 	/**
 	 * Creates a new object
 	 *
 	 * @param O_Dao_ActiveRecord|string $classOrRecord
 	 */
-	public function __construct( $classOrRecord )
+	public function __construct( $classOrRecord=null )
 	{
 		if ($classOrRecord) {
 			$this->setClassOrRecord( $classOrRecord );
@@ -73,6 +75,7 @@ class O_Form_Handler {
 			$this->class = (string)$classOrRecord;
 			$this->record = null;
 		}
+		$this->showType = O_Dao_Renderer::TYPE_DEF;
 	}
 
 	/**
@@ -80,13 +83,13 @@ class O_Form_Handler {
 	 *
 	 * @return O_Form_Generator
 	 */
-	public function getForm()
+	public function getForm($update=false)
 	{
-		if ($this->form->isGenerated()) {
+		if ($update && $this->form->isGenerated()) {
 			$this->form->clear();
 		}
 		foreach ($this->relationQueries as $fieldName => $params) {
-			$this->form->setRelationQuery( $fieldName, $params[ "query" ], 
+			$this->form->setRelationQuery( $fieldName, $params[ "query" ],
 					$params[ "displayField" ] );
 		}
 		$this->form->generate( $this->type, $this->values, $this->errors, $this->excludeFields );
@@ -102,7 +105,7 @@ class O_Form_Handler {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id" )
 	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query, 
+		$this->relationQueries[ $fieldName ] = array ("query" => $query,
 														"displayField" => $displayField);
 	}
 
@@ -137,6 +140,11 @@ class O_Form_Handler {
 		$this->createMode = $params ? $params : Array ();
 	}
 
+	public function setShowType($type) {
+		$this->showType = $type;
+	}
+
+
 	/**
 	 * Returns error message for given field
 	 *
@@ -158,11 +166,16 @@ class O_Form_Handler {
 		return $this->errors;
 	}
 
+	public function getRecord() {
+		return $this->record;
+	}
+
+
 	/**
 	 * Removes ActiveRecord, clears form
 	 *
 	 */
-	public function removeActiveRecord()
+	public function removeRecord()
 	{
 		$this->values = Array ();
 		$this->errors = Array ();
@@ -182,34 +195,34 @@ class O_Form_Handler {
 		if ($this->handled)
 			return $this->handleResult;
 		$this->handled = true;
-		
+
 		// Try to handle valid requests only
-		if (!$this->form->isFormRequest()) {
+		if (!$this->getForm()->isFormRequest()) {
 			return $this->handleResult = false;
 		}
-		
+
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
-			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), 
+			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ),
 					$this->class );
 			if (!$this->record) {
 				$this->errors[ "_" ] = "Record not found.";
 				return $this->handleResult = false;
 			}
 		}
-		
+
 		// Start transaction
 		O_Db_Manager::getConnection()->beginTransaction();
-		
+
 		try {
 			// Check and prepare values, find errors if they are
 			$this->handleValues();
-			
+
 			// Stop processing without saving, if errors occured
 			if (count( $this->errors )) {
 				return $this->handleResult = false;
 			}
-			
+
 			// Create record in database
 			if ($this->createMode !== 0 && !$this->record) {
 				$class = $this->class;
@@ -220,12 +233,12 @@ class O_Form_Handler {
 					$this->record = new $class( );
 				}
 			}
-			
+
 			// Setting values for ActiveRecord
 			foreach ($this->values as $name => $value) {
 				$this->record->$name = $value;
 			}
-			
+
 			// Trying to save
 			try {
 				$this->record->save();
@@ -234,7 +247,7 @@ class O_Form_Handler {
 				$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
 				throw $e;
 			}
-		
+
 		}
 		catch (Exception $e) {
 			O_Db_Manager::getConnection()->rollBack();
@@ -242,7 +255,7 @@ class O_Form_Handler {
 				$this->errors[ "_" ] = $e->getMessage();
 			return $this->handleResult = 0;
 		}
-		
+
 		O_Db_Manager::getConnection()->commit();
 		// Succeed
 		return $this->handleResult = 1;
@@ -255,13 +268,13 @@ class O_Form_Handler {
 	protected function handleValues()
 	{
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
-		foreach (array_keys( 
-				$tableInfo->getFieldsByKey( O_Form_Generator::FORM_KEY, $this->type, 
+		foreach (array_keys(
+				$tableInfo->getFieldsByKey( O_Form_Generator::FORM_KEY, $this->type,
 						$this->excludeFields ) ) as $name) {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
 			try {
-				$provider = new O_Form_Check_AutoProvider( $name, $this->record, $fieldInfo, 
+				$provider = new O_Form_Check_AutoProvider( $name, $this->record, $fieldInfo,
 						$this->type, $this->values[ $name ] );
 				if (isset( $this->relationQueries[ $name ] )) {
 					$provider->setRelationQuery( $this->relationQueries[ $name ][ "query" ] );
@@ -288,12 +301,12 @@ class O_Form_Handler {
 		$response = Array ("status" => "");
 		if ($this->handle()) {
 			$response[ "status" ] = "SUCCEED";
-			
+
 			if ($refreshOrLocation === 1 || $refreshOrLocation === true) {
 				$response[ "refresh" ] = 1;
 			} elseif ($refreshOrLocation) {
 				$response[ "redirect" ] = $refreshOrLocation;
-			
+
 			} elseif (!$showOnSuccess) {
 				ob_start();
 				$this->record->show( $this->layout, $this->showType );
