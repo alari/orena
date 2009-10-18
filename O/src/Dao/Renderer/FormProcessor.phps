@@ -18,28 +18,11 @@
  *
  * @deprecated Use O_Form_Handler instead
  */
-class O_Dao_Renderer_FormProcessor {
-
-	/**
-	 * Delegate object
-	 *
-	 * @var O_Form_Handler
-	 */
-	private $handler;
-
-	private $isAjax = false;
-	private $resetButtonValue;
-	private $submitButtonValue;
-	private $formTitle;
-	private $hiddenFields = Array ();
+class O_Dao_Renderer_FormProcessor extends O_Form_Handler {
 
 	private $htmlBefore = Array();
 	private $htmlAfter = Array();
-
-	public function __construct()
-	{
-		$this->handler = new O_Form_Handler( );
-	}
+	private $isAjax;
 
 	/**
 	 * Injects block of HTML before field
@@ -64,46 +47,15 @@ class O_Dao_Renderer_FormProcessor {
 	}
 
 	/**
-	 * Tries to handle the form, returns true on success
-	 *
-	 * @return bool
-	 */
-	public function handle()
-	{
-		return $this->handler->handle();
-	}
-
-	/**
-	 * Print response to be handled as an ajax response
-	 *
-	 * @param mixed $refreshOrLocation if 1 or true, refresh, else -- it's an url
-	 * @param string $showOnSuccess if not set and there's no value for refreshing, this will be shown in response; otherwise object will be shown
-	 * @return bool true if response was echoed, false if form wasn't handled
-	 */
-	public function responseAjax( $refreshOrLocation = null, $showOnSuccess = null )
-	{
-		return $this->handler->responseAjax( $refreshOrLocation, $showOnSuccess );
-	}
-
-	/**
 	 * Removes field from processing
 	 *
 	 * @param string $fieldName
 	 */
 	public function exceptField( $fieldName )
 	{
-		$this->handler->excludeField( $fieldName );
+		$this->excludeField( $fieldName );
 	}
 
-	/**
-	 * Sets type suffix to process
-	 *
-	 * @param string $type
-	 */
-	public function setType( $type )
-	{
-		$this->handler->setType( $type );
-	}
 
 	/**
 	 * Sets active record to process
@@ -112,7 +64,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setActiveRecord( O_Dao_ActiveRecord $record )
 	{
-		$this->handler->setClassOrRecord( $record );
+		$this->setClassOrRecord( $record );
 	}
 
 	/**
@@ -122,7 +74,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setClass( $class )
 	{
-		$this->handler->setClassOrRecord( $class );
+		$this->setClassOrRecord( $class );
 	}
 
 	/**
@@ -132,7 +84,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function getActiveRecord()
 	{
-		return $this->handler->getRecord();
+		return $this->getRecord();
 	}
 
 	/**
@@ -141,18 +93,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function removeActiveRecord()
 	{
-		$this->handler->removeRecord();
-	}
-
-	/**
-	 * This form should be handled not like edit-form, but like creation
-	 *
-	 * @param array $params Parameters to be given in constructor
-	 */
-	public function setCreateMode()
-	{
-		$params = func_get_args();
-		call_user_func_array( array ($this->handler, "setCreateMode"), $params );
+		$this->removeRecord();
 	}
 
 	/**
@@ -165,15 +106,7 @@ class O_Dao_Renderer_FormProcessor {
 		$this->isAjax = (bool)$isAjax;
 	}
 
-	/**
-	 * URL for form action. Default is currents
-	 *
-	 * @param string $url
-	 */
-	public function setActionUrl( $url )
-	{
-		$this->handler->setActionUrl( $url );
-	}
+
 
 	/**
 	 * Sets a query to select field value from
@@ -185,7 +118,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id", $multiply = false )
 	{
-		$this->handler->setRelationQuery( $fieldName, $query, $displayField );
+		parent::setRelationQuery( $fieldName, $query, $displayField );
 	}
 
 	/**
@@ -195,7 +128,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setResetButtonValue( $value )
 	{
-		$this->resetButtonValue = $value;
+		$this->addResetButton($value);
 	}
 
 	/**
@@ -205,7 +138,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setSubmitButtonValue( $value )
 	{
-		$this->submitButtonValue = $value;
+		$this->addSubmitButton($value);
 	}
 
 	/**
@@ -215,17 +148,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setFormTitle( $title )
 	{
-		$this->formTitle = $title;
-	}
-
-	/**
-	 * Sets show type (used in responseAjax())
-	 *
-	 * @param string $type
-	 */
-	public function setShowType( $type )
-	{
-		$this->handler->setShowType( $type );
+		$this->getFieldset()->setLegend( $title );
 	}
 
 	/**
@@ -236,28 +159,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function addHiddenField( $fieldName, $fieldValue )
 	{
-		$this->handler->addHidden($fieldName, $fieldValue);
-	}
-
-	/**
-	 * Returns error message for given field
-	 *
-	 * @param string $field
-	 * @return string
-	 */
-	public function getError( $field )
-	{
-		return $this->handler->getError( $field );
-	}
-
-	/**
-	 * Returns array of errors for fields
-	 *
-	 * @return array
-	 */
-	public function getErrors()
-	{
-		return $this->handler->getErrors();
+		$this->addHidden($fieldName, $fieldValue);
 	}
 
 	/**
@@ -267,49 +169,19 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function show( O_Html_Layout $layout = null )
 	{
-		if ($this->formTitle) {
-			$this->handler->getFieldset()->setLegend( $this->formTitle );
-		}
 		if ($this->isAjax) {
-			$this->handler->addHidden( "o:sbm-ajax", "+1" );
-		}
-		if ($this->submitButtonValue) {
-			$this->handler->addSubmitButton( $this->submitButtonValue );
-		}
-		if ($this->resetButtonValue) {
-			$this->handler->addResetButton( $this->resetButtonValue );
+			$this->addHidden( "o:sbm-ajax", "+1" );
 		}
 		if(count($this->htmlAfter)) foreach($this->htmlAfter as $f=>$c) {
 			$row = new O_Form_Row_Html();
 			$row->setContent($c);
-			$this->handler->addRowAfter($row, $f);
+			$this->addRowAfter($row, $f);
 		}
 		if(count($this->htmlBefore)) foreach($this->htmlBefore as $f=>$c) {
 			$row = new O_Form_Row_Html();
 			$row->setContent($c);
-			$this->handler->addRowBefore($row, $f);
+			$this->addRowBefore($row, $f);
 		}
-		$this->handler->render( $layout, $this->isAjax );
+		$this->render( $layout, $this->isAjax );
 	}
-
-	/**
-	 * Returns true if current request is form submission
-	 *
-	 * @return bool
-	 */
-	public function isFormRequest()
-	{
-		return $this->handler->isFormRequest();
-	}
-
-	/**
-	 * Returns delegated object
-	 *
-	 * @return O_Form_Handler
-	 */
-	public function getHandler() {
-		return $this->handler;
-	}
-
-
 }
