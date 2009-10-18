@@ -77,6 +77,7 @@ class O_Form_Handler {
 		}
 		$this->showType = O_Dao_Renderer::TYPE_DEF;
 		$this->getForm()->setClassOrRecord($classOrRecord);
+		echo $this->class;
 	}
 
 	/**
