@@ -300,86 +300,23 @@ _getEl();
 	}
 
 	/**
-	 * Prepares form texts
-	 *
-	 */
-	protected function prepareFormTexts()
-	{
-		// Form title
-		if (!$this->formTitle) {
-			$this->formTitle = $this->getFormText( "title", "Form" );
-		}
-		// Submit button text
-		if (!$this->submitButtonValue) {
-			$this->submitButtonValue = $this->getFormText( "submit", "Save changes" );
-		}
-		// Reset button text
-		if (is_null( $this->resetButtonValue )) {
-			$this->resetButtonValue = $this->getFormText( "reset", null );
-		}
-	}
-
-	/**
 	 * Displays form as HTML
 	 *
 	 * @param O_Html_Layout $layout
 	 */
 	public function show( O_Html_Layout $layout = null )
 	{
-		if (isset( $_GET[ "test_new_builder" ] )) {
-			$generator = new O_Form_Generator( $this->record ? $this->record : $this->class );
-			foreach($this->relationQueries as $n=>$q) {
-				$generator->setRelationQuery($n, $q["query"], $q["displayField"]);
-			}
-			if($this->formTitle) {
-				$generator->getFieldset()->setLegend($this->formTitle);
-			}
-			if($this->isAjax) $generator->addHidden("o:sbm-ajax", "+1");
-			$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
-			$generator->render( $layout, $this->isAjax );
-			return;
+		$generator = new O_Form_Generator( $this->record ? $this->record : $this->class );
+		foreach ($this->relationQueries as $n => $q) {
+			$generator->setRelationQuery( $n, $q[ "query" ], $q[ "displayField" ] );
 		}
-
-		if ($layout)
-			$this->setLayout( $layout );
-
-		$this->prepareFormTexts();
-
-		?>
-<div>
-<form method="POST" enctype="multipart/form-data" accept-charset="utf-8"
-	action="<?=$this->actionUrl?>" id="<?=$this->instanceId?>">
-<fieldset class="oo-renderer"><legend><?=$this->formTitle?></legend>
-
-<?
-
-		$this->showFormContents();
-
-		?>
-
-<div class="oo-renderer-buttons">
-
-<?php
-		if (isset( $this->errors[ '_' ] )) {
-			?><div class="oo-renderer-error"><?=$this->errors[ '_' ]?></div><?
+		if ($this->formTitle) {
+			$generator->getFieldset()->setLegend( $this->formTitle );
 		}
-		?>
-
-<input type="submit"
-	value="<?=htmlspecialchars( $this->submitButtonValue )?>" />
-<?
-		if ($this->resetButtonValue) {
-			?><input type="reset"
-	value="<?=htmlspecialchars( $this->resetButtonValue )?>" /></div><?
-		}
-		?></fieldset>
-</form>
-</div>
-
-<?
-		if ($this->isAjax) {
-			$this->showAjaxJs();
-		}
+		if ($this->isAjax)
+			$generator->addHidden( "o:sbm-ajax", "+1" );
+		$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
+		$generator->render( $layout, $this->isAjax );
 	}
 
 	/**
@@ -496,76 +433,6 @@ _getEl();
 						$fieldInfo->getRelationTarget() );
 			}
 		}
-	}
-
-	/**
-	 * Shows all the form fields
-	 *
-	 */
-	protected function showFormContents()
-	{
-		foreach ($this->getFieldsToProcess( O_Dao_Renderer::KEY_EDIT ) as $name => $params) {
-			// Find a callback for field renderer
-			$callback = $this->getCallbackByParams( $params,
-					O_Dao_Renderer::CALLBACK_EDIT );
-			$fieldInfo = O_Dao_TableInfo::get( $this->class )->getFieldInfo( $name );
-
-			if (!$callback) {
-				if (isset( $this->relationQueries[ $name ] )) {
-					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::selectRelation";
-					$params = $this->relationQueries[ $name ];
-				} elseif ($fieldInfo->isFile()) {
-					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::file";
-					$params = "";
-				} else {
-					$callback = O_Dao_Renderer::CALLBACK_EDIT . "::simple";
-					$params = "";
-				}
-			} else {
-				$params = $callback[ "params" ];
-				$callback = $callback[ "callback" ];
-
-				if (isset( $this->relationQueries[ $name ] )) {
-					$_params = $this->relationQueries[ $name ];
-					$_params[ "params" ] = $params;
-					$params = $_params;
-				}
-			}
-
-			// Prepare field value and title
-			$value = isset( $this->values[ $name ] ) ? $this->values[ $name ] : ($this->record ? $this->record->$name : null);
-			$title = $fieldInfo->getParam( O_Dao_Renderer::KEY_EDIT . ":title" );
-			if (!$title)
-				$title = $fieldInfo->getParam( "title" );
-			if (!$title)
-				$title = $name;
-
-			// Make HTML injections, display field value via callback
-			if (isset( $this->htmlBefore[ $name ] ))
-				echo $this->htmlBefore[ $name ];
-
-			$edit_params = new O_Dao_Renderer_Edit_Params( $name, $this->class, $params,
-					$this->record );
-			if ($this->layout)
-				$edit_params->setLayout( $this->layout );
-			$edit_params->setValue( $value );
-			$edit_params->setTitle( $title );
-			if (isset( $this->errors[ $name ] ))
-				$edit_params->setError( $this->errors[ $name ] );
-
-			call_user_func( $callback, $edit_params );
-			if (isset( $this->htmlAfter[ $name ] ))
-				echo $this->htmlAfter[ $name ];
-		}
-		// Hidden fields
-		foreach ($this->hiddenFields as $name => $value) {
-			echo "<input type=\"hidden\" name=\"$name\" value=\"$value\"/>";
-		}
-		if ($this->record)
-			echo "<input type=\"hidden\" name=\"id\" value=\"{$this->record->id}\"/>";
-		echo "<input type=\"hidden\" name=\"o:sbm-form\" value=\"+1\"/>";
-		if ($this->isAjax)
-			echo "<input type=\"hidden\" name=\"o:sbm-ajax\" value=\"+1\"/>";
 	}
 
 	/**
