@@ -30,7 +30,7 @@ class O_Dao_Renderer_FormProcessor {
 	private $isAjax = false;
 	private $actionUrl;
 	private $resetButtonValue;
-	private $submitButtonValue = "Save changes";
+	private $submitButtonValue;
 	private $formTitle;
 	private $hiddenFields = Array ();
 

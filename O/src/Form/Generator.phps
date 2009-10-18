@@ -31,7 +31,7 @@ class O_Form_Generator extends O_Form_Builder {
 	/**
 	 * Checks if a form was generated or not
 	 *
-	 * @var unknown_type
+	 * @var bool
 	 */
 	protected $isGenerated;
 
@@ -74,6 +74,7 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function generate( $type = "", Array $values = Array(), Array $errors = Array(), Array $excludeFields = Array() )
 	{
+		if($this->isGenerated) return;
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 
 		// Prepare field rows
