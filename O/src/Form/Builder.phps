@@ -2,7 +2,7 @@
 
 class O_Form_Builder {
 	const BASE_FIELDSET = "base";
-	
+
 	protected $fieldsets = Array ();
 	protected $hiddens = Array ();
 	protected $url;
@@ -27,6 +27,11 @@ class O_Form_Builder {
 	{
 		$this->method = $method;
 	}
+
+	public function setActionUrl($url) {
+		$this->url = $url;
+	}
+
 
 	public function setEnctype( $enctype )
 	{
@@ -117,7 +122,7 @@ class O_Form_Builder {
 				$fieldset->render( $layout, $this->isAjax );
 			}
 			foreach ($this->hiddens as $k => $v)
-				echo "<input type=\"hidden\" name=\"" . htmlspecialchars( $k ) . "\" value=\"" . htmlspecialchars( 
+				echo "<input type=\"hidden\" name=\"" . htmlspecialchars( $k ) . "\" value=\"" . htmlspecialchars(
 						$v ) . "\"/>";
 			if ($this->buttonsRow instanceof O_Form_Row_Buttons) {
 				$this->buttonsRow->render( $layout, $isAjax );
@@ -129,5 +134,5 @@ class O_Form_Builder {
 			}
 			echo "</form>";
 		}
-	
+
 	}

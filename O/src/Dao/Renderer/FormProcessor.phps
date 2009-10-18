@@ -28,7 +28,6 @@ class O_Dao_Renderer_FormProcessor {
 	private $handler;
 
 	private $isAjax = false;
-	private $actionUrl;
 	private $resetButtonValue;
 	private $submitButtonValue;
 	private $formTitle;
@@ -173,7 +172,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function setActionUrl( $url )
 	{
-		$this->actionUrl = $url;
+		$this->handler->setActionUrl( $url );
 	}
 
 	/**
@@ -237,7 +236,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function addHiddenField( $fieldName, $fieldValue )
 	{
-		$this->hiddenFields[ $fieldName ] = $fieldValue;
+		$this->handler->addHidden($fieldName, $fieldValue);
 	}
 
 	/**
@@ -268,34 +267,29 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function show( O_Html_Layout $layout = null )
 	{
-		$generator = $this->handler->getForm();
-
-		foreach ($this->hiddenFields as $name => $value) {
-			$generator->addHidden( $name, $value );
-		}
 		if ($this->formTitle) {
-			$generator->getFieldset()->setLegend( $this->formTitle );
+			$this->handler->getFieldset()->setLegend( $this->formTitle );
 		}
 		if ($this->isAjax) {
-			$generator->addHidden( "o:sbm-ajax", "+1" );
+			$this->handler->addHidden( "o:sbm-ajax", "+1" );
 		}
 		if ($this->submitButtonValue) {
-			$generator->addSubmitButton( $this->submitButtonValue );
+			$this->handler->addSubmitButton( $this->submitButtonValue );
 		}
 		if ($this->resetButtonValue) {
-			$generator->addResetButton( $this->resetButtonValue );
+			$this->handler->addResetButton( $this->resetButtonValue );
 		}
 		if(count($this->htmlAfter)) foreach($this->htmlAfter as $f=>$c) {
 			$row = new O_Form_Row_Html();
 			$row->setContent($c);
-			$generator->addRowAfter($row, $f);
+			$this->handler->addRowAfter($row, $f);
 		}
 		if(count($this->htmlBefore)) foreach($this->htmlBefore as $f=>$c) {
 			$row = new O_Form_Row_Html();
 			$row->setContent($c);
-			$generator->addRowBefore($row, $f);
+			$this->handler->addRowBefore($row, $f);
 		}
-		$generator->render( $layout, $this->isAjax );
+		$this->handler->render( $layout, $this->isAjax );
 	}
 
 	/**
@@ -305,7 +299,7 @@ class O_Dao_Renderer_FormProcessor {
 	 */
 	public function isFormRequest()
 	{
-		return $this->handler->getForm()->isFormRequest();
+		return $this->handler->isFormRequest();
 	}
 
 }

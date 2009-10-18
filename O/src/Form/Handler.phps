@@ -1,10 +1,7 @@
 <?php
-class O_Form_Handler {
+class O_Form_Handler extends O_Form_Generator {
 
-	protected $class;
-	protected $record;
 
-	protected $type;
 	/**
 	 * Array of field values
 	 *
@@ -30,105 +27,15 @@ class O_Form_Handler {
 	 * @var Array
 	 */
 	protected $errors = Array ();
-	protected $relationQueries = Array ();
-	protected $excludeFields = Array ();
 	/**
 	 * We're creating the new ActiveRecord or editing the old one?
 	 *
 	 * @var array or 0
 	 */
 	protected $createMode = 0;
-	/**
-	 * Related form generator object
-	 *
-	 * @var O_Form_Generator
-	 */
-	protected $form;
 
 	protected $showType;
 
-	/**
-	 * Creates a new object
-	 *
-	 * @param O_Dao_ActiveRecord|string $classOrRecord
-	 */
-	public function __construct( $classOrRecord=null )
-	{
-		if ($classOrRecord) {
-			$this->setClassOrRecord( $classOrRecord );
-		}
-		$this->form = new O_Form_Generator( $classOrRecord );
-		$this->type = O_Dao_Renderer::TYPE_DEF;
-	}
-
-	/**
-	 * Sets a class or a record to be handled
-	 *
-	 * @param O_Dao_ActiveRecord|string $classOrRecord
-	 */
-	public function setClassOrRecord( $classOrRecord )
-	{
-		if ($classOrRecord instanceof O_Dao_ActiveRecord) {
-			$this->record = $classOrRecord;
-			$this->class = get_class( $classOrRecord );
-		} else {
-			$this->class = (string)$classOrRecord;
-			$this->record = null;
-		}
-		$this->showType = O_Dao_Renderer::TYPE_DEF;
-		$this->form->setClassOrRecord($classOrRecord);
-	}
-
-	/**
-	 * Returns prepared form generator
-	 *
-	 * @return O_Form_Generator
-	 */
-	public function getForm($update=false)
-	{
-		if ($update && $this->form->isGenerated()) {
-			$this->form->clear();
-		}
-		foreach ($this->relationQueries as $fieldName => $params) {
-			$this->form->setRelationQuery( $fieldName, $params[ "query" ],
-					$params[ "displayField" ] );
-		}
-		$this->form->generate( $this->type, $this->values, $this->errors, $this->excludeFields );
-		return $this->form;
-	}
-
-	/**
-	 * Sets a query to select field value from
-	 *
-	 * @param string $fieldName
-	 * @param O_Dao_Query $query
-	 * @param string $displayField Field name to display in selector
-	 */
-	public function setRelationQuery( $fieldName, O_Dao_Query $query, $displayField = "id" )
-	{
-		$this->relationQueries[ $fieldName ] = array ("query" => $query,
-														"displayField" => $displayField);
-	}
-
-	/**
-	 * Remove a field from form handler and builder
-	 *
-	 * @param unknown_type $fieldName
-	 */
-	public function excludeField( $fieldName )
-	{
-		$this->excludeFields[] = $fieldName;
-	}
-
-	/**
-	 * Set editing type -- key suffix edit-$type
-	 *
-	 * @param string $type
-	 */
-	public function setType( $type )
-	{
-		$this->type = $type;
-	}
 
 	/**
 	 * This form should be handled not like edit-form, but like creation
@@ -167,9 +74,22 @@ class O_Form_Handler {
 		return $this->errors;
 	}
 
-	public function getRecord() {
-		return $this->record;
+
+	public function setType($type) {
+		parent::setType($type);
+		if(!$this->showType) $this->showType = $type;
 	}
+
+	public function generate() {
+		parent::generate($this->values, $this->errors);
+	}
+
+
+	public function render(O_Html_Layout $layout = null, $isAjax = false) {
+		$this->generate();
+		parent::render($layout, $isAjax);
+	}
+
 
 
 	/**
@@ -182,7 +102,7 @@ class O_Form_Handler {
 		$this->errors = Array ();
 		$this->handled = false;
 		$this->record = null;
-		$this->form->clear();
+		parent::clear();
 	}
 
 	/**
@@ -198,7 +118,7 @@ class O_Form_Handler {
 		$this->handled = true;
 
 		// Try to handle valid requests only
-		if (!$this->getForm()->isFormRequest()) {
+		if (!$this->isFormRequest()) {
 			return $this->handleResult = false;
 		}
 
@@ -297,7 +217,7 @@ class O_Form_Handler {
 	 */
 	public function responseAjax( $refreshOrLocation = null, $showOnSuccess = null )
 	{
-		if (!$this->form->isFormRequest())
+		if (!$this->isFormRequest())
 			return false;
 		$response = Array ("status" => "");
 		if ($this->handle()) {

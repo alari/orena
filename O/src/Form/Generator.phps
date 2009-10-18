@@ -34,6 +34,8 @@ class O_Form_Generator extends O_Form_Builder {
 	 * @var bool
 	 */
 	protected $isGenerated;
+	protected $type;
+	protected $excludeFields = Array ();
 
 	/**
 	 * Creates a new instance
@@ -46,7 +48,30 @@ class O_Form_Generator extends O_Form_Builder {
 		if ($classOrRecord)
 			$this->setClassOrRecord( $classOrRecord );
 		parent::__construct( O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) ) );
+		$this->type = O_Dao_Renderer::TYPE_DEF;
 	}
+
+
+	/**
+	 * Remove a field from form handler and builder
+	 *
+	 * @param unknown_type $fieldName
+	 */
+	public function excludeField( $fieldName )
+	{
+		$this->excludeFields[] = $fieldName;
+	}
+
+	/**
+	 * Set editing type -- key suffix edit-$type
+	 *
+	 * @param string $type
+	 */
+	public function setType( $type )
+	{
+		$this->type = $type;
+	}
+
 
 	/**
 	 * Sets classname or record object to be handled
@@ -64,21 +89,25 @@ class O_Form_Generator extends O_Form_Builder {
 		}
 	}
 
+
+	public function getRecord() {
+		return $this->record;
+	}
+
 	/**
 	 * Generates form builder contents
 	 *
-	 * @param string $type type of editing
 	 * @param array $values
 	 * @param array $errors
 	 * @param array $excludeFields
 	 */
-	public function generate( $type = "", Array $values = Array(), Array $errors = Array(), Array $excludeFields = Array() )
+	public function generate( Array $values = Array(), Array $errors = Array() )
 	{
 		if($this->isGenerated) return;
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 
 		// Prepare field rows
-		foreach ($tableInfo->getFieldsByKey( self::FORM_KEY, $type, $excludeFields ) as $name => $params) {
+		foreach ($tableInfo->getFieldsByKey( self::FORM_KEY, $this->type, $this->excludeFields ) as $name => $params) {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
 			$producer = new O_Form_Row_AutoProducer( $name, $params, $fieldInfo, $this->record );
 			if (isset( $this->relationQueries[ $name ] )) {
