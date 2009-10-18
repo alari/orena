@@ -275,7 +275,7 @@ class O_Form_Handler {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
 			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
 			try {
-				$provider = new O_Form_Check_AutoProvider( $name, $this->record, $fieldInfo,
+				$provider = new O_Form_Check_AutoProducer( $name, $this->record, $fieldInfo,
 						$this->type, $this->values[ $name ] );
 				if (isset( $this->relationQueries[ $name ] )) {
 					$provider->setRelationQuery( $this->relationQueries[ $name ][ "query" ] );
