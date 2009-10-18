@@ -285,7 +285,6 @@ class O_Dao_Renderer_FormProcessor {
 		if ($this->resetButtonValue) {
 			$generator->addResetButton( $this->resetButtonValue );
 		}
-		$generator->generate( $this->type, $this->values, $this->errors, $this->exceptFields );
 		if(count($this->htmlAfter)) foreach($this->htmlAfter as $f=>$c) {
 			$row = new O_Form_Row_Html();
 			$row->setContent($c);
