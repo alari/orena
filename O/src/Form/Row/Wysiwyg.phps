@@ -20,7 +20,8 @@ class O_Form_Row_Wysiwyg extends O_Form_Row_Field {
 			O_Js_Middleware::getFramework()->addDomreadyCode( 
 					"
 var oFCKeditor = new FCKeditor( 'form-wysiwyg-" . $this->name . "' );
-oFCKeditor.BasePath = '" . $layout->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
+oFCKeditor.BasePath = '" .
+						 $layout->staticUrl( 'fckeditor/', 1 ) . "';" . ($customConfig ? 'oFCKeditor.Config["CustomConfigurationsPath"] = "' .
 						 $customConfig . '";' : "") . ($toolbarSet ? "oFCKeditor.ToolbarSet = '" .
 						 $toolbarSet . "';" : "") . ($height ? "oFCKeditor.Height = '" . $height .
 						 "';" : "") . "oFCKeditor.ReplaceTextarea();", $layout );

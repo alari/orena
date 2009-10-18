@@ -18,7 +18,7 @@
  *
  */
 class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
-	
+
 	/**
 	 * Instances counter -- to give an unique id to each form
 	 *
@@ -47,34 +47,34 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 		if ($this->handled)
 			return $this->handleResult;
 		$this->handled = true;
-		
+
 		if (!$this->isFormRequest()) {
 			return $this->handleResult = false;
 		}
-		
+
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
-			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ), 
+			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ),
 					$this->class );
 			if (!$this->record) {
 				$this->errors[ "_" ] = "Record not found.";
 				return $this->handleResult = false;
 			}
 		}
-		
+
 		// Start transaction
 		O_Db_Manager::getConnection()->beginTransaction();
-		
+
 		try {
-			
+
 			// Check and prepare values, found errors if they are
 			$this->checkValues();
-			
+
 			// Stop processing without saving, if errors occured
 			if (count( $this->errors )) {
 				return $this->handleResult = false;
 			}
-			
+
 			// Create record in database
 			if ($this->createMode !== 0 && !$this->record) {
 				$class = $this->class;
@@ -85,12 +85,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 					$this->record = new $class( );
 				}
 			}
-			
+
 			// Setting values for ActiveRecord
 			foreach ($this->values as $name => $value) {
 				$this->record->$name = $value;
 			}
-			
+
 			// Trying to save
 			try {
 				$this->record->save();
@@ -99,7 +99,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 				$this->errors[ "_" ] = "Duplicate entries found. Saving failed.";
 				throw $e;
 			}
-		
+
 		}
 		catch (Exception $e) {
 			O_Db_Manager::getConnection()->rollBack();
@@ -107,7 +107,7 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 				$this->errors[ "_" ] = $e->getMessage();
 			return $this->handleResult = 0;
 		}
-		
+
 		O_Db_Manager::getConnection()->commit();
 		// Succeed
 		return $this->handleResult = 1;
@@ -127,12 +127,12 @@ class O_Dao_Renderer_FormProcessor extends O_Dao_Renderer_FormBases {
 		$response = Array ("status" => "");
 		if ($this->handle()) {
 			$response[ "status" ] = "SUCCEED";
-			
+
 			if ($refreshOrLocation === 1 || $refreshOrLocation === true) {
 				$response[ "refresh" ] = 1;
 			} elseif ($refreshOrLocation) {
 				$response[ "redirect" ] = $refreshOrLocation;
-			
+
 			} elseif (!$showOnSuccess) {
 				ob_start();
 				$this->record->show( $this->layout, $this->showType );

@@ -376,18 +376,16 @@ class O_Dao_TableInfo {
 	 * Returns array of fields to process by key.
 	 * Can be used by renderers, form builders or any other automated fields processors
 	 *
-	 * @param mixed $classOrRecord
 	 * @param string $key Name of field params, like "edit"
 	 * @param string $type Suffix of field params. Will be used "$key-$type", if this param is set and $type is given, or "$key" instead
 	 * @param array $excludeFields
 	 * @return Array ($fieldName => $renderParams)
 	 */
-	static public function getFieldsByKey( $classOrRecord, $key, $type=null, Array $excludeFields=Array() )
+	public function getFieldsByKey( $key, $type=null, Array $excludeFields=Array() )
 	{
-		$tableInfo = self::get( $classOrRecord );
 		$fullkey = $type ? $key . "-" . $type : "";
 		$fields = Array ();
-		foreach ($tableInfo->getFields() as $fieldName => $fieldInfo) {
+		foreach ($this->getFields() as $fieldName => $fieldInfo) {
 			if (in_array( $fieldName, $excludeFields )) {
 				continue;
 			}

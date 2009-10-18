@@ -1,51 +1,9 @@
 <?php
 
-class O_Form_Row_AutoProducer {
+class O_Form_Row_AutoProducer extends O_Form_FieldActionProducer {
 	
 	const CLASS_PREFIX = "O_Form_Row_";
 	
-	/**
-	 * Rendered fieldname
-	 *
-	 * @var string
-	 */
-	protected $name;
-	/**
-	 * Callable resourse to generate a row
-	 *
-	 * @var callback
-	 */
-	protected $callback;
-	/**
-	 * String params given in dao' table info after callback
-	 *
-	 * @var string
-	 */
-	protected $params = "";
-	/**
-	 * Current field value
-	 *
-	 * @var mixed
-	 */
-	protected $value;
-	/**
-	 * FieldInfo object of current field
-	 *
-	 * @var O_Dao_FieldInfo
-	 */
-	protected $fieldInfo;
-	/**
-	 * Active record we're editing
-	 *
-	 * @var O_Dao_ActiveRecord
-	 */
-	protected $record;
-	/**
-	 * Relation query to choose valid target of relative field
-	 *
-	 * @var O_Dao_Query
-	 */
-	protected $relationQuery;
 	/**
 	 * Field name to show when choosing a relation
 	 *
@@ -58,12 +16,6 @@ class O_Form_Row_AutoProducer {
 	 * @var bool
 	 */
 	protected $relationMultiple;
-	/**
-	 * Was callback already prepared from params and field info or not
-	 *
-	 * @var bool
-	 */
-	protected $callbackPrepared = false;
 	/**
 	 * Field title to be displayed in row
 	 *
@@ -143,26 +95,6 @@ class O_Form_Row_AutoProducer {
 	}
 
 	/**
-	 * Returns currently handled field info
-	 *
-	 * @return O_Dao_FieldInfo
-	 */
-	public function getFieldInfo()
-	{
-		return $this->fieldInfo;
-	}
-
-	/**
-	 * Returns a query to select relative objects from
-	 *
-	 * @return O_Dao_Query
-	 */
-	public function getRelationQuery()
-	{
-		return $this->relationQuery;
-	}
-
-	/**
 	 * Returns the field to display in relation selecting list
 	 *
 	 * @return unknown
@@ -183,46 +115,6 @@ class O_Form_Row_AutoProducer {
 	}
 
 	/**
-	 * Returns current field name
-	 *
-	 * @return string
-	 */
-	public function getFieldName()
-	{
-		return $this->name;
-	}
-
-	/**
-	 * Returns current field value
-	 *
-	 * @return mixed
-	 */
-	public function getValue()
-	{
-		return $this->value;
-	}
-
-	/**
-	 * Returns ActiveRecord we're handling
-	 *
-	 * @return O_Dao_ActiveRecord
-	 */
-	public function getRecord()
-	{
-		return $this->record;
-	}
-
-	/**
-	 * Returns additional params for row generator
-	 *
-	 * @return string
-	 */
-	public function getParams()
-	{
-		return $this->params;
-	}
-
-	/**
 	 * Returns field title
 	 *
 	 * @return string
@@ -231,7 +123,7 @@ class O_Form_Row_AutoProducer {
 	{
 		if ($this->title)
 			return $this->title;
-		$this->title = $this->fieldInfo->getParam( O_Form_Processor::FORM_KEY . ":title" );
+		$this->title = $this->fieldInfo->getParam( O_Form_Generator::FORM_KEY . ":title" );
 		if (!$this->title)
 			$this->title = $this->fieldInfo->getParam( "title" );
 		if (!$this->title)
@@ -258,6 +150,18 @@ class O_Form_Row_AutoProducer {
 		}
 		
 		if (!strpos( $this->callback, "::" )) {
+			// FIXME temporary hack
+			$replace_callback = array ("simple" => "String", 
+														"timestamp" => "DateTime", 
+														"file" => "File", 
+														"enum" => "Select", 
+														"wysiwyg" => "Wysiwyg", 
+														"area" => "Text", 
+														"selectRelation" => "Select", 
+														"selectRelationBox" => "BoxList");
+			if (isset( $replace_callback[ $this->callback ] ))
+				$this->callback = $replace_callback[ $this->callback ];
+				// /FIXME
 			$this->callback = self::CLASS_PREFIX . $this->callback;
 			if (class_exists( $this->callback, true ))
 				return true;

@@ -38,6 +38,12 @@ class O_Form_Builder {
 		$this->acceptCharset = $acceptCharset;
 	}
 
+	/**
+	 * Returns named fieldset
+	 *
+	 * @param string $fieldsetName
+	 * @return O_Form_Fieldset
+	 */
 	public function getFieldset( $fieldsetName = self::BASE_FIELDSET )
 	{
 		return $this->fieldsets[ $fieldsetName ];
