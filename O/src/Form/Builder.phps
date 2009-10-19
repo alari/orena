@@ -119,7 +119,7 @@ class O_Form_Builder {
 		echo "<form action=\"$this->url\" method=\"$this->method\" enctype=\"$this->enctype\" accept-charset=\"$this->acceptCharset\"" .
 			 ($this->instanceId ? " id=\"{$this->instanceId}\"" : "") . ">";
 			foreach ($this->fieldsets as $fieldset) {
-				$fieldset->render( $layout, $this->isAjax );
+				$fieldset->render( $layout, $isAjax );
 			}
 			foreach ($this->hiddens as $k => $v)
 				echo "<input type=\"hidden\" name=\"" . htmlspecialchars( $k ) . "\" value=\"" . htmlspecialchars(
