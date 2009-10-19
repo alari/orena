@@ -1,14 +1,11 @@
 <?php
 class O_Form_Handler extends O_Form_Generator {
-
-
 	/**
 	 * Array of field values
 	 *
 	 * @var Array
 	 */
 	protected $values = Array ();
-
 	/**
 	 * Was the form handled or not
 	 *
@@ -33,9 +30,19 @@ class O_Form_Handler extends O_Form_Generator {
 	 * @var array or 0
 	 */
 	protected $createMode = 0;
-
+	/**
+	 * Type suffix for showing record in ajax response
+	 *
+	 * @var string
+	 */
 	protected $showType;
 
+	/**
+	 * Is it an ajax-sending form or not
+	 *
+	 * @var bool
+	 */
+	protected $isAjax = false;
 
 	/**
 	 * This form should be handled not like edit-form, but like creation
@@ -48,10 +55,25 @@ class O_Form_Handler extends O_Form_Generator {
 		$this->createMode = $params ? $params : Array ();
 	}
 
-	public function setShowType($type) {
+	/**
+	 * Sets chowing type (to be used in ajax response)
+	 *
+	 * @param string $type
+	 */
+	public function setShowType( $type )
+	{
 		$this->showType = $type;
 	}
 
+	/**
+	 * Sets form as an ajax one or not
+	 *
+	 * @param bool $isAjax
+	 */
+	public function setAjax( $isAjax = true )
+	{
+		$this->isAjax = $isAjax;
+	}
 
 	/**
 	 * Returns error message for given field
@@ -74,23 +96,38 @@ class O_Form_Handler extends O_Form_Generator {
 		return $this->errors;
 	}
 
-
-	public function setType($type) {
-		parent::setType($type);
-		if(!$this->showType) $this->showType = $type;
+	/**
+	 * Sets type for form generator and (default) show type
+	 *
+	 * @param string $type
+	 */
+	public function setType( $type )
+	{
+		parent::setType( $type );
+		if (!$this->showType)
+			$this->showType = $type;
 	}
 
-	public function generate() {
-		parent::generate($this->values, $this->errors);
+	/**
+	 * Generates form with all the current values
+	 *
+	 */
+	public function generate()
+	{
+		parent::generate( $this->values, $this->errors );
 	}
 
-
-	public function render(O_Html_Layout $layout = null, $isAjax = false) {
+	/**
+	 * Renders form html. Calls generator first
+	 *
+	 * @param O_Html_Layout $layout
+	 * @param bool $isAjax
+	 */
+	public function render( O_Html_Layout $layout = null, $isAjax = null )
+	{
 		$this->generate();
-		parent::render($layout, $isAjax);
+		parent::render( $layout, $isAjax === null ? $this->isAjax : $isAjax );
 	}
-
-
 
 	/**
 	 * Removes ActiveRecord, clears form

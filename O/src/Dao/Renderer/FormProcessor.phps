@@ -22,7 +22,6 @@ class O_Dao_Renderer_FormProcessor extends O_Form_Handler {
 
 	private $htmlBefore = Array();
 	private $htmlAfter = Array();
-	private $isAjax;
 
 	/**
 	 * Injects block of HTML before field
@@ -103,7 +102,7 @@ class O_Dao_Renderer_FormProcessor extends O_Form_Handler {
 	 */
 	public function setAjaxMode( $isAjax = true )
 	{
-		$this->isAjax = (bool)$isAjax;
+		$this->setAjax($isAjax);
 	}
 
 

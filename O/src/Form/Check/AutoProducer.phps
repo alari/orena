@@ -2,8 +2,22 @@
 
 class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 	const CLASS_PREFIX = "O_Form_Check_";
+	/**
+	 * Type suffix of checking
+	 *
+	 * @var string
+	 */
 	protected $type;
 
+	/**
+	 * Creates auto producer instance
+	 *
+	 * @param string $name
+	 * @param O_Dao_ActiveRecord $record
+	 * @param O_Dao_FieldInfo $fieldInfo
+	 * @param string $type
+	 * @param reference $value New value to be checked
+	 */
 	public function __construct( $name, $record, $fieldInfo, $type, &$value )
 	{
 		$this->name = $name;
@@ -13,11 +27,22 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 		$this->value = &$value;
 	}
 
+	/**
+	 * Sets the query to get related values from
+	 *
+	 * @param O_Dao_Query $query
+	 */
 	public function setRelationQuery( O_Dao_Query $query )
 	{
 		$this->relationQuery = $query;
 	}
 
+	/**
+	 * Provides the check
+	 *
+	 * @param bool $createMode
+	 * @throws O_Form_Check_Error
+	 */
 	public function check( $createMode = false )
 	{
 
@@ -44,7 +69,7 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 			$required = $this->fieldInfo->getParam( "required" );
 		if ($required && ((!$this->value && !$this->fieldInfo->isFile()) || ($this->fieldInfo->isFile() &&
 			 $createMode && (!isset( $_FILES[ $this->name ] ) || !$_FILES[ $this->name ][ "size" ])))) {
-				throw new O_Dao_Renderer_Check_Error(
+				throw new O_Form_Check_Error(
 						$required === 1 ? "Field value is required!" : $required );
 		}
 
@@ -96,7 +121,7 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 	}
 
 	/**
-	 * Prepares callable function to be used in call()
+	 * Prepares callable function to be used in check()
 	 *
 	 * @return bool
 	 */
@@ -144,26 +169,10 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 	}
 
 	/**
-	 * Returns callback for field check
+	 * Sets the new formed value
 	 *
-	 * @param O_Dao_FieldInfo $fieldInfo
-	 * @return array
+	 * @param mixed $value
 	 */
-	protected function getCheckCallback( O_Dao_FieldInfo $fieldInfo )
-	{
-		$fullkey = $this->type ? O_Dao_Renderer::KEY_CHECK . "-" . $this->type : "";
-		$key = O_Dao_Renderer::KEY_CHECK;
-		$params = null;
-		if ($fullkey && $fieldInfo->getParam( $fullkey )) {
-			$params = $fieldInfo->getParam( $fullkey );
-		} elseif ($fieldInfo->getParam( $key )) {
-			$params = $fieldInfo->getParam( $key );
-		}
-		if (!$params)
-			return false;
-		return $this->getCallbackByParams( $params, O_Dao_Renderer::CALLBACK_CHECK );
-	}
-
 	public function setValue( $value )
 	{
 		$this->value = $value;

@@ -2,7 +2,6 @@
 /**
  * Shortcut class for rendering and handling Active Records.
  *
- * @see O_Dao_Renderer_FormProcessor
  * @see O_Dao_Renderer_Shower
  *
  * @author Dmitry Kurinskiy

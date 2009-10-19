@@ -61,11 +61,10 @@ class O_Form_Generator extends O_Form_Builder {
 		$this->type = O_Dao_Renderer::TYPE_DEF;
 	}
 
-
 	/**
 	 * Remove a field from form handler and builder
 	 *
-	 * @param unknown_type $fieldName
+	 * @param string $fieldName
 	 */
 	public function excludeField( $fieldName )
 	{
@@ -82,6 +81,27 @@ class O_Form_Generator extends O_Form_Builder {
 		$this->type = $type;
 	}
 
+	/**
+	 * Sets current active record class
+	 *
+	 * @param string $class
+	 */
+	public function setClass( $class )
+	{
+		$this->class = $class;
+		$this->record = null;
+	}
+
+	/**
+	 * Sets active record we're generating a form with
+	 *
+	 * @param O_Dao_ActiveRecord $record
+	 */
+	public function setRecord( O_Dao_ActiveRecord $record )
+	{
+		$this->record = $record;
+		$this->class = get_class( $record );
+	}
 
 	/**
 	 * Sets classname or record object to be handled
@@ -90,7 +110,7 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function setClassOrRecord( $classOrRecord )
 	{
-		if ( $classOrRecord instanceof O_Dao_ActiveRecord) {
+		if ($classOrRecord instanceof O_Dao_ActiveRecord) {
 			$this->record = $classOrRecord;
 			$this->class = get_class( $classOrRecord );
 		} else {
@@ -104,7 +124,8 @@ class O_Form_Generator extends O_Form_Builder {
 	 *
 	 * @return O_Dao_ActiveRecord
 	 */
-	public function getRecord() {
+	public function getRecord()
+	{
 		return $this->record;
 	}
 
@@ -117,11 +138,13 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function generate( Array $values = Array(), Array $errors = Array() )
 	{
-		if($this->isGenerated) return;
+		if ($this->isGenerated)
+			return;
 		$tableInfo = O_Dao_TableInfo::get( $this->class );
 
 		// Prepare field rows
-		foreach ($tableInfo->getFieldsByKey( self::FORM_KEY, $this->type, $this->excludeFields ) as $name => $params) {
+		foreach ($tableInfo->getFieldsByKey( self::FORM_KEY, $this->type,
+				$this->excludeFields ) as $name => $params) {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
 			$producer = new O_Form_Row_AutoProducer( $name, $params, $fieldInfo, $this->record );
 			if (isset( $this->relationQueries[ $name ] )) {
@@ -135,7 +158,7 @@ class O_Form_Generator extends O_Form_Builder {
 			if (isset( $errors[ $name ] )) {
 				$row->setError( $errors[ $name ] );
 			}
-			$this->addRow( $row, parent::BASE_FIELDSET, $name );
+			$this->addRow( $row, $name );
 		}
 		$this->addHidden( "o:sbm-form", "+1" );
 		if ($this->record) {
