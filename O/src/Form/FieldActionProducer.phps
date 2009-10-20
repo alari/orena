@@ -42,7 +42,7 @@ abstract class O_Form_FieldActionProducer {
 	 *
 	 * @var bool
 	 */
-	protected $callbackPrepared = false;
+	protected $callbackPrepared = null;
 	/**
 	 * Relation query to choose valid target of relative field
 	 *
