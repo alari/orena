@@ -65,6 +65,17 @@ class O_Form_Builder {
 	}
 
 	/**
+	 * Fieldset legend setting shortcut
+	 *
+	 * @param string $legend
+	 * @param string $fieldset
+	 */
+	public function setLegend( $legend, $fieldset = self::BASE_FIELDSET )
+	{
+		$this->fieldsets[ $fieldset ]->setLegend( $legend );
+	}
+
+	/**
 	 * Sets form id attribute
 	 *
 	 * @param string $id

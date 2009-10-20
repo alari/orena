@@ -8,13 +8,10 @@
  */
 class O_Dao_Renderer {
 	const CALLBACK_SHOW = "O_Dao_Renderer_Show_Callbacks";
-	const CALLBACK_EDIT = "O_Dao_Renderer_Edit_Callbacks";
-	const CALLBACK_CHECK = "O_Dao_Renderer_Check_Callbacks";
 
 	const KEY_SHOW = "show";
 	const KEY_LOOP = "loop";
-	const KEY_EDIT = "edit";
-	const KEY_CHECK = "check";
+	const KEY_IN_LOOP = "in-loop";
 
 	const TYPE_DEF = "def";
 	const TYPE_LOOP = "loop";
