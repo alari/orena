@@ -175,6 +175,6 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 	 */
 	public function setValue( $value )
 	{
-		$this->value = $value;
+		$this->value = $value;echo $value;
 	}
 }
