@@ -77,7 +77,7 @@ class O_Feed_AtomPub {
 
 		if (!$ret)
 			return self::setError( curl_error( $curl ) );
-		if (!strpos( $ret, "<?xml" ) !== 0)
+		if (!strpos( $ret, "<?xml" ) !== 0 && !strpos($ret, "200 OK"))
 			return self::setError( "Update error: $ret" );
 
 		return $ret;
