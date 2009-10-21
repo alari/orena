@@ -19,7 +19,7 @@ class O_Base_SearchEngines {
 
 	static public function isBot()
 	{
-		if (is_bool( self::$is_bot ))
+		if (self::$is_bot !== null)
 			return self::$is_bot;
 
 		$user_agent = $_SERVER[ 'HTTP_USER_AGENT' ];
