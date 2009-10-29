@@ -58,12 +58,7 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 		$this->name = $name;
 		$this->owns = $owns;
 		$this->targetBase = $target;
-		if ($this->targetBase[ 0 ] == "{" && $this->targetBase[ strlen( $this->targetBase ) - 1 ] ==
-			 "}") {
-				$this->target = O_Registry::get( "app/" . substr( $this->targetBase, 1, -1 ) );
-		} else {
-			$this->target = $this->targetBase;
-		}
+		$this->target = $this->getTargetByBase( $this->targetBase );
 		$this->inverse = $fieldInfo->getParam( "inverse" );
 	}
 
@@ -102,9 +97,8 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 					$oldValue->$inverseName = null;
 					$oldValue->save();
 				}
-				if ($fieldValue && (!$fieldValue->$inverseName || $fieldValue->$inverseName->id !=
-						 $obj->id)) {
-							$fieldValue->$inverseName = $obj;
+				if ($fieldValue && (!$fieldValue->$inverseName || $fieldValue->$inverseName->id != $obj->id)) {
+					$fieldValue->$inverseName = $obj;
 					$fieldValue->save();
 				}
 			}
@@ -159,8 +153,7 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 		if (!$this->inverse)
 			$this->inverse = $this->fieldInfo->getParam( "inverse" );
 		if (!$this->inverseField)
-			$this->inverseField = O_Dao_TableInfo::get( $this->target )->getFieldInfo( 
-					$this->inverse );
+			$this->inverseField = O_Dao_TableInfo::get( $this->target )->getFieldInfo( $this->inverse );
 		if (!$this->inverseField)
 			throw new O_Ex_Critical( "Inverse field not found: $this->target -> $this->inverse" );
 		return $this->inverseField;

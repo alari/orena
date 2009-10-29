@@ -32,4 +32,22 @@ abstract class O_Dao_Field_Bases {
 	public function addFieldTypeToQuery( O_Db_Query $query )
 	{
 	}
+
+	/**
+	 * Returns prepared target class name
+	 *
+	 * @param string $targetBase
+	 * @return string
+	 */
+	protected function getTargetByBase( $targetBase )
+	{
+		if ($targetBase[ 0 ] == "{" && $targetBase[ strlen( $targetBase ) - 1 ] == "}") {
+			return O_Registry::get( "app/" . substr( $targetBase, 1, -1 ) );
+		} elseif ($targetBase[ 0 ] == "_") {
+			return O_Registry::get( "app/class_prefix" ) . "_Mdl" . $targetBase;
+		} else {
+			return $this->targetBase;
+		}
+	}
+
 }
