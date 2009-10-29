@@ -46,7 +46,7 @@ abstract class O_Dao_Field_Bases {
 		} elseif ($targetBase[ 0 ] == "_") {
 			return O_Registry::get( "app/class_prefix" ) . "_Mdl" . $targetBase;
 		} else {
-			return $this->targetBase;
+			return $targetBase;
 		}
 	}
 
