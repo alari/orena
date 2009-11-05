@@ -55,8 +55,7 @@ class O_Form_Check_AutoProducer extends O_Form_FieldActionProducer {
 		if ($this->prepareCallback()) {
 			if (!strpos( $this->callback, "::" )) {
 				$class = $this->callback;
-				$checker = new $class( $this->name );
-				$checker->autoProduce( $this );
+				$checker = new $class( $this );
 				$checker->check();
 			} else {
 				call_user_func( $this->callback, $this );
