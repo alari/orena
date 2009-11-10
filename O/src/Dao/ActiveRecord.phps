@@ -468,3 +468,27 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	}
 
 }
+
+
+
+require_once 'Query.phps';
+require_once 'TableInfo.phps';
+require_once 'FieldInfo.phps';
+require_once 'Renderer.phps';
+require_once 'Renderer/Commons.phps';
+require_once 'Renderer/Params.phps';
+require_once 'Renderer/Shower.phps';
+require_once 'Signals.phps';
+require_once 'Relation/BaseToMany.phps';
+require_once 'Relation/OneToMany.phps';
+require_once 'Relation/ManyToMany.phps';
+require_once 'Field/iFace.phps';
+require_once 'Field/iRelation.phps';
+require_once 'Field/Bases.phps';
+require_once 'Field/Relative.phps';
+require_once 'Field/Atomic.phps';
+require_once 'Field/File.phps';
+require_once 'Field/Image.phps';
+require_once 'Field/OneOf.phps';
+require_once 'Field/ToOne.phps';
+require_once 'Field/ToMany.phps';
