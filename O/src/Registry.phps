@@ -6,7 +6,7 @@
  */
 class O_Registry {
 	/**
-	 * Parsed ini-files -- registry defaults
+	 * Parsed registry
 	 *
 	 * @var Array
 	 */
@@ -18,6 +18,13 @@ class O_Registry {
 	 * @var Array
 	 */
 	private static $inheritance = Array ();
+	
+	/**
+	 * Cached full keys
+	 *
+	 * @var Array
+	 */
+	private static $cached_keys = Array();
 
 	/**
 	 * Returns registry value or array of values, runtime or default
@@ -32,9 +39,13 @@ class O_Registry {
 			$class = get_class( $class );
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
+			
+		if(isset(self::$cached_keys[$key])) {
+			return self::$cached_keys[$key];
+		}
 		
 		$keys = explode( "/", $key );
-		$value = self::$registry;
+		$value = &self::$registry;
 		foreach ($keys as $k) {
 			if (isset( $value[ $k ] )) {
 				$value = $value[ $k ];
@@ -54,7 +65,7 @@ class O_Registry {
 				return $value;
 			return null;
 		}
-		return $value;
+		return self::$cached_keys[$key] =& $value;
 	}
 
 	/**
@@ -88,6 +99,9 @@ class O_Registry {
 	 */
 	static private function setOrAdd( $key, $value, $add = false )
 	{
+		if(isset(self::$cached_keys[$key])) {
+			unset(self::$cached_keys[$key]);
+		}
 		$keys = explode( "/", $key );
 		$registry = &self::$registry;
 		foreach ($keys as $i => $k) {
