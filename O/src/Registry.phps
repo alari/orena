@@ -32,6 +32,14 @@ class O_Registry {
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
 		
+<<<<<<< .mine
+		$keys = explode ( "/", $key );
+		$value = self::$registry;
+		foreach ( $keys as $k ) {
+			if (isset ( $value [$k] )) {
+				$value = $value [$k];
+				continue;
+=======
 		if (! isset ( self::$registry [$key] )) {
 			foreach ( self::$inheritance as $_key => $_replace_key ) {
 				if (strpos ( $key, $_key ) === 0) {
@@ -39,10 +47,28 @@ class O_Registry {
 					if (isset ( self::$registry [$key] ))
 						return self::$registry [$key];
 				}
+>>>>>>> .r311
 			}
+<<<<<<< .mine
+			// Value not found, trying to get it from parents
+			for($j = count ( $keys ); $j > 0; $j --) {
+				$_key = join ( "/", array_slice ( $keys, 0, $j ) );
+				if (isset ( self::$inheritance [$_key] )) {
+					$key = self::$inheritance [$_key] . ($j < count ( $keys ) ? "/" . join ( "/", array_slice ( $keys, $j ) ) : "");
+					return self::get ( $key );
+				} else
+					continue;
+			}
+			if (! $key)
+				return $value;
+			return null;
+		}
+		return $value;
+=======
 		} else
 			return self::$registry [$key];
 		return null;
+>>>>>>> .r311
 	}
 	
 	/**
@@ -72,8 +98,31 @@ class O_Registry {
 	 * @param mixed $value
 	 * @param bool $add
 	 */
+<<<<<<< .mine
 	static private function setOrAdd($key, $value, $add = false) {
+		$keys = explode ( "/", $key );
+=======
+	static private function setOrAdd($key, $value, $add = false) {
+>>>>>>> .r311
 		$registry = &self::$registry;
+<<<<<<< .mine
+		foreach ( $keys as $i => $k ) {
+			if (isset ( $registry [$k] )) {
+				$registry = &$registry [$k];
+			} elseif ($i < count ( $keys ) - 1) {
+				$registry [$k] = Array ();
+				$registry = &$registry [$k];
+			} else {
+				if ($add) {
+					if (! isset ( $registry [$k] ) || ! is_array ( $registry [$k] ))
+						$registry [$k] = Array ();
+					$registry [$k] [] = $value;
+					return;
+				} else {
+					$registry [$k] = $value;
+					return;
+				}
+=======
 		if (! $add) {
 			$registry [$key] = $value;
 			return;
@@ -83,11 +132,19 @@ class O_Registry {
 			if (is_array ( $v )) {
 				$registry [$key] [] = $value;
 				return;
+>>>>>>> .r311
 			}
 			$registry [$key] = array ($registry [$key], $value );
 			return;
 		}
+<<<<<<< .mine
+		if ($add)
+			$registry [] = $value;
+		else
+			$registry = $value;
+=======
 		$registry [$key] = array ($value );
+>>>>>>> .r311
 	}
 	
 	/**
