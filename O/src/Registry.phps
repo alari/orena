@@ -65,7 +65,7 @@ class O_Registry {
 				return $value;
 			return null;
 		}
-		return self::$cached_keys[$key] =& $value;
+		return /*self::$cached_keys[$key] =&*/ $value;
 	}
 
 	/**
