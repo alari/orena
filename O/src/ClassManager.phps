@@ -27,8 +27,8 @@ class O_ClassManager {
 	{
 		if ($source_folder[ strlen( $source_folder ) - 1 ] != "/")
 			$source_folder .= "/";
-		O_Registry::set( "fw/classmanager/prefix/$prefix/folder", $source_folder );
-		O_Registry::set( "fw/classmanager/prefix/$prefix/ext", $extension );
+		O_Registry::add( "fw/classmanager/prefix", array($prefix, $source_folder, $extension) );
+		//O_Registry::set( "fw/classmanager/prefix/$prefix/ext", $extension );
 	}
 
 	/**
@@ -50,10 +50,11 @@ class O_ClassManager {
 	static public function load( $class )
 	{
 		$file = "";
-		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $prefix => $params) {
+		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $params) {
+			list($prefix, $folder, $ext) = $params;
 			if (strpos( $class, $prefix ) === 0) {
-				$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'),
-						substr( $class, strlen( $prefix ) + 1 ) ) . "." . $params[ "ext" ];
+				$file = $folder . str_replace( array ('\\', '_'), array ('/', '/'),
+						substr( $class, strlen( $prefix ) + 1 ) ) . "." . $ext;
 				break;
 			}
 		}
