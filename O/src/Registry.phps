@@ -45,7 +45,7 @@ class O_Registry {
 		}
 		
 		$keys = explode( "/", $key );
-		$value = &self::$registry;
+		$value = self::$registry;
 		foreach ($keys as $k) {
 			if (isset( $value[ $k ] )) {
 				$value = $value[ $k ];
