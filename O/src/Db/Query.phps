@@ -501,7 +501,7 @@ class O_Db_Query {
 		$this->stmt = $this->prepareStmt( $this->prepareSelect() );
 
 		$this->bindParams( $this->stmt );
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		if (in_array( self::CALC_FOUND_ROWS, $this->sql_options )) {
 			$this->found_rows = 0;
@@ -523,7 +523,7 @@ class O_Db_Query {
 	{
 		$this->stmt = $this->conn()->prepare( $this->prepareCreate( $tail ) );
 
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		return $this->stmt;
 	}
@@ -538,7 +538,7 @@ class O_Db_Query {
 	{
 		$this->stmt = $this->conn()->prepare( $this->prepareAlter( $command ) );
 
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		return $this->stmt;
 	}
@@ -553,7 +553,7 @@ class O_Db_Query {
 		$this->stmt = $this->prepareStmt( $this->prepareUpdate() );
 
 		$this->bindParams( $this->stmt );
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		return $this->stmt->rowCount();
 	}
@@ -568,7 +568,7 @@ class O_Db_Query {
 		$this->stmt = $this->prepareStmt( $this->prepareDelete() );
 
 		$this->bindParams( $this->stmt );
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		return $this->stmt->rowCount();
 	}
@@ -585,10 +585,26 @@ class O_Db_Query {
 
 		$this->bindParams( $this->stmt );
 
-		$this->stmt->execute();
+		$this->executeStmt();
 
 		return $returnLastId ? $this->conn()->lastInsertId() : $this->stmt->rowCount();
 	}
+	
+	/**
+	 * Executes statement $this->stmt, counts time needed for execution
+	 *
+	 * @return mixed
+	 */
+	private function executeStmt() {
+		$t = microtime(true);
+		$r = $this->stmt->execute();
+		$t = microtime(true)-$t;
+		$t0 = O_Registry::get("db-time");
+		if(!$t0) $t0 = 0;
+		O_Registry::set("db-time", $t0+$t);
+		return $r;
+	}
+	
 
 	/**
 	 * Disables statements preparing for particular table use
