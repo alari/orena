@@ -32,24 +32,14 @@ class O_Registry {
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
 		
-<<<<<<< .mine
 		$keys = explode ( "/", $key );
 		$value = self::$registry;
 		foreach ( $keys as $k ) {
 			if (isset ( $value [$k] )) {
 				$value = $value [$k];
 				continue;
-=======
-		if (! isset ( self::$registry [$key] )) {
-			foreach ( self::$inheritance as $_key => $_replace_key ) {
-				if (strpos ( $key, $_key ) === 0) {
-					$key = $_replace_key . substr ( $key, 0, strlen ( $_key ) );
-					if (isset ( self::$registry [$key] ))
-						return self::$registry [$key];
-				}
->>>>>>> .r311
 			}
-<<<<<<< .mine
+
 			// Value not found, trying to get it from parents
 			for($j = count ( $keys ); $j > 0; $j --) {
 				$_key = join ( "/", array_slice ( $keys, 0, $j ) );
@@ -64,11 +54,6 @@ class O_Registry {
 			return null;
 		}
 		return $value;
-=======
-		} else
-			return self::$registry [$key];
-		return null;
->>>>>>> .r311
 	}
 	
 	/**
@@ -98,14 +83,10 @@ class O_Registry {
 	 * @param mixed $value
 	 * @param bool $add
 	 */
-<<<<<<< .mine
 	static private function setOrAdd($key, $value, $add = false) {
 		$keys = explode ( "/", $key );
-=======
-	static private function setOrAdd($key, $value, $add = false) {
->>>>>>> .r311
 		$registry = &self::$registry;
-<<<<<<< .mine
+
 		foreach ( $keys as $i => $k ) {
 			if (isset ( $registry [$k] )) {
 				$registry = &$registry [$k];
@@ -122,29 +103,16 @@ class O_Registry {
 					$registry [$k] = $value;
 					return;
 				}
-=======
-		if (! $add) {
-			$registry [$key] = $value;
-			return;
-		}
-		if (isset ( $registry [$key] )) {
-			$v = $registry [$key];
-			if (is_array ( $v )) {
-				$registry [$key] [] = $value;
-				return;
->>>>>>> .r311
+
 			}
 			$registry [$key] = array ($registry [$key], $value );
 			return;
 		}
-<<<<<<< .mine
+
 		if ($add)
 			$registry [] = $value;
 		else
 			$registry = $value;
-=======
-		$registry [$key] = array ($value );
->>>>>>> .r311
 	}
 	
 	/**
