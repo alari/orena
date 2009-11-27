@@ -99,9 +99,9 @@ class O_Registry {
 	 */
 	static private function setOrAdd( $key, $value, $add = false )
 	{
-		if(isset(self::$cached_keys[$key])) {
+		/*if(isset(self::$cached_keys[$key])) {
 			unset(self::$cached_keys[$key]);
-		}
+		}*/
 		$keys = explode( "/", $key );
 		$registry = &self::$registry;
 		foreach ($keys as $i => $k) {
