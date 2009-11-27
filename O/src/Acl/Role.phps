@@ -14,6 +14,7 @@
  * @field actions -has many {classnames/acl_action} -inverse roles
  * @field visitor_role tinyint default 0
  * @index name
+ * @index visitor_role
  */
 class O_Acl_Role extends O_Dao_ActiveRecord {
 
