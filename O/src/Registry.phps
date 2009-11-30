@@ -81,7 +81,7 @@ class O_Registry {
 	
 	static private function stopTime($t){
 		$t = microtime(true)-$t;
-		O_Registry::set("reg-time", O_Registry::get("reg-time")+$t);
+		self::$registry["reg-time"] = isset(self::$registry["reg-time"]) ? (self::$registry["reg-time"]+$t) : $t;
 	}
 	
 	/**
