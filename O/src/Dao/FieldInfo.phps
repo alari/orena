@@ -84,6 +84,13 @@ class O_Dao_FieldInfo {
 	 * @var O_Dao_Field_iFace
 	 */
 	private $fieldInstance;
+	
+	/**
+	 * Database type of field
+	 *
+	 * @var unknown_type
+	 */
+	private $type;
 
 	/**
 	 * Creates FieldInfo object
@@ -97,64 +104,8 @@ class O_Dao_FieldInfo {
 	{
 		$this->class = $class;
 		$this->name = $name;
+		$this->type = $type;
 		$this->params = $params;
-		
-		// check if it's relation
-		if (isset( $params[ "has" ] )) {
-			$relation = "has";
-			$relationOwns = 0;
-		} elseif (isset( $params[ "owns" ] )) {
-			$relation = "owns";
-			$relationOwns = 1;
-		}
-		
-		// save info about relation to be ready to say it to another side
-		if (isset( $relation )) {
-			
-			list ($quantity, $relationTargetBase) = explode( " ", $params[ $relation ], 2 );
-			
-			if ($quantity == "one") {
-				$this->fieldInstance = new O_Dao_Field_ToOne( $this, $name, $relationOwns, 
-						$relationTargetBase );
-			} else {
-				$this->fieldInstance = new O_Dao_Field_ToMany( $this, $name, $relationOwns, 
-						$relationTargetBase );
-			
-			}
-		} else {
-			// Custom field
-			if (isset( $params[ "custom-field-type" ] )) {
-				$fieldType = $params[ "custom-field-type" ];
-				if (!class_exists( $fieldType )) {
-					throw new O_Ex_Config( "Field type custom class not found" );
-				}
-				$this->fieldInstance = new $fieldType( $this, $type, $this->name );
-				if (!$this->fieldInstance instanceof O_Dao_Field_iFace) {
-					throw new O_Ex_Config( "Wrong field type interface" );
-				}
-				// Alias field
-			} elseif (isset( $params[ "alias" ] ) && strpos( $params[ "alias" ], 
-					"." )) {
-				$this->fieldInstance = new O_Dao_Field_Alias( $this, $params[ "alias" ] );
-				// Alias for a number of other fields
-			} elseif (isset( $params[ "one-of" ] ) && strpos( 
-					$params[ "one-of" ], ";" )) {
-				$this->fieldInstance = new O_Dao_Field_OneOf( $this );
-				// Relative field
-			} elseif (isset( $params[ "relative" ] ) && strpos( 
-					$params[ "relative" ], "->" )) {
-				$this->fieldInstance = new O_Dao_Field_Relative( $this );
-				// Image file
-			} elseif (isset( $params[ "image" ] )) {
-				$this->fieldInstance = new O_Dao_Field_Image( $this, $type, $this->name );
-				// File
-			} elseif (isset( $params[ "file" ] )) {
-				$this->fieldInstance = new O_Dao_Field_File( $this, $type, $this->name );
-				// Atomic field
-			} else {
-				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
-			}
-		}
 	}
 
 	/**
@@ -167,7 +118,7 @@ class O_Dao_FieldInfo {
 	public function setClass( $class )
 	{
 		$this->class = $class;
-		$this->fieldInstance->setFieldInfo( $this );
+		if($this->fieldInstance) $this->fieldInstance->setFieldInfo( $this );
 	}
 
 	/**
@@ -215,7 +166,6 @@ class O_Dao_FieldInfo {
 	public function addParams( array $params )
 	{
 		$this->params = array_merge( $this->params, $params );
-		$this->fieldInstance->setFieldInfo( $this );
 	}
 
 	/**
@@ -226,7 +176,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function addFieldTypeToQuery( O_Db_Query $query )
 	{
-		return $this->fieldInstance->addFieldTypeToQuery( $query );
+		return $this->getFieldInstance()->addFieldTypeToQuery( $query );
 	}
 
 	/**
@@ -237,7 +187,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function reload( $obj_id )
 	{
-		return $this->fieldInstance->reload( $obj_id );
+		return $this->getFieldInstance()->reload( $obj_id );
 	}
 
 	/**
@@ -247,7 +197,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isAtomic()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_Atomic;
+		return $this->getFieldInstance() instanceof O_Dao_Field_Atomic;
 	}
 
 	/**
@@ -257,7 +207,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isOneOf()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_OneOf;
+		return $this->getFieldInstance() instanceof O_Dao_Field_OneOf;
 	}
 
 	/**
@@ -267,7 +217,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isAlias()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_Alias;
+		return $this->getFieldInstance() instanceof O_Dao_Field_Alias;
 	}
 
 	/**
@@ -277,7 +227,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationOne()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_ToOne;
+		return $this->getFieldInstance() instanceof O_Dao_Field_ToOne;
 	}
 
 	/**
@@ -287,10 +237,10 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelationMany()
 	{
-		if ($this->fieldInstance instanceof O_Dao_Field_Relative) {
-			return $this->fieldInstance->isRelationMany();
+		if ($this->getFieldInstance() instanceof O_Dao_Field_Relative) {
+			return $this->getFieldInstance()->isRelationMany();
 		}
-		return $this->fieldInstance instanceof O_Dao_Field_ToMany;
+		return $this->getFieldInstance() instanceof O_Dao_Field_ToMany;
 	}
 
 	/**
@@ -300,11 +250,11 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelation()
 	{
-		if ($this->fieldInstance instanceof O_Dao_Field_Relative) {
-			return (bool)$this->fieldInstance->getTargetClass();
+		if ($this->getFieldInstance() instanceof O_Dao_Field_Relative) {
+			return (bool)$this->getFieldInstance()->getTargetClass();
 		}
 		
-		return $this->fieldInstance instanceof O_Dao_Field_iRelation;
+		return $this->getFieldInstance() instanceof O_Dao_Field_iRelation;
 	}
 
 	/**
@@ -314,7 +264,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isRelative()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_Relative;
+		return $this->getFieldInstance() instanceof O_Dao_Field_Relative;
 	}
 
 	/**
@@ -324,7 +274,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function isFile()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_Image || $this->fieldInstance instanceof O_Dao_Field_File;
+		return $this->getFieldInstance() instanceof O_Dao_Field_Image || $this->getFieldInstance() instanceof O_Dao_Field_File;
 	}
 
 	/**
@@ -334,9 +284,9 @@ class O_Dao_FieldInfo {
 	 */
 	public function isOneToWhateverRelation()
 	{
-		if (!$this->fieldInstance instanceof O_Dao_Field_iRelation)
+		if (!$this->getFieldInstance() instanceof O_Dao_Field_iRelation)
 			return false;
-		return $this->fieldInstance->getInverse()->isRelationOne();
+		return $this->getFieldInstance()->getInverse()->isRelationOne();
 	}
 
 	/**
@@ -345,6 +295,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function __clone()
 	{
+		if(!$this->fieldInstance) return;
 		$this->fieldInstance = clone $this->fieldInstance;
 		$this->fieldInstance->setFieldInfo( $this );
 	}
@@ -356,7 +307,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function getRelationTarget()
 	{
-		return $this->fieldInstance instanceof O_Dao_Field_iRelation ? $this->fieldInstance->getTargetClass() : null;
+		return $this->getFieldInstance() instanceof O_Dao_Field_iRelation ? $this->getFieldInstance()->getTargetClass() : null;
 	}
 
 	/**
@@ -367,7 +318,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function getRealField( O_Dao_ActiveRecord $obj )
 	{
-		return $this->isOneOf() ? $this->fieldInstance->getExistentFieldName( $obj ) : null;
+		return $this->isOneOf() ? $this->getFieldInstance()->getExistentFieldName( $obj ) : null;
 	}
 
 	/**
@@ -390,7 +341,7 @@ class O_Dao_FieldInfo {
 					$this->params[ "signal" ], $this->class, $obj, $fieldValue );
 		}
 		
-		return $this->fieldInstance->setValue( $obj, $fieldValue, $fieldExists );
+		return $this->getFieldInstance()->setValue( $obj, $fieldValue, $fieldExists );
 	}
 
 	/**
@@ -403,7 +354,7 @@ class O_Dao_FieldInfo {
 	 */
 	public function getValue( O_Dao_ActiveRecord $obj, $fieldValue, $fieldExists )
 	{
-		return $this->fieldInstance->getValue( $obj, $fieldValue, $fieldExists );
+		return $this->getFieldInstance()->getValue( $obj, $fieldValue, $fieldExists );
 	}
 
 	/**
@@ -422,7 +373,7 @@ class O_Dao_FieldInfo {
 			throw new O_Ex_Logic( "Cannot create mapped query field by atomic field basis." );
 			// If the basis is an alias for a number of fields, build query from it
 		if ($this->isOneOf()) {
-			$field = $this->fieldInstance->getExistentFieldName( $obj );
+			$field = $this->getFieldInstance()->getExistentFieldName( $obj );
 			if ($field)
 				return $obj->{$field . "." . $subreq};
 			return false;
@@ -430,8 +381,8 @@ class O_Dao_FieldInfo {
 		
 		$query = null;
 		$joinOnField = $this->prepareMappedQuery( $query, $subreq );
-		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
-			$rel = $this->fieldInstance->getRelation( 0 );
+		if ($this->isRelationMany() && $this->getFieldInstance()->getInverse()->isRelationMany()) {
+			$rel = $this->getFieldInstance()->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel";
 			$query->join( $tbl . " " . $als, 
@@ -488,11 +439,11 @@ class O_Dao_FieldInfo {
 	private function modifyMappedQuery( O_Dao_Query &$query = null, $joinOnField = null, O_Dao_FieldInfo $nextInfo = null, $i = 0 )
 	{
 		if (!$query) {
-			$query = new O_Dao_Query( $this->fieldInstance->getTargetClass() );
-			$core_tbl = O_Dao_TableInfo::get( $this->fieldInstance->getTargetClass() )->getTableName();
+			$query = new O_Dao_Query( $this->getFieldInstance()->getTargetClass() );
+			$core_tbl = O_Dao_TableInfo::get( $this->getFieldInstance()->getTargetClass() )->getTableName();
 			$joinOnField = $core_tbl . ".id";
 			if ($this->isOneToWhateverRelation() && $this->isRelationMany())
-				$joinOnField = $core_tbl . "." . $this->fieldInstance->getInverse()->name;
+				$joinOnField = $core_tbl . "." . $this->getFieldInstance()->getInverse()->name;
 		
 		}
 		
@@ -502,8 +453,8 @@ class O_Dao_FieldInfo {
 		$currAlias = "__rel" . $i;
 		
 		// many-to-many: relation is a special table
-		if ($this->isRelationMany() && $this->fieldInstance->getInverse()->isRelationMany()) {
-			$rel = $this->fieldInstance->getRelation( 0 );
+		if ($this->isRelationMany() && $this->getFieldInstance()->getInverse()->isRelationMany()) {
+			$rel = $this->getFieldInstance()->getRelation( 0 );
 			$tbl = $rel->getRelationTableName();
 			$als = "__rel_" . $i;
 			
@@ -547,7 +498,79 @@ class O_Dao_FieldInfo {
 					$this->params[ "signal" ], $this->class, $obj, $obj->{$this->name} );
 		}
 		
-		$this->fieldInstance->deleteThis( $obj, $fieldValue );
+		$this->getFieldInstance()->deleteThis( $obj, $fieldValue );
 	}
+	
+	/**
+	 * Returns logic instance of field
+	 *
+	 * @var O_Dao_Field_iFace
+	 */
+	public function getFieldInstance() {
+		if($this->fieldInstance) return $this->fieldInstance;
+
+		$params = $this->params;
+		$name = $this->name;
+		$type = $this->type;
+	
+		// check if it's relation
+		if (isset( $params[ "has" ] )) {
+			$relation = "has";
+			$relationOwns = 0;
+		} elseif (isset( $params[ "owns" ] )) {
+			$relation = "owns";
+			$relationOwns = 1;
+		}
+		
+		// save info about relation to be ready to say it to another side
+		if (isset( $relation )) {
+			
+			list ($quantity, $relationTargetBase) = explode( " ", $params[ $relation ], 2 );
+			
+			if ($quantity == "one") {
+				$this->fieldInstance = new O_Dao_Field_ToOne( $this, $name, $relationOwns, 
+						$relationTargetBase );
+			} else {
+				$this->fieldInstance = new O_Dao_Field_ToMany( $this, $name, $relationOwns, 
+						$relationTargetBase );
+			
+			}
+		} else {
+			// Custom field
+			if (isset( $params[ "custom-field-type" ] )) {
+				$fieldType = $params[ "custom-field-type" ];
+				if (!class_exists( $fieldType )) {
+					throw new O_Ex_Config( "Field type custom class not found" );
+				}
+				$this->fieldInstance = new $fieldType( $this, $type, $this->name );
+				if (!$this->fieldInstance instanceof O_Dao_Field_iFace) {
+					throw new O_Ex_Config( "Wrong field type interface" );
+				}
+				// Alias field
+			} elseif (isset( $params[ "alias" ] ) && strpos( $params[ "alias" ], 
+					"." )) {
+				$this->fieldInstance = new O_Dao_Field_Alias( $this, $params[ "alias" ] );
+				// Alias for a number of other fields
+			} elseif (isset( $params[ "one-of" ] ) && strpos( 
+					$params[ "one-of" ], ";" )) {
+				$this->fieldInstance = new O_Dao_Field_OneOf( $this );
+				// Relative field
+			} elseif (isset( $params[ "relative" ] ) && strpos( 
+					$params[ "relative" ], "->" )) {
+				$this->fieldInstance = new O_Dao_Field_Relative( $this );
+				// Image file
+			} elseif (isset( $params[ "image" ] )) {
+				$this->fieldInstance = new O_Dao_Field_Image( $this, $type, $this->name );
+				// File
+			} elseif (isset( $params[ "file" ] )) {
+				$this->fieldInstance = new O_Dao_Field_File( $this, $type, $this->name );
+				// Atomic field
+			} else {
+				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
+			}
+		}
+		return $this->fieldInstance;
+	}
+	
 
 }
