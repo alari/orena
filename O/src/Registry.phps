@@ -2,6 +2,12 @@
 /**
  * Class to store request environment information.
  *
+ * class:(classname)/params
+ * app:
+ * fw:
+ * db:
+ * env:
+ * 
  * @author Dmitry Kurinskiy
  */
 class O_Registry {
@@ -35,15 +41,12 @@ class O_Registry {
 	 */
 	static public function get( $key, $class = null )
 	{
+		$t = self::startTime();
 		if (is_object( $class ))
 			$class = get_class( $class );
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
-			
-		if(isset(self::$cached_keys[$key])) {
-			return self::$cached_keys[$key];
-		}
-		
+					
 		$keys = explode( "/", $key );
 		$value = self::$registry;
 		foreach ($keys as $k) {
@@ -57,17 +60,30 @@ class O_Registry {
 				if (isset( self::$inheritance[ $_key ] )) {
 					$key = self::$inheritance[ $_key ] . ($j < count( $keys ) ? "/" . join( "/", 
 							array_slice( $keys, $j ) ) : "");
+					self::stopTime($t);
 					return self::get( $key );
 				} else
 					continue;
 			}
-			if (!$key)
+			self::stopTime($t);
+			if (!$key) {
 				return $value;
+			}
 			return null;
 		}
-		return /*self::$cached_keys[$key] =&*/ $value;
+		self::stopTime($t);
+		return $value;
 	}
 
+	static private function startTime(){
+		return microtime(true);
+	}
+	
+	static private function stopTime($t){
+		$t = microtime(true)-$t;
+		O_Registry::set("reg-time", O_Registry::get("reg-time")+$t);
+	}
+	
 	/**
 	 * Sets runtime registry value, overrides defaults
 	 *
@@ -99,9 +115,7 @@ class O_Registry {
 	 */
 	static private function setOrAdd( $key, $value, $add = false )
 	{
-		/*if(isset(self::$cached_keys[$key])) {
-			unset(self::$cached_keys[$key]);
-		}*/
+		$t = self::startTime();
 		$keys = explode( "/", $key );
 		$registry = &self::$registry;
 		foreach ($keys as $i => $k) {
@@ -115,9 +129,11 @@ class O_Registry {
 					if (!isset( $registry[ $k ] ) || !is_array( $registry[ $k ] ))
 						$registry[ $k ] = Array ();
 					$registry[ $k ][] = $value;
+					self::stopTime($t);
 					return;
 				} else {
 					$registry[ $k ] = $value;
+					self::stopTime($t);
 					return;
 				}
 			}
@@ -126,6 +142,7 @@ class O_Registry {
 			$registry[] = $value;
 		else
 			$registry = $value;
+		self::stopTime($t);
 	}
 
 	/**
