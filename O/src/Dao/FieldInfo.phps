@@ -570,6 +570,7 @@ class O_Dao_FieldInfo {
 				$this->fieldInstance = new O_Dao_Field_Atomic( $this, $type, $this->name );
 			}
 		}
+		$this->fieldInstance->setFieldInfo($this);
 		return $this->fieldInstance;
 	}
 	

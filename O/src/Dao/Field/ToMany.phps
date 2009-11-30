@@ -160,7 +160,7 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 			$this->inverseField = null;
 			$this->relations = Array ();
 		}
-	}
+	}	
 
 	/**
 	 * FieldInfo of reverse field
