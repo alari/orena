@@ -408,9 +408,9 @@ class O_Dao_FieldInfo {
 		$subreq = explode( ".", $subreq );
 		$info = $this;
 		foreach ($subreq as $fieldName) {
-			$info = O_Dao_TableInfo::get( $info->fieldInstance->getTargetClass() )->getFieldInfo( 
+			$info = O_Dao_TableInfo::get( $info->getFieldInstance()->getTargetClass() )->getFieldInfo( 
 					$fieldName );
-			if (!$info->fieldInstance instanceof O_Dao_Field_iRelation)
+			if (!$info->getFieldInstance() instanceof O_Dao_Field_iRelation)
 				throw new O_Ex_Logic( 
 						"Cannot use non-relative field ($fieldName) as a part of mapped query field." );
 			array_unshift( $fieldInfos, $info );
