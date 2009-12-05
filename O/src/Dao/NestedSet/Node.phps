@@ -4,20 +4,21 @@
  * @field left_key int DEFAULT 1
  * @field right_key int DEFAULT 2
  * @field level int DEFAULT 0
+ * 
  * @index level
  * @index left_key
  * @index right_key
  * @index left_key,level
  * @index left_key,right_key
  */
-abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
+abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord implements O_Dao_NestedSet_iNode  {
 
 	/**
 	 * Creates new node, injects it into the root, on the bottom
 	 *
-	 * @param O_Dao_NestedSet_Root $root
+	 * @param O_Dao_NestedSet_iRoot $root
 	 */
-	public function __construct( O_Dao_NestedSet_Root $root )
+	public function __construct( O_Dao_NestedSet_iRoot $root )
 	{
 		$this->root = $root;
 		$left_key = $root->nodes->query()->getFunc( "right_key", "MAX" ) + 1;
@@ -79,7 +80,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	/**
 	 * Returns parent node, if it exists
 	 *
-	 * @return O_Dao_NestedSet_Node
+	 * @return O_Dao_NestedSet_iNode
 	 */
 	public function getParent()
 	{
@@ -224,9 +225,9 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	/**
 	 * Injects child node before this, on the same level
 	 *
-	 * @param O_Dao_NestedSet_Node $child
+	 * @param O_Dao_NestedSet_iNode $child
 	 */
-	public function injectBefore( O_Dao_NestedSet_Node $child )
+	public function injectBefore( O_Dao_NestedSet_iNode $child )
 	{
 		O_Db_Manager::getConnection()->beginTransaction();
 		// Remove child from its tree
@@ -254,7 +255,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	 *
 	 * @param mr_abstract_node $child
 	 */
-	public function injectAfter( O_Dao_NestedSet_Node $child )
+	public function injectAfter( O_Dao_NestedSet_iNode $child )
 	{
 		O_Db_Manager::getConnection()->beginTransaction();
 		// Remove child from its tree
@@ -277,9 +278,9 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	/**
 	 * Injects child node inside this, on the top
 	 *
-	 * @param O_Dao_NestedSet_Node $child
+	 * @param O_Dao_NestedSet_iNode $child
 	 */
-	public function injectTop( O_Dao_NestedSet_Node $child )
+	public function injectTop( O_Dao_NestedSet_iNode $child )
 	{
 		O_Db_Manager::getConnection()->beginTransaction();
 		// Remove child from its tree
@@ -302,9 +303,9 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord {
 	/**
 	 * Injects child node inside this, on the bottom
 	 *
-	 * @param O_Dao_NestedSet_Node $child
+	 * @param O_Dao_NestedSet_iNode $child
 	 */
-	public function injectBottom( O_Dao_NestedSet_Node $child )
+	public function injectBottom( O_Dao_NestedSet_iNode $child )
 	{
 		O_Db_Manager::getConnection()->beginTransaction();
 		// Remove child from its tree
