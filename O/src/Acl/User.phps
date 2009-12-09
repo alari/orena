@@ -26,12 +26,13 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
 			return $access;
 		}
+		
+		die(print_r($this,1));
 
 		// Getting context role for resourse
 		if ($resourse) {
 			$registry = O_Registry::get( "acl", $resourse );
 			if(is_array($registry)) {
-				O_Registry::add("test-log", $registry);
 				$access = null;
 				foreach ($registry as $key=>$params) {
 					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
