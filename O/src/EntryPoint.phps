@@ -215,17 +215,10 @@ class O_EntryPoint {
 	 */
 	static public function processFwConfig()
 	{
-		$src = is_file( "./Apps/Orena.fw.xml" ) ? "./Apps/Orena.fw.xml" : "./O/src/Orena.fw.xml";
+		$src = is_file( "./Apps/Orena.fw.conf" ) ? "./Apps/Orena.fw.conf" : "./O/src/Orena.fw.conf";
 		if (!is_file( $src ))
 			throw new O_Ex_Critical( "Cannot find framework configuration file." );
-		$xml_fw = simplexml_load_file( $src );
-		foreach ($xml_fw as $registry) {
-			if ($registry->getName() == "Registry") {
-				self::processRegistry( $registry, "fw" );
-			} else
-				throw new O_Ex_Config(
-						"Framework configuration file should contain only registry values!" );
-		}
+		O_Registry::parseFile($src, "fw");
 	}
 
 	/**
