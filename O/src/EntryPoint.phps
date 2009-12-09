@@ -277,9 +277,10 @@ class O_EntryPoint {
 			case "url" :
 				$url = O_Registry::get ( "app/env/process_url" );
 				if(strpos($url, "opic:")) {
-					print_r($url);
-					print_r($subkey);
-					print_r(preg_match("#^$subkey$#i", $url));
+					echo "<pre>";
+					print_r($url); echo "\n";
+					print_r($subkey); echo "\n";
+					print_r(preg_match("#^$subkey$#i", $url)); echo "</pre><hr/>";
 				}
 				if (preg_match ( "#^$subkey$#i", $url, $pockets )) {
 					// Set command for URL, if available
