@@ -114,7 +114,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					$obj = $obj->{trim($related)};
 					$field = ltrim($field);
 				}
-				$field = $obj[ $params["field"] ];
+				$field = $obj[ $field ];
 				
 				
 				O_Registry::add("test-log", "--resourse [$field|$type|$value]");
