@@ -301,7 +301,9 @@ class O_Dao_TableInfo {
 			return $this->fields [$name];
 		}
 		if (is_array ( $this->fields [$name] )) {
+			$t = microtime(true);
 			$this->fields [$name] = new O_Dao_FieldInfo ( $this->class, $name, $this->fields [$name] [0], $this->fields [$name] [1] );
+			O_Registry::set("dao-time", O_Registry::get("dao-time")+microtime(true)-$t);
 		}
 		return $this->fields [$name];
 	}
