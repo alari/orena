@@ -103,11 +103,9 @@ class O_Registry {
 					if (! isset ( $registry [$k] ) || ! is_array ( $registry [$k] ))
 						$registry [$k] = Array ();
 					$registry [$k] [] = $value;
-					self::stopTime ( $t );
 					return;
 				} else {
 					$registry [$k] = $value;
-					self::stopTime ( $t );
 					return;
 				}
 			}
