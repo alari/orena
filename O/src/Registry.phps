@@ -165,12 +165,11 @@ class O_Registry {
 				continue;
 			}
 			// Line has keypart
-			// TODO: add ability to include ":" sign in the value line
-			$l = str_replace('\:', "\v", $l);
+			$l = str_replace("\\:", "\t", $l);
 			if (strpos ( $l, ":" )) {
 				list ( $k, $v ) = explode ( ":", $l, 2 );
-				$k = str_replace("\v", ":", $k);
-				$v = str_replace("\v", ":", $v);
+				$k = str_replace("\t", ":", $k);
+				$v = str_replace("\t", ":", $v);
 				$k = rtrim ( $k );
 				$v = ltrim ( $v );
 				if ($v) {
