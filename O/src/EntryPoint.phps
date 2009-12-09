@@ -172,6 +172,9 @@ class O_EntryPoint {
 		}
 		if ($app_name) {
 			O_Registry::set ( "app/env/process_url", substr ( O_Registry::get ( "app/env/request_url" ), strlen ( O_Registry::get ( "app/env/base_url" ) ) ) );
+			if(is_file("./Apps/" . $app_name . "/Conf/Registry.conf")) {
+				O_Registry::parseFile("./Apps/" . $app_name . "/Conf/Registry.conf", "app");
+			}
 			return;
 		}
 		throw new O_Ex_Critical ( "Neither app-selecting config nor app config found." );
