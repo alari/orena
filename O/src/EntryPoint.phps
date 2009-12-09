@@ -221,8 +221,6 @@ class O_EntryPoint {
 		
 		$conf = O_Registry::parseFile("./Apps/" . $app_name . "/Conf/Urls.conf");
 		
-		O_Registry::set("test-log", $conf);
-		
 		foreach ( $conf as $key => $params ) {
 			self::processUrlsConfPart ( $key, $params );
 		}
@@ -278,6 +276,11 @@ class O_EntryPoint {
 			// Parses URL with pattern, processes child nodes if matches
 			case "url" :
 				$url = O_Registry::get ( "app/env/process_url" );
+				if(strpos($url, "opic:")) {
+					print_r($url);
+					print_r($subkey);
+					print_r(preg_match("#^$subkey$#i", $url));
+				}
 				if (preg_match ( "#^$subkey$#i", $url, $pockets )) {
 					// Set command for URL, if available
 					foreach ( $params as $k=>$v )
