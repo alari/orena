@@ -276,12 +276,6 @@ class O_EntryPoint {
 			// Parses URL with pattern, processes child nodes if matches
 			case "url" :
 				$url = O_Registry::get ( "app/env/process_url" );
-				if(strpos($url, "opic:")) {
-					echo "<pre>";
-					print_r($url); echo "\n";
-					print_r($subkey); echo "\n";
-					print_r(preg_match("#^$subkey$#i", $url)); echo "</pre><hr/>";
-				}
 				if (preg_match ( "#^$subkey$#i", $url, $pockets )) {
 					// Set command for URL, if available
 					foreach ( $params as $k=>$v )
@@ -291,6 +285,7 @@ class O_EntryPoint {
 			// Sets "app/command_name" registry key, continues processing
 			case "command" :
 				// TODO: add command type and so on processing
+				if(!O_Registry::get("app/command_name"))
 					O_Registry::set ( "app/command_name", $params );
 				break;
 			// Set plugin into "app/plugin_name" registry
