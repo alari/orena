@@ -221,6 +221,8 @@ class O_EntryPoint {
 		
 		$conf = O_Registry::parseFile("./Apps/" . $app_name . "/Conf/Urls.conf");
 		
+		O_Registry::set("test-log", $conf);
+		
 		foreach ( $conf as $key => $params ) {
 			self::processUrlsConfPart ( $key, $params );
 		}
