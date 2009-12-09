@@ -118,7 +118,7 @@ class O_EntryPoint {
 	 * @throws O_Ex_Critical
 	 */
 	static public function selectApp() {
-		
+		// TODO: make this shitty code clear
 		$app_name = null;
 		if (! is_file ( "./Apps/Orena.apps.xml" )) {
 			$d = opendir ( "./Apps" );
@@ -157,17 +157,6 @@ class O_EntryPoint {
 						}
 					}
 				}
-			}
-		} else {
-			$xml_apps = simplexml_load_file ( "./Apps/Orena.apps.xml" );
-			foreach ( $xml_apps as $app ) {
-				if ($app->getName () == "App") {
-					$app_name = self::processAppSelection ( $app );
-					if ($app_name) {
-						break;
-					}
-				} else
-					throw new O_Ex_Config ( "App-selection file should contain only app blocks!" );
 			}
 		}
 		if ($app_name) {
@@ -228,19 +217,13 @@ class O_EntryPoint {
 	 */
 	static private function processAppConfig() {
 		$app_name = O_Registry::get ( "app/name" );
-		if (self::$appConfigXml instanceof SimpleXMLElement) {
-			$xml_current = & self::$appConfigXml;
-		} else {
-			if (! is_file ( "./Apps/" . $app_name . "/App.xml" ))
-				throw new O_Ex_Critical ( "Can't find application config file ($app_name)." );
-			
-			$xml_current = simplexml_load_file ( "./Apps/" . $app_name . "/App.xml" );
-		}
-		foreach ( $xml_current as $node ) {
-			self::processAppConfigPart ( $node );
-		}
+		if(!is_file ( "./Apps/" . $app_name . "/Conf/Urls.conf" )) return false;
 		
-		self::$appConfigXml = null;
+		$conf = O_Registry::parseFile("./Apps/" . $app_name . "/Conf/Urls.conf");
+		
+		foreach ( $conf as $key => $params ) {
+			self::processUrlsConfPart ( $key, $params );
+		}
 		
 		// Processing class uses
 		$uses = O_Registry::get ( "app/uses" );
@@ -248,6 +231,71 @@ class O_EntryPoint {
 			foreach ( $uses as $class )
 				class_exists ( $class );
 	}
+	
+	static private function processUrlsConfPart($key, $params, $pockets=Array()) {
+		$subkey = "";
+		if(strpos($key, " ")) {
+			list($key, $subkey) = explode(" ", $key, 2);
+			$subkey = trim($subkey);
+		}
+		switch ($key) {
+			// Process registry in "app" rootkey
+			case "registry" :
+				if(is_array($params)) {
+					$v = null;
+					if(isset($params["pocket"])) {
+						$v = isset($pockets[$params["pocket"]]) ? $pockets[$params["pocket"]] : null;
+					}
+					if(isset($params["call"]) && is_callable($params["call"])) {
+						$v = call_user_func($params["call"], $v);
+					} elseif(isset($params["class"]) && class_exists($params["class"])) {
+						$v = O_Dao_ActiveRecord::getById($v, $params["class"]);
+					}
+				} else $v = $params;
+				O_Registry::set("app/".$subkey, $v);
+				break;
+			// Condition based on mode name and plugin name
+			case "if" :
+				list($what, $to_what) = explode("=", $subkey, 2);
+				$what = trim($what);
+				$to_what = trim($to_what);
+				if($what == "mode" && O_Registry::get("app/mode") != $to_what) break;
+				if($what == "plugin" && O_Registry::get("app/plugin_name") != $to_what) break;
+				foreach($params as $k=>$v) {
+					self::processUrlsConfPart($k, $v);
+				}
+				
+				break;
+			// Parses hostname with pattern, processes child nodes if matches
+			case "host" :
+				if (preg_match ( "#^$subkey$#i", O_Registry::get ( "app/env/http_host" ), $pockets )) {
+					foreach ( $params as $k=>$v )
+						self::processUrlsConfPart ( $k, $v, $pockets );
+				}
+				break;
+			// Parses URL with pattern, processes child nodes if matches
+			case "url" :
+				$url = O_Registry::get ( "app/env/process_url" );
+				if (preg_match ( "#^$subkey$#i", $url, $pockets )) {
+					// Set command for URL, if available
+					foreach ( $params as $k=>$v )
+						self::processUrlsConfPart ( $k, $v, $pockets );
+				}
+				break;
+			// Sets "app/command_name" registry key, continues processing
+			case "command" :
+				// TODO: add command type and so on processing
+					O_Registry::set ( "app/command_name", $params );
+				break;
+			// Set plugin into "app/plugin_name" registry
+			case "plugin" :
+				O_Registry::set ( "app/plugin_name", $params );
+				break;
+			default :
+				throw new O_Ex_Config ( "Unknown key in urls configuration file." );
+		}
+	}
+	
 	
 	/**
 	 * Parses framework config, puts it into "fw" registry rootkey.
@@ -322,199 +370,5 @@ class O_EntryPoint {
 			}
 		}
 		throw new O_Ex_PageNotFound ( "Page Not Found", 404 );
-	}
-	
-	/**
-	 * Processes one node from application configuration file.
-	 *
-	 * If it founds command name to process, sets it to "app/command_name" registry key.
-	 * Bases on environment prepared by
-	 * @see O_EntryPoint::prepareEnvironment()
-	 *
-	 * @param SimpleXMLElement $node
-	 * @param array $pockets
-	 */
-	static private function processAppConfigPart(SimpleXMLElement $node, $pockets = null) {
-		switch ($node->getName ()) {
-			// Process registry in "app" rootkey
-			case "Registry" :
-				self::processRegistry ( $node, "app", $pockets );
-				break;
-			// Condition based on mode name and plugin name
-			case "If" :
-				if (( string ) $node ["mode"] && ( string ) $node ["mode"] != O_Registry::get ( "app/mode" ))
-					break;
-				if (( string ) $node ["plugin"] && ( string ) $node ["plugin"] != O_Registry::get ( "app/plugin_name" ))
-					break;
-				foreach ( $node as $n )
-					self::processAppConfigPart ( $n, $pockets );
-				
-				break;
-			// Parses hostname with pattern, processes child nodes if matches
-			case "Host" :
-				$pattern = ( string ) $node ["pattern"];
-				if (preg_match ( "#^$pattern$#i", O_Registry::get ( "app/env/http_host" ), $pockets )) {
-					foreach ( $node as $n )
-						self::processAppConfigPart ( $n, $pockets );
-				}
-				break;
-			// Parses URL with pattern, processes child nodes if matches
-			case "Url" :
-				$url = O_Registry::get ( "app/env/process_url" );
-				$pattern = ( string ) $node ["pattern"];
-				if (preg_match ( "#^$pattern$#i", $url, $pockets )) {
-					// Set command for URL, if available
-					$command = ( string ) $node ["command"];
-					if ($command && ! O_Registry::get ( "app/command_name" )) {
-						O_Registry::set ( "app/command_name", $command );
-					}
-					foreach ( $node as $n ) {
-						self::processAppConfigPart ( $n, $pockets );
-					}
-				}
-				break;
-			// Sets "app/command_name" registry key, continues processing
-			case "Command" :
-				if (O_Registry::get ( "app/command_name" ))
-					break;
-				if (( string ) $node ["plugin"])
-					O_Registry::set ( "app/plugin_name", ( string ) $node ["plugin"] );
-				if (( string ) $node ["type"]) {
-					O_Registry::set ( "app/command_name", "O_Cmd_" . (( string ) $node ["type"]) );
-					O_Registry::set ( "app/command_full", 1 );
-				} else {
-					O_Registry::set ( "app/command_name", ( string ) $node ["name"] );
-				}
-				break;
-			// Set plugin into "app/plugin_name" registry
-			case "Plugin" :
-				O_Registry::set ( "app/plugin_name", ( string ) $node ["name"] );
-				break;
-			case "Condition" :
-				break;
-			default :
-				throw new O_Ex_Config ( "Unknown node in application configuration file." );
-		}
-	}
-	
-	/**
-	 * Processes one App node from application selecting config file
-	 *
-	 * @param SimpleXMLElement $app
-	 * @return string application name or false
-	 * @throws O_Ex_Config
-	 * @see O_EntryPoint::processAppSelectionCondition()
-	 */
-	static private function processAppSelection(SimpleXMLElement $app) {
-		$app_name = ( string ) $app ["name"];
-		$app_prefix = ( string ) $app ["prefix"];
-		$app_ext = ( string ) $app ["ext"];
-		if (! $app_ext)
-			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
-		
-		if (! $app_name || ! $app_prefix)
-			throw new O_Ex_Config ( "Application without name or class prefix cannot be processed." );
-		
-		foreach ( $app as $cond ) {
-			if ($cond->getName () == "Condition") {
-				if (self::processAppSelectionCondition ( $cond )) {
-					O_ClassManager::registerPrefix ( $app_prefix, "./Apps/" . $app_name, $app_ext );
-					O_Registry::set ( "app/class_prefix", $app_prefix );
-					O_Registry::set ( "app/name", $app_name );
-					O_Registry::set ( "app/mode", ( string ) $cond ["mode"] );
-					return $app_name;
-				}
-			} else
-				throw new O_Ex_Config ( "App section should contain only conditions." );
-		}
-		return false;
-	}
-	
-	/**
-	 * Processes one Condition node to select application.
-	 *
-	 * Condition could contain any number of Url and Host childs.
-	 *
-	 * @param SimpleXMLElement $cond
-	 * @return bool
-	 * @throws O_Ex_Config
-	 */
-	static private function processAppSelectionCondition(SimpleXMLElement $cond) {
-		if (( string ) $cond ["pattern"] == "any")
-			return true;
-		
-		foreach ( $cond as $condPart ) {
-			switch ($condPart->getName ()) {
-				// Checks if url starts with "base" attribute or matches "pattern"
-				case "Url" :
-					$base = ( string ) $condPart ["base"];
-					if ($base) {
-						if (strpos ( O_Registry::get ( "app/env/request_url" ), $base ) === 0) {
-							O_Registry::set ( "app/env/base_url", $base );
-							continue;
-						}
-						return false;
-					}
-					$pattern = ( string ) $condPart ["pattern"];
-					if (! $pattern) {
-						throw new O_Ex_Config ( "App-selecting Url condition must have 'base' or 'pattern' attribute." );
-					}
-					if (preg_match ( "#^$pattern$#i", O_Registry::get ( "app/env/request_url" ) ))
-						continue;
-					
-					return false;
-					break;
-				// Checks if hostname is equal with "value" attribute or matches "pattern"
-				case "Host" :
-					$value = ( string ) $condPart ["value"];
-					if ($value && (O_Registry::get ( "app/env/http_host" ) == $value || O_Registry::get ( "app/env/http_host" ) == "www." . $value))
-						continue;
-					$pattern = ( string ) $condPart ["pattern"];
-					if ($pattern && preg_match ( "#^$pattern$#i", O_Registry::get ( "app/env/http_host" ) ))
-						continue;
-					return false;
-					break;
-				default :
-					throw new O_Ex_Config ( "Wrong node in app-selection condition: " . $condPart->getName () );
-			}
-		}
-		return true;
-	}
-	
-	/**
-	 * Processes one Registry node in any configuration file. Sets or adds value into $rootkey
-	 *
-	 * @param SimpleXMLElement $registry
-	 * @param string $rootkey
-	 * @param array $pockets
-	 */
-	static private function processRegistry(SimpleXMLElement $registry, $rootkey, $pockets = null) {
-		$key = ( string ) $registry ["key"];
-		$value = ( string ) $registry ["value"];
-		if (! $value && is_array ( $pockets )) {
-			$pocket = ( string ) $registry ["pocket"];
-			if (array_key_exists ( $pocket, $pockets ))
-				$value = $pockets [$pocket];
-		} elseif (! $value) {
-			$value = $registry;
-		}
-		// Load object into registry
-		if (( string ) $registry ["class"]) {
-			$class = ( string ) $registry ["class"];
-			if (! class_exists ( $class, true )) {
-				throw O_Ex_Config ( "Wrong class given in registry." );
-			}
-			$method = ( string ) $registry ["method"];
-			$value = $method ? call_user_func ( array ($class, $method ), $value ) : O_Dao_ActiveRecord::getById ( $value, $class );
-			// Add to default acl checker
-			if (( string ) $registry ["can"]) {
-				O_Registry::add ( "app/cmd/can", $registry ["can"] . "#" . $rootkey . "/" . $key );
-			}
-		}
-		if ($registry ["type"] == "add") {
-			O_Registry::add ( $rootkey . "/" . $key, $value );
-		} else {
-			O_Registry::set ( $rootkey . "/" . $key, $value );
-		}
 	}
 }
