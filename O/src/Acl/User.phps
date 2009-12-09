@@ -26,8 +26,6 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
 			return $access;
 		}
-		
-		die(print_r($this,1));
 
 		// Getting context role for resourse
 		if ($resourse) {
