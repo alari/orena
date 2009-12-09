@@ -65,6 +65,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if(strpos($key, " ")) {
 			list($key, $subkey) = explode(" ", $key, 2);
 		}
+		if(!is_array($params)) $params = trim($params);
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
