@@ -66,7 +66,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			list($key, $subkey) = explode(" ", $key, 2);
 		}
 		if(!is_array($params)) $params = trim($params);
-		
+		O_Registry::add("test-log", $key);
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
