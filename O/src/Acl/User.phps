@@ -66,6 +66,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			list($key, $subkey) = explode(" ", $key, 2);
 		}
 		if(!is_array($params)) $params = trim($params);
+		
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
@@ -75,7 +76,9 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
+				O_Registry::add("test-log", ">> user-in [$subkey]");
 				$value = $resourse->$subkey;
+				O_Registry::add("test-log", "value: ".($value instanceof O_Dao_Query ? "query": (is_object($value) ? $value->id : "null"))." / current: ".$this->id);
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
@@ -87,6 +90,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 						$is_true = 1;
 					}
 				}
+				O_Registry::add("test-log", "<< ".($is_true ? "TRUE" : "FALSE"));
 			break;
 			case "user" :
 			case "resourse" :
@@ -102,13 +106,13 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				if(!$type) {
 					throw new O_Ex_Config("Wrong notation for $key ACL directive.");
 				}
-				$field = trim($field);
-				$value = trim($value);
+				$field = rtrim($field);
+				$value = ltrim($value);
 				
 				if($field[0] == "(" && strpos($field, ")")) {
 					list($related, $field) = explode(")", substr($field, 1),2);
 					$obj = $obj->{trim($related)};
-					$field = trim($field);
+					$field = ltrim($field);
 				}
 				$field = $obj[ $params["field"] ];
 				
