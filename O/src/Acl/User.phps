@@ -30,7 +30,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		// Getting context role for resourse
 		if ($resourse) {
 			$registry = O_Registry::get( "acl", $resourse );
-			if(is_array($registry)) {O_Registry::add("acl-log", $registry);
+			if(is_array($registry)) {
 				$access = null;
 				foreach ($registry as $key=>$params) {
 					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
@@ -55,13 +55,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * Returns access by rules given in registry
 	 *
 	 * Nodes:
-	 * Delegate.target -- use resourse stored in resourse's .target to get access rights
-	 * Role.name -- set access rules as for this role
-	 * User-In.field -- process inner instructions if user is in .field of resourse
-	 * (User|Resourse).related -- take related object to process
-	 * (User|Resourse).field -- field of user, resourse or related object to be checked
-	 * (User|Resourse).value -- value to compare field with
-	 * (User|Resourse).type -- type of comparing: "GT" "LT" "NOT" or equivalence, if type is not specified
+	 * delegate: target -- use resourse stored in resourse's .target to get access rights
+	 * role: name -- set access rules as for this role
+	 * user-in field: -- process inner instructions if user is in .field of resourse
+	 * (user|resourse) (related)field(operator)value: ... -- take an object to process
 	 *
 	 * @param string $action
 	 * @param SimpleXMLElement $node
@@ -71,6 +68,9 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	private function getAccessByParams( $action, $key, $params, O_Dao_ActiveRecord $resourse )
 	{
 		$is_true = 0;
+		if(strpos($key, " ")) {
+			list($key, $subkey) = explode(" ", $key, 2);
+		}
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
@@ -80,8 +80,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
-				$field = $params[ "field" ];
-				$value = $resourse->$field;
+				$value = $resourse->$subkey;
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
@@ -97,19 +96,35 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			case "user" :
 			case "resourse" :
 				$obj = $key == "user" ? $this : $resourse;
-				if (isset($params[ "related" ]))
-					$obj = $obj->{$params[ "related" ]};
+				$type = null;
+				foreach(Array("!=", "==", "=", ">", "<") as $possible_type){
+					if(strpos($subkey, $possible_type)) {
+						$type = $possible_type;
+						list($field, $value) = explode($possible_type, $subkey, 2);
+						break;
+					}
+				}
+				if(!$type) {
+					throw new O_Ex_Config("Wrong notation for $key ACL directive.");
+				}
+				$field = trim($field);
+				$value = trim($value);
+				
+				if($field[0] == "(" && strpos($field, ")")) {
+					list($related, $field) = explode(")", substr($field, 1),2);
+					$obj = $obj->{trim($related)};
+					$field = trim($field);
+				}
 				$field = $obj[ $params["field"] ];
-				$value = $params[ "value" ];
-				$type = isset($params[ "type" ]) ? $params["type"] : null;
+				
 				switch ($type) {
-					case "GT" : case ">":
+					case ">":
 						$is_true = $field > $value;
 					break;
-					case "LT" : case "<":
+					case "<":
 						$is_true = $field < $value;
 					break;
-					case "NOT" : case "!=":
+					case "!=":
 						$is_true = $field != $value;
 					break;
 					default :
