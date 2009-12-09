@@ -77,7 +77,7 @@ class O_Dao_TableInfo {
 	 * @param string $class
 	 */
 	private function __construct($class) {
-		$t = microtime();
+		$t = microtime(true);
 		
 		$this->class = $class;
 		
