@@ -76,10 +76,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				$res = $resourse->$params;
 				return $this->can( $action, $res );
 			break;
-			case "Role" :
+			case "role" :
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
-			case "User-In" :
+			case "user-in" :
 				$field = $params[ "field" ];
 				$value = $resourse->$field;
 				// It's an user object
@@ -94,9 +94,9 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					}
 				}
 			break;
-			case "User" :
-			case "Resourse" :
-				$obj = $key == "User" ? $this : $resourse;
+			case "user" :
+			case "resourse" :
+				$obj = $key == "user" ? $this : $resourse;
 				if (isset($params[ "related" ]))
 					$obj = $obj->{$params[ "related" ]};
 				$field = $obj[ $params["field"] ];
