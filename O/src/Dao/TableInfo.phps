@@ -77,6 +77,8 @@ class O_Dao_TableInfo {
 	 * @param string $class
 	 */
 	private function __construct($class) {
+		$t = microtime();
+		
 		$this->class = $class;
 		
 		$reflection = new ReflectionClass ( $class );
@@ -231,6 +233,8 @@ class O_Dao_TableInfo {
 				}
 			}
 		}
+		
+		O_Registry::set("dao-time", O_Registry::get("dao-time")+microtime(true)-$t);
 	}
 	
 	/**
