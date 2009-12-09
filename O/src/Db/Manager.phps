@@ -38,7 +38,7 @@ class O_Db_Manager {
 	static public function getConnection( $conn_id = self::CONN_DEFAULT )
 	{
 		if (!isset( self::$connections[ $conn_id ] )) {
-			$conf = O_Registry::get( "app/db/" . $conn_id );
+			$conf = O_Registry::get( "db/" . $conn_id );
 			if (isset( $conf[ "engine" ] )) {
 				self::connect( $conf )->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				self::$connections[ $conn_id ]->query( "SET character_set_client='utf8'" );

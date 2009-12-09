@@ -85,12 +85,12 @@ class O_Registry {
 	/**
 	 * Handler for add and set methods
 	 *
-	 * @param string $key
+	 * @param string|array $key
 	 * @param mixed $value
 	 * @param bool $add
 	 */
 	static private function setOrAdd($key, $value, $add = false) {
-		$keys = explode ( "/", $key );
+		$keys = is_array($key) ? $key : explode ( "/", $key );
 		$registry = &self::$registry;
 		foreach ( $keys as $i => $k ) {
 			if (isset ( $registry [$k] )) {
@@ -186,5 +186,28 @@ class O_Registry {
 			return $result;
 		return null;
 	}
+	
+	static public function mixIn(Array $values, $rootkey) {
+		if(!isset(self::$registry[$rootkey])) {
+			self::$registry[$rootkey] = Array();
+		}
+		self::mixInArray(self::$registry[$rootkey], $values);
+	}
+	
+	static private function mixInArray(&$base,$mix)
+    {
+        foreach($base as $k => $v) {
+            if(!array_key_exists($k,$mix)) continue;
+            if(is_array($v) && is_array($mix[$k])){
+            	self::mixInArray($base[$k], $mix[$k]);
+            }else{
+                $base[$k] = $mix[$k];
+            }
+        }
+        foreach($mix as $k=>$v) {
+        	if(array_key_exists($k, $base)) continue;
+        	$base[$k] = $v;
+        }
+    }
 
 }
