@@ -66,7 +66,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			list($key, $subkey) = explode(" ", $key, 2);
 		}
 		if(!is_array($params)) $params = trim($params);
-		O_Registry::add("test-log", $key);
+		
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
@@ -76,9 +76,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
-				O_Registry::add("test-log", ">> user-in [$subkey]");
 				$value = $resourse->$subkey;
-				O_Registry::add("test-log", "value: ".($value instanceof O_Dao_Query ? "query": (is_object($value) ? $value->id : "null"))." / current: ".$this->id);
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
@@ -90,7 +88,6 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 						$is_true = 1;
 					}
 				}
-				O_Registry::add("test-log", "<< ".($is_true ? "TRUE" : "FALSE"));
 			break;
 			case "user" :
 			case "resourse" :
@@ -115,9 +112,6 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					$field = ltrim($field);
 				}
 				$field = $obj[ $field ];
-				
-				
-				O_Registry::add("test-log", "--resourse [$field|$type|$value]");
 				
 				switch ($type) {
 					case ">":
