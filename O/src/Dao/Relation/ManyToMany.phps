@@ -174,7 +174,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	{
 		$q = new O_Dao_Query( $this->targetClass );
 		$q->join( $this->relationTbl, 
-				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " .
+				$this->targetTbl . ".id          =" . $this->relationTbl . "." . $this->targetFieldName . " AND " .
 					 $this->relationTbl . "." . $this->baseFieldName . "=" . $this->baseId, 
 					"CROSS" );
 		if ($this->orderBy)
