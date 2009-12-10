@@ -87,10 +87,8 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 	 */
 	public function reload( $obj_id )
 	{
-		O_Registry::startProfiler(__METHOD__."|".$obj_id);
 		if (isset( $this->relations[ $obj_id ] ))
 			unset( $this->relations[ $obj_id ] );
-		O_Registry::stopProfiler(__METHOD__."|".$obj_id);
 	}
 
 	/**
@@ -186,6 +184,7 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 	 */
 	public function getRelation( $obj_id )
 	{
+		O_Registry::startProfiler(__METHOD__."|".$obj_id);
 		if (!isset( $this->relation[ $obj_id ] ) || !$this->relation[ $obj_id ] instanceof O_Dao_Relation_BaseToMany) {
 			if ($this->getInverse()->isRelationMany()) {
 				// Relation with anchors table (many-to-many or one-to-many without inverse)
@@ -195,6 +194,7 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 				$this->relation[ $obj_id ] = new O_Dao_Relation_OneToMany( $this->target, $this->inverse, $obj_id, $this->class, $this->name, $this->orderBy );
 			}
 		}
+		O_Registry::stopProfiler(__METHOD__."|".$obj_id);
 		return clone $this->relation[ $obj_id ];
 	}
 
