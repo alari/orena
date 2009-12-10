@@ -564,13 +564,9 @@ class O_Db_Query {
 	 * @return mixed
 	 */
 	private function executeStmt() {
-		$t = microtime ( true );
+		O_Registry::startProfiler(__METHOD__);
 		$r = $this->stmt->execute ();
-		$t = microtime ( true ) - $t;
-		$t0 = O_Registry::get ( "db-time" );
-		if (! $t0)
-			$t0 = 0;
-		O_Registry::set ( "db-time", $t0 + $t );
+		O_Registry::stopProfiler(__METHOD__);
 		return $r;
 	}
 	
