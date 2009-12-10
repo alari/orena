@@ -258,8 +258,9 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 */
 	static public function getById( $id, $class, Array $row = null )
 	{
-		if (isset( self::$objs[ $class ][ $id ] ))
+		if(array_key_exists($class, self::$objs) && array_key_exists($id, self::$objs[$class])){
 			return self::$objs[ $class ][ $id ];
+		}
 
 		self::$objs[ $class ][ $id ] = unserialize(
 				sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
