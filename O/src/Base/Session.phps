@@ -40,7 +40,6 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function get( $id = null )
 	{
-		O_Registry::startProfiler(__METHOD__);
 		if (!$id) {
 			$id = session_id();
 		}
@@ -65,7 +64,6 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 		} elseif(!isset(self::$objs[$id])) {
 			self::$objs[$id] = $obj;
 		}
-		O_Registry::stopProfiler(__METHOD__);
 		return $obj;
 	}
 

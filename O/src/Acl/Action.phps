@@ -39,7 +39,6 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 	 */
 	static public function getByRule( $name, $type = self::TYPE_ALLOW )
 	{
-		O_Registry::startProfiler(__METHOD__);
 		$class = self::getClassName();
 		if(!count(self::$objs)) {
 			foreach( O_Dao_Query::get($class) as $action){
@@ -52,7 +51,6 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 		if (!isset( self::$objs[ $name ][ $type ] )) {
 			self::$objs[ $name ][ $type ] = new $class( $name, $type );
 		}
-		O_Registry::stopProfiler(__METHOD__);
 		return self::$objs[ $name ][ $type ];
 	}
 
