@@ -289,9 +289,9 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	
 	public function getAll($cache=false, $preload=true) {
 		if(!$cache && count($this->objects)) return $this->objects;
-		O_Registry::startProfiler(__METHOD__.($cache?":reload":""));
+		O_Registry::startProfiler(__METHOD__."|".$this->baseClass."-".$this->baseField."-".$this->baseId);
 		parent::getAll($cache, $preload);
-		O_Registry::stopProfiler(__METHOD__.($cache?":reload":""));
+		O_Registry::stopProfiler(__METHOD__."|".$this->baseClass."-".$this->baseField."-".$this->baseId);
 		return $this->objects;
 	}
 	
