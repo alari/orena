@@ -587,7 +587,6 @@ class O_Db_Query {
 	 * @return PDOStatement
 	 */
 	protected function prepareStmt($query) {
-		O_Registry::add("profiler/".__METHOD__, $query);
 		if ($this->tables && count ( self::$disable_preparing )) {
 			foreach ( self::$disable_preparing as $table )
 				if (strpos ( $this->tables, $table ) !== false) {

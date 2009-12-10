@@ -49,7 +49,13 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 			}
 		}
 		if (!isset( self::$objs[ $name ][ $type ] )) {
-			self::$objs[ $name ][ $type ] = new $class( $name, $type );
+			if(!isset(self::$objs[ $name ])) {
+				self::$objs[ $name ] = Array();
+			}
+			self::$objs[ $name ][ $type ] = O_Dao_Query::get($class)->test("name", $name)->test("type", $type)->getOne();
+			if(!self::$objs[ $name ]) {
+				self::$objs[ $name ][ $type ] = new $class( $name, $type );
+			}
 		}
 		return self::$objs[ $name ][ $type ];
 	}

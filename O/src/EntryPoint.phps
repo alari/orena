@@ -33,7 +33,6 @@ class O_EntryPoint {
 	static public function processRequest() {
 		try {
 			O_Registry::set ( "start-time", microtime ( true ) );
-			O_Registry::startProfiler(__CLASS__." ".__METHOD__);
 			
 			// Preparing environment
 			self::prepareEnvironment ();
@@ -53,9 +52,7 @@ class O_EntryPoint {
 			if (O_Registry::get ( "app/mode" ) == "development") {
 				set_error_handler ( Array (__CLASS__, "errorException" ), E_ALL );
 			}
-			
-			O_Registry::stopProfiler(__CLASS__." ".__METHOD__);
-			
+						
 			// Prepare and echo response
 			return self::makeResponse ();
 		} catch ( Exception $e ) {
