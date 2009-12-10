@@ -33,6 +33,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function __construct( $targetClass, $targetField, $baseId, $baseClass, $baseField, $orderBy )
 	{
+		O_Registry::startProfiler(__METHOD__.":{$baseClass}-$baseField");
+		
 		$this->targetClass = $targetClass;
 		$this->targetField = $targetField;
 		$this->targetTbl = O_Dao_TableInfo::get( $targetClass )->getTableName();
@@ -52,6 +54,8 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 					 $this->relationTbl . "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
+			
+		O_Registry::stopProfiler(__METHOD__.":{$baseClass}-$baseField");
 	}
 
 	/**
