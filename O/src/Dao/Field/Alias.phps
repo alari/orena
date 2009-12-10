@@ -28,6 +28,13 @@ class O_Dao_Field_Alias extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 	private $query;
 
 	/**
+	 * Cached queries for concrete objects
+	 *
+	 * @var O_Dao_Query[]
+	 */
+	private $objQueries = Array();
+	
+	/**
 	 * Constructor
 	 *
 	 * @param O_Dao_FieldInfo $fieldInfo
@@ -72,8 +79,14 @@ class O_Dao_Field_Alias extends O_Dao_Field_Bases implements O_Dao_Field_iFace {
 		if (!$this->query instanceof O_Dao_Query) {
 			throw new O_Ex_Critical( "Wrong mapped query is produced by $name.$subreq map." );
 		}
-		$q = clone $this->query;
-		return $q->test( $this->testField, $fieldValue ? $fieldValue : $obj->id );
+		if(!$fieldValue) {
+			$fieldValue = $obj->id;
+		}
+		if(!isset($this->objQueries[$fieldValue])) {
+			$this->objQueries[$fieldValue] = clone $this->query;
+			$this->objQueries[$fieldValue]->test($this->testField, $fieldValue);
+		}
+		return $this->objQueries[$fieldValue];
 	}
 
 	/**
