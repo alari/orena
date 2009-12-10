@@ -71,9 +71,9 @@ class O_ClassManager {
 		}
 		if ($f) {
 			fclose( $f );
-			O_Registry::startProfiler(__METHOD__."|include");
+			O_Registry::startProfiler("include/$class");
 			include $file;
-			O_Registry::stopProfiler(__METHOD__."|include");
+			O_Registry::stopProfiler("include/$class");
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 			if (class_exists( $class )) {
 				$callbacks = O_Registry::get( "fw/classmanager/callback/$class" );
