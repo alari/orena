@@ -49,6 +49,7 @@ class O_ClassManager {
 	 */
 	static public function load( $class )
 	{
+		O_Registry::startProfiler(__CLASS__." ".__METHOD__);
 		$file = "";
 		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $prefix => $params) {
 			if (strpos( $class, $prefix ) === 0) {
@@ -78,6 +79,8 @@ class O_ClassManager {
 			}
 		}
 
+		O_Registry::stopProfiler(__CLASS__." ".__METHOD__);
+		
 	}
 }
 

@@ -211,5 +211,13 @@ class O_Registry {
         	$base[$k] = $v;
         }
     }
-
+    
+    static public function startProfiler($name) {
+    	self::set("profiler-start/$name", microtime(true));
+    }
+    
+	static public function stopProfiler($name) {
+		self::set("profiler/$name", self::get("profiler-start/$name")+microtime(true)-self::get("profiler-start/$name"));
+		self::set("profiler/$name:calls", self::get("profiler/$name:calls")+1);
+	}	
 }
