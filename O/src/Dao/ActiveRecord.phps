@@ -469,7 +469,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 
 }
 
-
+/*
 
 require_once 'Query.phps';
 require_once 'TableInfo.phps';
@@ -491,4 +491,4 @@ require_once 'Field/File.phps';
 require_once 'Field/Image.phps';
 require_once 'Field/OneOf.phps';
 require_once 'Field/ToOne.phps';
-require_once 'Field/ToMany.phps';
+require_once 'Field/ToMany.phps';*/
