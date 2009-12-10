@@ -151,8 +151,12 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	static public function getByName( $name )
 	{
 		$class = self::getClassName();
+		if(!count(self::$objs)) {
+			foreach(O_Dao_Query::get($class) as $role) {
+				self::$objs[$name] = $role;
+			}
+		}
 		if (!isset( self::$objs[ $name ] )) {
-			self::$objs[ $name ] = O_Dao_Query::get( $class )->test( "name", $name )->getOne();
 			if (!self::$objs[ $name ]) {
 				self::$objs[ $name ] = new $class( $name );
 			}
