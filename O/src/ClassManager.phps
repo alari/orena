@@ -72,7 +72,7 @@ class O_ClassManager {
 		if ($f) {
 			fclose( $f );
 			O_Registry::startProfiler(__METHOD__."|include");
-			include_once $file;
+			include $file;
 			O_Registry::stopProfiler(__METHOD__."|include");
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 			if (class_exists( $class )) {
