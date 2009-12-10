@@ -47,11 +47,4 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 	 *
 	 */
 	abstract public function reload();
-
-	/**
-	 * Returns true if relation contains an object, false otherwise
-	 *
-	 * @param int $objOrId
-	 */
-	abstract public function has( $objOrId );
 }

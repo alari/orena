@@ -73,6 +73,9 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function has( $objOrId )
 	{
+		if(is_array($this->objects)) {
+			return parent::has($objOrId);
+		}
 		if ($objOrId instanceof $this->targetClass)
 			$objOrId = $objOrId->id;
 		if (!is_numeric( $objOrId ))

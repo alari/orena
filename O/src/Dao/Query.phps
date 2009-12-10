@@ -229,6 +229,24 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	{
 		parent::disablePreparing( O_Dao_TableInfo::get( $class )->getTableName() );
 	}
+	
+	/**
+	 * Returns true if an object is in result
+	 *
+	 * @param O_Dao_ActiveRecord|int $objectOrId
+	 * @return bool
+	 */
+	public function has($objectOrId) {
+		if($objectOrId instanceof $this->class) {
+			$objectOrId = $objectOrId->id;
+		}
+		if(!is_numeric($objectOrId)) {
+			return false;
+		}
+		$this->getAll();
+		return array_key_exists($objectOrId, $this->objects);
+	}
+	
 
 	/**
 	 * For Iterator
