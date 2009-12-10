@@ -157,6 +157,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 			}
 		}
 		if (!isset( self::$objs[ $name ] )) {
+			self::$objs[ $name ] = O_Dao_Query::get($class)->test("name", $name)->limit(1)->getOne();
 			if (!self::$objs[ $name ]) {
 				self::$objs[ $name ] = new $class( $name );
 			}
