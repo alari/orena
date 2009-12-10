@@ -54,7 +54,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get(
 				self::getClassName() )->test( "ses_id", $id )->getOne();
 		if (!$obj) {
-			O_Registry::set("profiler/".__METHOD__, array("id"=>$id, "objs"=>array_keys(self::$objs), "not_null"=>isset(self::$objs[$id])&&self::$objs[$id]));
+			O_Registry::add("profiler/".__METHOD__, array("id"=>$id, "objs"=>array_keys(self::$objs), "not_null"=>isset(self::$objs[$id])&&self::$objs[$id]));
 			$class = self::getClassName();
 			$obj = new $class( );
 			$obj->ses_id = $id;
