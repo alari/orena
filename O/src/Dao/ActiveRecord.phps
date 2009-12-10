@@ -266,7 +266,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		if (!isset( $row[ "id" ] )) {
 			$query = new O_Dao_Query( $class );
 			try {
-				$row = $query->test( "id", $id )->select()->fetch();
+				$row = $query->where( "id   =   $id" )->select()->fetch();
 			}
 			catch (PDOException $e) {
 				if (!O_Dao_TableInfo::get( $class )->tableExists()) {
