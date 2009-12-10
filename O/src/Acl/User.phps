@@ -24,6 +24,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	{
 		// Role overrides resourse context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
+			O_Registry::add("profiler/role_call", $this["role"]);
 			return $access;
 		}
 
