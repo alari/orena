@@ -20,6 +20,7 @@
  * @field time int
  * @field views int default 0
  * @field user -has one {classnames/user} -inverse session
+ * @field user_agent tinytext
  * @index ses_id -unique
  * @index time
  */
@@ -59,6 +60,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 			$obj->ses_id = $id;
 			$obj->started = time();
 			$obj->time = time();
+			$obj->user_agent = $_SERVER['HTTP_USER_AGENT'];
 			$obj->save();
 			self::$objs[ $id ] = $obj;
 		} elseif(!isset(self::$objs[$id])) {
