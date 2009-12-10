@@ -48,7 +48,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 		parent::__construct( $this->targetClass );
 		
 		$this->join( $this->relationTbl, 
-				$this->targetTbl . ".id=            " . $this->relationTbl . "." . $this->targetFieldName . " AND " .
+				$this->targetTbl . ".id=" . $this->relationTbl . "." . $this->targetFieldName . " AND " .
 					 $this->relationTbl . "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
