@@ -41,12 +41,16 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 	{
 		O_Registry::startProfiler(__METHOD__);
 		$class = self::getClassName();
-		if (!isset( self::$objs[ $name ][ $type ] )) {
-			self::$objs[ $name ][ $type ] = O_Dao_Query::get( $class )->test( "name", $name )->test( 
-					"type", $type )->getOne();
-			if (!self::$objs[ $name ][ $type ]) {
-				self::$objs[ $name ][ $type ] = new $class( $name, $type );
+		if(!count(self::$objs)) {
+			foreach( O_Dao_Query::get($class) as $action){
+				if(!isset(self::$objs[$action->name])) {
+					self::$objs[$action->name] = Array();
+				}
+				self::$objs[$action->name][$action->type] = $action;
 			}
+		}
+		if (!isset( self::$objs[ $name ][ $type ] )) {
+			self::$objs[ $name ][ $type ] = new $class( $name, $type );
 		}
 		O_Registry::stopProfiler(__METHOD__);
 		return self::$objs[ $name ][ $type ];
