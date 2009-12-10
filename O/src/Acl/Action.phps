@@ -28,7 +28,6 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 		$this->name = $name;
 		$this->type = $type;
 		parent::__construct();
-		;
 	}
 
 	/**
@@ -40,6 +39,7 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 	 */
 	static public function getByRule( $name, $type = self::TYPE_ALLOW )
 	{
+		O_Registry::startProfiler(__METHOD__);
 		$class = self::getClassName();
 		if (!isset( self::$objs[ $name ][ $type ] )) {
 			self::$objs[ $name ][ $type ] = O_Dao_Query::get( $class )->test( "name", $name )->test( 
@@ -48,6 +48,7 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 				self::$objs[ $name ][ $type ] = new $class( $name, $type );
 			}
 		}
+		O_Registry::stopProfiler(__METHOD__);
 		return self::$objs[ $name ][ $type ];
 	}
 
