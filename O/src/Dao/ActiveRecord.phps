@@ -261,6 +261,9 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		if(array_key_exists($class, self::$objs) && array_key_exists($id, self::$objs[$class])){
 			return self::$objs[ $class ][ $id ];
 		}
+		if(!$id) {
+			O_Registry::set("profiler/role", debug_backtrace());
+		}
 
 		self::$objs[ $class ][ $id ] = unserialize(
 				sprintf( 'O:%d:"%s":0:{}', strlen( $class ), $class ) );
