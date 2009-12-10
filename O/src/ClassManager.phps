@@ -49,7 +49,7 @@ class O_ClassManager {
 	 */
 	static public function load( $class )
 	{
-		
+		O_Registry::startProfiler(__METHOD__);
 		$file = "";
 		foreach (O_Registry::get( "fw/classmanager/prefix" ) as $prefix => $params) {
 			if (strpos( $class, $prefix ) === 0) {
@@ -62,18 +62,14 @@ class O_ClassManager {
 			$file = str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
 		try {
-			O_Registry::startProfiler(__METHOD__."|fopen");
 			$f = @fopen( $file, "r", true );
-			O_Registry::stopProfiler(__METHOD__."|fopen");
 		}
 		catch (Exception $e) {
 			$f = 0;
 		}
 		if ($f) {
 			fclose( $f );
-			O_Registry::startProfiler("include/$class");
-			include $file;
-			O_Registry::stopProfiler("include/$class");
+			require $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 			if (class_exists( $class )) {
 				$callbacks = O_Registry::get( "fw/classmanager/callback/$class" );
@@ -82,7 +78,7 @@ class O_ClassManager {
 						call_user_func( $callback );
 			}
 		}
-		
+		O_Registry::stopProfiler(__METHOD__);
 	}
 }
 
