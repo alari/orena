@@ -153,7 +153,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 		$class = self::getClassName();
 		if(!count(self::$objs)) {
 			foreach(O_Dao_Query::get($class) as $role) {
-				self::$objs[$name] = $role;
+				self::$objs[$role->name] = $role;
 			}
 		}
 		if (!isset( self::$objs[ $name ] )) {

@@ -29,7 +29,6 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 
 		// Getting context role for resourse
 		if ($resourse) {
-			O_Registry::add("profiler/acl", "request for ".get_class($resourse)." / ".$action);
 			$registry = O_Registry::get( "acl", $resourse );
 			if(is_array($registry)) {
 				$access = null;
@@ -74,9 +73,6 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				return $this->can( $action, $res );
 			break;
 			case "role" :
-				O_Registry::add("profiler/acl", "role $params action $action resourse ".get_class($resourse)." = ".(O_Acl_Role::getByName( $params )->can( $action )?"yes":"no"));
-				O_Registry::add("profiler/acl", print_r(O_Acl_Role::getByName($params),1));
-				O_Registry::add("profiler/acl", print_r(O_Acl_Role::getByName($params)->actions,1));
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
