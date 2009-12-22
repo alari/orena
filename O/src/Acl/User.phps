@@ -75,11 +75,12 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			break;
 			case "role" :
 				O_Registry::add("profiler/acl", "role $params action $action resourse ".get_class($resourse)." = ".(O_Acl_Role::getByName( $params )->can( $action )?"yes":"no"));
+				O_Registry::add("profiler/acl", print_r(O_Acl_Role::getByName($params)));
+				O_Registry::add("profiler/acl", print_r(O_Acl_Role::getByName($params)->actions));
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
 				$value = $resourse->$subkey;
-				O_Registry::add("profiler/acl", "test user-in $subkey: ".($value->id==$this->id?"ok":"fail: ".$value->id."|".$this->id));
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
