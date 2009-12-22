@@ -79,7 +79,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			break;
 			case "user-in" :
 				$value = $resourse->$subkey;
-				O_Registry::add("profiler/acl", "test user-in $subkey: ".($value->id==$this->id?"ok":"fail"));
+				O_Registry::add("profiler/acl", "test user-in $subkey: ".($value->id==$this->id?"ok":"fail: ".$value->id."|".$this->id));
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
