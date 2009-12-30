@@ -84,8 +84,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					}
 					// It's a relation with many users
 				} elseif ($value instanceof O_Dao_Query) {
+					O_Registry::add("profiler/aclcall", "user-in $subkey request");
 					if($value->has($this)){
 						$is_true = 1;
+						O_Registry::add("profiler/aclcall", "user-in $subkey request passed");
 					}
 				}
 			break;
