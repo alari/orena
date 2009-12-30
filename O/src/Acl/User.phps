@@ -84,7 +84,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					}
 					// It's a relation with many users
 				} elseif ($value instanceof O_Dao_Query) {
-					if (isset( $value[ $this->id ] ) && $value[ $this->id ] instanceof $this) {
+					if($value->has($this)){
 						$is_true = 1;
 					}
 				}
