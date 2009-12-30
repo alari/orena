@@ -60,7 +60,6 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 		}
 		if ($this->isEnumerated) {
 			$v = $this->fieldInfo->getParam( "enum", 1 );
-			O_Registry::set("profiler/test_enum", print_r($v,1)."\n\n".print_r($fieldValue,1));
 			$v = array_search( $fieldValue, $v );
 			if ($v === false) {
 				if (array_key_exists( $fieldValue, $this->fieldInfo->getParam( "enum", 1 ) ))
