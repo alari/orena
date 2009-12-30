@@ -24,6 +24,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	{
 		// Role overrides resourse context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
+			O_Registry::add("profiler/aclreq", "req $action ".($access?"passed":"failed")." native");
 			return $access;
 		}
 
@@ -34,8 +35,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				$access = null;
 				foreach ($registry as $key=>$params) {
 					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
-					if (!is_null( $access ))
+					if (!is_null( $access )){
+						O_Registry::add("profiler/aclreq", "req $action ".($access?"passed":"failed")." acl");
 						return $access;
+					}
 				}
 			}
 		}
@@ -84,10 +87,8 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 					}
 					// It's a relation with many users
 				} elseif ($value instanceof O_Dao_Query) {
-					O_Registry::add("profiler/aclcall", "user-in $subkey request");
 					if($value->has($this)){
 						$is_true = 1;
-						O_Registry::add("profiler/aclcall", "user-in $subkey request passed");
 					}
 				}
 			break;
