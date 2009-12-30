@@ -43,6 +43,8 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			}
 		}
 
+		O_Registry::add("profiler/aclreq", "req $action failed et al");
+		
 		// No rules available et al
 		return null;
 	}
