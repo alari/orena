@@ -67,7 +67,7 @@ class O_Dao_Field_Atomic extends O_Dao_Field_Bases implements O_Dao_Field_iFace 
 					$v = $fieldValue;
 				else
 					throw new O_Ex_WrongArgument( 
-							"Cannot assign \"$fieldValue\" to enumerated atomic field." );
+							"Cannot assign \"$fieldValue\" to enumerated atomic field {$this->name}." );
 			}
 			$fieldValue = $v;
 		}
