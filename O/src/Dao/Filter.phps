@@ -50,13 +50,13 @@ class O_Dao_Filter {
 			return;
 		foreach ($this->fields as $name => &$params) {
 			if ($params[ "type" ] == self::TYPE_PLAIN) {
-				$params[ "value" ] = O_Registry::get( "app/env/params/$name" );
+				$params[ "value" ] = O_Registry::get( "env/params/$name" );
 				if ($params[ "value" ])
 					$this->query->test( $name, "%" . $params[ "value" ] . "%", 
 							O_Dao_Query::LIKE );
 			} elseif ($params[ "type" ] == self::TYPE_INTDATE) {
 				if ($params[ "asInterval" ]) {
-					$left = O_Registry::get( "app/env/params/$name.left" );
+					$left = O_Registry::get( "env/params/$name.left" );
 					if ($left) {
 						$_left = strtotime( $left );
 						if ($_left) {
@@ -64,7 +64,7 @@ class O_Dao_Filter {
 							$params[ "left" ] = $left;
 						}
 					}
-					$right = O_Registry::get( "app/env/params/$name.right" );
+					$right = O_Registry::get( "env/params/$name.right" );
 					if ($right) {
 						$_right = strtotime( $right );
 						if ($_right) {
@@ -73,7 +73,7 @@ class O_Dao_Filter {
 						}
 					}
 				} else {
-					$value = O_Registry::get( "app/env/params/$name" );
+					$value = O_Registry::get( "env/params/$name" );
 					if ($value) {
 						$_value = strtotime( $value );
 						if ($_value) {
@@ -88,7 +88,7 @@ class O_Dao_Filter {
 				$tableInfo = O_Dao_TableInfo::get( 
 						$params[ "class" ] ? $params[ "class" ] : $this->query->getClass() );
 				$fieldInfo = $tableInfo->getFieldInfo( $fieldName );
-				$params[ "value" ] = O_Registry::get( "app/env/params/$name" );
+				$params[ "value" ] = O_Registry::get( "env/params/$name" );
 				if ($fieldInfo->isRelationOne()) {
 					$this->query->test( $name, $params[ "value" ] );
 				} /* elseif($fieldInfo->isRelationMany() && $fieldInfo->getInverse()->isRelationOne()) {

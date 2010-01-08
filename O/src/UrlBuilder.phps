@@ -14,9 +14,9 @@ class O_UrlBuilder {
 	 */
 	static public function get( $url, Array $params = Array() )
 	{
-		$r = O_Registry::get( "app/env/base_url" );
+		$r = O_Registry::get( "env/base_url" );
 		if ($r[ strlen( $r ) - 1 ] != "/") {
-			O_Registry::set( "app/env/base_url", $r = $r . "/" );
+			O_Registry::set( "env/base_url", $r = $r . "/" );
 		}
 		if (!$url) {
 			$url = $r;

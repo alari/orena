@@ -17,8 +17,6 @@ class O_Acl_Admin_Cmd {
 	 */
 	static public function process( O_Command $cmd )
 	{
-		Header( "Content-type: text/html; charset=utf-8" );
-		
 		// Find role to process, if given
 		if ($cmd->getParam( "role" )) {
 			$role = O_Dao_ActiveRecord::getById( $cmd->getParam( "role" ), 
@@ -26,7 +24,7 @@ class O_Acl_Admin_Cmd {
 		}
 		
 		// Process ajax request
-		if (O_Registry::get( "app/env/request_method" ) == "POST" && isset( $role ) && $role) {
+		if (O_Registry::get( "env/request_method" ) == "POST" && isset( $role ) && $role) {
 			// Request to show role
 			if ($cmd->getParam( "mode" ) == "show") {
 				$tpl = $cmd->getTemplate();
@@ -75,10 +73,10 @@ class O_Acl_Admin_Cmd {
 			$response[ "status" ] = $role->save() ? "SAVED" : "NO DAO CHANGES";
 			echo json_encode( $response );
 			return null;
-		} elseif (O_Registry::get( "app/env/request_method" ) == "POST" && $cmd->getParam( 
+		} elseif (O_Registry::get( "env/request_method" ) == "POST" && $cmd->getParam( 
 				"new_role" )) {
 			O_Acl_Role::getByName( $cmd->getParam( "new_role" ) );
-			return $cmd->redirect( O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) ) );
+			return $cmd->redirect( O_UrlBuilder::get( O_Registry::get( "env/process_url" ) ) );
 		}
 		
 		// Just return the template

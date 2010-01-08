@@ -96,7 +96,7 @@ abstract class O_Acl_Admin_Tpl extends O_Html_Template {
 						"clear" => $this->phrases[ "clear" ]);
 		?>
 <form method="POST" id="role-form"
-	action="<?=O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) )?>">
+	action="<?=O_UrlBuilder::get( O_Registry::get( "env/process_url" ) )?>">
 <fieldset><legend><?=$this->phrases[ "ed_role" ]?>: <?=$this->role->name?></legend>
 <table>
 	<tr>

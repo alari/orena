@@ -24,7 +24,7 @@ abstract class O_OpenId_Consumer_Template extends O_Html_Template {
 				?>
 <form method="GET" id="openid-login-form"
 	action="<?=
-				O_Registry::get( "app/env/request_url" )?>"><label><span>OpenId:</span> <input
+				O_Registry::get( "env/request_url" )?>"><label><span>OpenId:</span> <input
 	type="text" name="openid_identifier" value="<?=
 				$this->identity?>" /></label>
 

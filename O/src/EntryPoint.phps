@@ -78,9 +78,9 @@ class O_EntryPoint {
 	/**
 	 * Prepares registry environment for future use.
 	 *
-	 * Sets current URL (without query string) to "app/env/request_url"
-	 * Sets current HTTP_HOST to "app/env/http_host"
-	 * Merges GET and POST parameters to "app/env/params"
+	 * Sets current URL (without query string) to "env/request_url"
+	 * Sets current HTTP_HOST to "env/http_host"
+	 * Merges GET and POST parameters to "env/params"
 	 * Sets "app" inheritance from "fw"
 	 */
 	static public function prepareEnvironment() {
@@ -88,29 +88,29 @@ class O_EntryPoint {
 		$url = $_SERVER ['REQUEST_URI'];
 		if (strpos ( $url, "?" ))
 			$url = substr ( $url, 0, strpos ( $url, "?" ) );
-		O_Registry::set ( "app/env/request_url", $url );
+		O_Registry::set ( "env/request_url", $url );
 		
 		// Saving HTTP_HOST value
-		O_Registry::set ( "app/env/http_host", $_SERVER ['HTTP_HOST'] );
+		O_Registry::set ( "env/http_host", $_SERVER ['HTTP_HOST'] );
 		// Request method
-		O_Registry::set ( "app/env/request_method", $_SERVER ['REQUEST_METHOD'] );
+		O_Registry::set ( "env/request_method", $_SERVER ['REQUEST_METHOD'] );
 		
 		// Setting registry inheritance
 		O_Registry::setInheritance ( "fw", "app" );
 		
-		// Adding request params to app/env/request registry
-		O_Registry::set ( "app/env/params", array_merge ( $_POST, $_GET ) );
+		// Adding request params to env/request registry
+		O_Registry::set ( "env/params", array_merge ( $_POST, $_GET ) );
 		
 		// Base URL
-		O_Registry::set ( "app/env/base_url", "/" );
+		O_Registry::set ( "env/base_url", "/" );
 	}
 	
 	/**
 	 * Parses and processes application selecting according with current environment.
 	 *
 	 * Uses configuration file allocated in "./Apps/Orena.apps.xml"
-	 * Sets "app/env/base_url" for application prefix.
-	 * Sets "app/env/process_url" for future use inside application.
+	 * Sets "env/base_url" for application prefix.
+	 * Sets "env/process_url" for future use inside application.
 	 * Sets "app/name", "app/class_prefix", "app/mode" registry keys.
 	 *
 	 * @throws O_Ex_Critical
@@ -158,7 +158,7 @@ class O_EntryPoint {
 			}
 		}
 		if ($app_name) {
-			O_Registry::set ( "app/env/process_url", substr ( O_Registry::get ( "app/env/request_url" ), strlen ( O_Registry::get ( "app/env/base_url" ) ) ) );
+			O_Registry::set ( "env/process_url", substr ( O_Registry::get ( "env/request_url" ), strlen ( O_Registry::get ( "env/base_url" ) ) ) );
 			if(is_file("./Apps/" . $app_name . "/Conf/Registry.conf")) {
 				O_Registry::parseFile("./Apps/" . $app_name . "/Conf/Registry.conf", "app");
 			}
@@ -177,15 +177,15 @@ class O_EntryPoint {
 				case "url" :
 					$d = 0;
 					if (isset ( $part ["base"] ) && $part ["base"]) {
-						if (strpos ( O_Registry::get ( "app/env/request_url" ), $part ["base"] ) === 0) {
-							O_Registry::set ( "app/env/base_url", $part ["base"] );
+						if (strpos ( O_Registry::get ( "env/request_url" ), $part ["base"] ) === 0) {
+							O_Registry::set ( "env/base_url", $part ["base"] );
 							$d = 1;
 						} else
 							return false;
 					}
 					if (isset ( $part ["pattern"] ) && $part ["pattern"]) {
 						$pattern = $part ["pattern"];
-						if (preg_match ( "#^$pattern$#i", O_Registry::get ( "app/env/request_url" ) ))
+						if (preg_match ( "#^$pattern$#i", O_Registry::get ( "env/request_url" ) ))
 							continue;
 					}
 					if ($d)
@@ -194,7 +194,7 @@ class O_EntryPoint {
 					break;
 				// Checks if hostname matches pattern
 				case "host" :
-					if ($part && preg_match ( "#^$part$#i", O_Registry::get ( "app/env/http_host" ) ))
+					if ($part && preg_match ( "#^$part$#i", O_Registry::get ( "env/http_host" ) ))
 						continue;
 					return false;
 					break;
@@ -266,14 +266,14 @@ class O_EntryPoint {
 				break;
 			// Parses hostname with pattern, processes child nodes if matches
 			case "host" :
-				if (preg_match ( "#^$subkey$#i", O_Registry::get ( "app/env/http_host" ), $pockets )) {
+				if (preg_match ( "#^$subkey$#i", O_Registry::get ( "env/http_host" ), $pockets )) {
 					foreach ( $params as $k=>$v )
 						self::processUrlsConfPart ( $k, $v, $pockets );
 				}
 				break;
 			// Parses URL with pattern, processes child nodes if matches
 			case "url" :
-				$url = O_Registry::get ( "app/env/process_url" );
+				$url = O_Registry::get ( "env/process_url" );
 				if (preg_match ( "#^$subkey$#i", $url, $pockets )) {
 					// Set command for URL, if available
 					foreach ( $params as $k=>$v )
@@ -317,7 +317,7 @@ class O_EntryPoint {
 		// Create O_Command and process it
 		$cmd_name = O_Registry::get ( "app/command_name" );
 		if (! $cmd_name) {
-			$url = O_Registry::get ( "app/env/process_url" );
+			$url = O_Registry::get ( "env/process_url" );
 			// Remove extension
 			if (O_Registry::get ( "app/pages_extension" )) {
 				$ext = O_Registry::get ( "app/pages_extension" );

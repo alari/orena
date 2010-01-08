@@ -161,7 +161,7 @@ class O_Form_Handler extends O_Form_Generator {
 
 		// Load record, if needed
 		if (!$this->record && $this->createMode === 0) {
-			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "app/env/params/id" ),
+			$this->record = O_Dao_ActiveRecord::getById( O_Registry::get( "env/params/id" ),
 					$this->class );
 			if (!$this->record) {
 				$this->errors[ "_" ] = "Record not found.";
@@ -230,7 +230,7 @@ class O_Form_Handler extends O_Form_Generator {
 				$tableInfo->getFieldsByKey( O_Form_Generator::FORM_KEY, $this->type,
 						$this->excludeFields ) ) as $name) {
 			$fieldInfo = $tableInfo->getFieldInfo( $name );
-			$this->values[ $name ] = O_Registry::get( "app/env/params/$name" );
+			$this->values[ $name ] = O_Registry::get( "env/params/$name" );
 			try {
 				$provider = new O_Form_Check_AutoProducer( $name, $this->record, $fieldInfo,
 						$this->type, $this->values[ $name ] );

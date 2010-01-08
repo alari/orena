@@ -57,7 +57,7 @@ class O_Form_Generator extends O_Form_Builder {
 		$this->instanceId = "form-o-" . (++self::$instancesCounter);
 		if ($classOrRecord)
 			$this->setClassOrRecord( $classOrRecord );
-		parent::__construct( O_UrlBuilder::get( O_Registry::get( "app/env/process_url" ) ) );
+		parent::__construct( O_UrlBuilder::get( O_Registry::get( "env/process_url" ) ) );
 		$this->type = O_Dao_Renderer::TYPE_DEF;
 	}
 
@@ -243,9 +243,9 @@ class O_Form_Generator extends O_Form_Builder {
 	 */
 	public function isFormRequest()
 	{
-		if (O_Registry::get( "app/env/request_method" ) != "POST")
+		if (O_Registry::get( "env/request_method" ) != "POST")
 			return false;
-		if (O_Registry::get( "app/env/params/o:sbm-form" ) != "+1")
+		if (O_Registry::get( "env/params/o:sbm-form" ) != "+1")
 			return false;
 		return true;
 	}

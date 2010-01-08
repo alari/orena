@@ -82,7 +82,7 @@ abstract class O_Command extends O_Dict_Access {
 	public function redirect( $href = null )
 	{
 		$href = O_UrlBuilder::get( 
-				is_null( $href ) ? O_Registry::get( "app/env/process_url" ) : $href );
+				is_null( $href ) ? O_Registry::get( "env/process_url" ) : $href );
 		Header( "Location: $href" );
 		return null;
 	}
@@ -96,7 +96,7 @@ abstract class O_Command extends O_Dict_Access {
 	 */
 	public function getParam( $name, $defaultValue = null )
 	{
-		$v = O_Registry::get( "app/env/params/$name" );
+		$v = O_Registry::get( "env/params/$name" );
 		return is_null( $v ) ? $defaultValue : $v;
 	}
 
@@ -107,7 +107,7 @@ abstract class O_Command extends O_Dict_Access {
 	 */
 	public function getParams()
 	{
-		return O_Registry::get( "app/env/params" );
+		return O_Registry::get( "env/params" );
 	}
 
 	/**

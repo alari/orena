@@ -389,8 +389,8 @@ class O_Dao_Paginator {
 	 */
 	public function isAjaxPageRequest()
 	{
-		return $this->ajax_id && O_Registry::get( "app/env/request_method" ) == "POST" && O_Registry::get(
-				"app/env/params/mode" ) == $this->ajax_id;
+		return $this->ajax_id && O_Registry::get( "env/request_method" ) == "POST" && O_Registry::get(
+				"env/params/mode" ) == $this->ajax_id;
 	}
 
 }

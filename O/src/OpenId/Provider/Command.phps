@@ -22,7 +22,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 	{
 
 		// Prepare current identity
-		$this->identity = O_Registry::get( "app/env/http_host" );
+		$this->identity = O_Registry::get( "env/http_host" );
 		if (strpos( $this->identity, "openid." ) === 0 || strpos( $this->identity, "www." ) === 0)
 			list (, $this->identity) = explode( ".", $this->identity, 2 );
 	}
@@ -85,7 +85,7 @@ abstract class O_OpenId_Provider_Command extends O_Command {
 
 	protected function buildUrl( $action = "" )
 	{
-		return "http://" . O_Registry::get( "app/env/http_host" ) . "/openid/provider" . ($action ? "/" .
+		return "http://" . O_Registry::get( "env/http_host" ) . "/openid/provider" . ($action ? "/" .
 				 $action : "");
 	}
 
