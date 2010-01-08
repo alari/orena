@@ -26,13 +26,13 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	{
 		$key = $action.($resourse?"/".get_class($resourse).":".$resourse["id"]:"");
 		if(array_key_exists($key, $this->acl_cache)){
-			O_Registry::add("profiler/aclreq", "req $action ".($this->acl_cache[$key]?"passed":"failed")." cache");
+			O_Registry::add("profiler/aclreq", "req $key ".($this->acl_cache[$key]?"passed":"failed")." cache");
 			return $this->acl_cache[$key];
 		}
 		
 		// Role overrides resourse context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
-			O_Registry::add("profiler/aclreq", "req $action ".($access?"passed":"failed")." native");
+			O_Registry::add("profiler/aclreq", "req $key ".($access?"passed":"failed")." native");
 			return $this->acl_cache[$key] = $access;
 		}
 
@@ -44,14 +44,14 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				foreach ($registry as $key=>$params) {
 					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
 					if (!is_null( $access )){
-						O_Registry::add("profiler/aclreq", "req $action ".($access?"passed":"failed")." acl");
+						O_Registry::add("profiler/aclreq", "req $key ".($access?"passed":"failed")." acl");
 						return $this->acl_cache[$key] = $access;
 					}
 				}
 			}
 		}
 
-		O_Registry::add("profiler/aclreq", "req $action failed et al");
+		O_Registry::add("profiler/aclreq", "req $key failed et al");
 		
 		// No rules available et al
 		return $this->acl_cache[$key] = null;
