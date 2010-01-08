@@ -186,7 +186,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 * Removes an object from relation (current query state influes)
 	 *
 	 * @param O_Dao_ActiveRecord $object
-	 * @param bool $delete If true, not only relation removed, but also an object deleted
+	 * @param bool $delete If true, not only relation will be removed, but also an object will be deleted
 	 * @return bool
 	 */
 	public function remove( O_Dao_ActiveRecord $object, $delete = false )

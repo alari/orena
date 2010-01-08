@@ -48,7 +48,7 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 	/**
 	 * Cached relation objects, like O_Dao_Relation_Base
 	 *
-	 * @var O_Dao_Relation_Base[]
+	 * @var O_Dao_Relation_BaseToMany[]
 	 */
 	private $relations = Array ();
 	
@@ -198,7 +198,7 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 		if(!$obj_id) {
 			return clone $this->relation[ $obj_id ];
 		}
-		return $this->relation[ $obj_id ];
+		return clone $this->relation[ $obj_id ];
 	}
 
 	/**
