@@ -498,8 +498,8 @@ class O_Db_Query {
 	 * @return PDOStatement
 	 */
 	public function select($mode = PDO::FETCH_ASSOC) {
-		$this->stmt = $this->prepareStmt ( $this->prepareSelect () );
-		
+		$this->stmt = $this->prepareStmt ( $a = $this->prepareSelect () );
+		O_Registry::add("profiler/dbs", $a);
 		$this->bindParams ( $this->stmt );
 		$this->executeStmt ();
 		
