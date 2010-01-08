@@ -52,6 +52,17 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 					 $this->relationTbl . "." . $this->baseFieldName . "=" . $baseId, "CROSS" );
 		if ($orderBy)
 			$this->orderBy( $this->targetTbl . "." . $orderBy );
+			
+		$this->defStateNumber = $this->state_number;
+	}
+	
+	/**
+	 * Returns relation cache key
+	 *
+	 * @return string
+	 */
+	protected function getCacheKey() {
+		return $this->relationTbl."/".$this->baseFieldName.":".$this->baseId;
 	}
 
 	/**

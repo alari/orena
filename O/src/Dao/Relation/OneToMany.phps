@@ -36,6 +36,17 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 		$this->test( $tbl . "." . $targetField, $baseId );
 		if ($orderBy)
 			$this->orderBy( $tbl . "." . $orderBy );
+			
+		$this->defStateNumber = $this->state_number;
+	}
+	
+	/**
+	 * Returns relation cache key
+	 *
+	 * @return string
+	 */
+	protected function getCacheKey() {
+		return $this->baseClass.".".$this->baseField."-".$this->targetClass.".".$this->targetField.":".$this->baseId;
 	}
 
 	/**
@@ -78,6 +89,9 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
+		if(array_key_exists($this->getCacheKey(), self::$cachedObjects)) {
+			unset(self::$cachedObjects[$this->getCacheKey()]);
+		}
 		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( 
 				$this->baseId );
 	}

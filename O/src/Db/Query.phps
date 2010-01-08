@@ -141,6 +141,13 @@ class O_Db_Query {
 	private $found_rows;
 	
 	/**
+	 * Indicator of query state changes
+	 *
+	 * @var int
+	 */
+	protected $state_number = 0;
+	
+	/**
 	 * Array of tables with deny to prepare statements
 	 *
 	 * @var Array
@@ -228,6 +235,7 @@ class O_Db_Query {
 	 */
 	public function from($table, $alias = null) {
 		array_unshift ( $this->from, $table . ($alias ? " " . $alias : "") );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -240,6 +248,7 @@ class O_Db_Query {
 	 */
 	public function addFrom($table, $alias = null) {
 		$this->from [] = $table . ($alias ? " " . $alias : "");
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -250,6 +259,7 @@ class O_Db_Query {
 	 */
 	public function clearFrom() {
 		$this->from = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -263,6 +273,7 @@ class O_Db_Query {
 	 */
 	public function join($table, $condition, $type = "LEFT") {
 		$this->joins [] = array ("table" => $table, "cond" => $condition, "type" => $type );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -278,6 +289,7 @@ class O_Db_Query {
 		foreach ( $this->joins as $join )
 			if ($join ["table"] == $table)
 				return $this;
+		++$this->state_number;
 		return $this->join ( $table, $condition, $type );
 	}
 	
@@ -288,6 +300,7 @@ class O_Db_Query {
 	 */
 	public function clearJoins() {
 		$this->joins = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -304,6 +317,7 @@ class O_Db_Query {
 		array_shift ( $args );
 		$cond ["params"] = $args;
 		$this->where [] = $cond;
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -314,6 +328,7 @@ class O_Db_Query {
 	 */
 	public function clearWhere() {
 		$this->where = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -327,6 +342,7 @@ class O_Db_Query {
 	 */
 	public function test($field, $value, $type = self::EQ) {
 		$this->where [] = Array ("t" => self::T_WHERE_TEST, "param" => $value, "cond" => $type, "field" => $field );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -337,6 +353,7 @@ class O_Db_Query {
 	 */
 	public function addOr() {
 		$this->where [] = Array ("t" => self::T_WHERE_OR );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -350,6 +367,7 @@ class O_Db_Query {
 	 */
 	public function field($name, $aliasOrValue = null, $asIs = false) {
 		$this->fields [] = array ($name, $aliasOrValue, $asIs );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -360,6 +378,7 @@ class O_Db_Query {
 	 */
 	public function clearFields() {
 		$this->fields = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -374,6 +393,7 @@ class O_Db_Query {
 	 */
 	public function index($field, $type = "key", $name = null) {
 		$this->indexes [] = array ($type, $field, $name );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -385,6 +405,7 @@ class O_Db_Query {
 	 */
 	public function setSqlOption($option) {
 		$this->sql_options [] = $option;
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -396,6 +417,7 @@ class O_Db_Query {
 	 */
 	public function orderBy($field) {
 		$this->orders [] = $field;
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -406,6 +428,7 @@ class O_Db_Query {
 	 */
 	public function clearOrders() {
 		$this->orders = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -417,6 +440,7 @@ class O_Db_Query {
 	 */
 	public function groupBy($field) {
 		$this->group_by [] = $field;
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -427,6 +451,7 @@ class O_Db_Query {
 	 */
 	public function clearGroupBy() {
 		$this->group_by = array ();
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -440,6 +465,7 @@ class O_Db_Query {
 	public function limit($offset = 0, $limit = 0) {
 		$this->limit = ( int ) ($limit ? $limit : $offset);
 		$this->offset = ( int ) ($limit ? $offset : 0);
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -453,6 +479,7 @@ class O_Db_Query {
 		$this->having_condition = $condition;
 		$this->having_params = func_get_args ();
 		array_shift ( $this->having_params );
+		++$this->state_number;
 		return $this;
 	}
 	
@@ -471,8 +498,8 @@ class O_Db_Query {
 	 * @return PDOStatement
 	 */
 	public function select($mode = PDO::FETCH_ASSOC) {
-		$this->stmt = $this->prepareStmt ( $a = $this->prepareSelect () );
-		O_Registry::add("profiler/dbq", $a);
+		$this->stmt = $this->prepareStmt ( $this->prepareSelect () );
+		
 		$this->bindParams ( $this->stmt );
 		$this->executeStmt ();
 		

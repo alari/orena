@@ -87,10 +87,8 @@ class O_Dao_Field_ToMany extends O_Dao_Field_Bases implements O_Dao_Field_iFace,
 	 */
 	public function reload( $obj_id )
 	{
-		O_Registry::startProfiler(__METHOD__."|".$obj_id);
 		if (isset( $this->relations[ $obj_id ] ))
 			unset( $this->relations[ $obj_id ] );
-			O_Registry::stopProfiler(__METHOD__."|".$obj_id);
 	}
 
 	/**
