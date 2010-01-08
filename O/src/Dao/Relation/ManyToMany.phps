@@ -172,6 +172,7 @@ class O_Dao_Relation_ManyToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
+		parent::reload();
 		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( 
 				$this->baseId );
 	}

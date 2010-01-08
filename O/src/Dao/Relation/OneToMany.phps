@@ -89,9 +89,7 @@ class O_Dao_Relation_OneToMany extends O_Dao_Relation_BaseToMany {
 	 */
 	public function reload()
 	{
-		if(array_key_exists($this->getCacheKey(), self::$cachedObjects)) {
-			unset(self::$cachedObjects[$this->getCacheKey()]);
-		}
+		parent::reload();
 		O_Dao_TableInfo::get( $this->baseClass )->getFieldInfo( $this->baseField )->reload( 
 				$this->baseId );
 	}

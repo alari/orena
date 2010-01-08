@@ -78,5 +78,9 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 	 * Reloads the relation, renewes it if it was cached.
 	 *
 	 */
-	abstract public function reload();
+	public function reload(){
+		if(array_key_exists($this->getCacheKey(), self::$cachedObjects)) {
+			unset(self::$cachedObjects[$this->getCacheKey()]);
+		}	
+	}
 }
