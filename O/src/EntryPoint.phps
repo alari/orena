@@ -246,11 +246,12 @@ class O_EntryPoint {
 	 */
 	static private function processAppConfig()
 	{
+		$app_name = O_Registry::get( "app/name" );
+		
 		if (is_file( "./Apps/" . $app_name . "/Conf/Registry.conf" )) {
 			O_Registry::parseFile( "./Apps/" . $app_name . "/Conf/Registry.conf", "app" );
 		}
 		
-		$app_name = O_Registry::get( "app/name" );
 		if (!is_file( "./Apps/" . $app_name . "/Conf/Urls.conf" ))
 			return false;
 		
