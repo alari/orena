@@ -24,16 +24,16 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 */
 	public function can( $action, O_Dao_ActiveRecord $resourse = null )
 	{
-		$key = $action.($resourse?"/".get_class($resourse).":".$resourse["id"]:"");
+		$cache_key = $action.($resourse?"/".get_class($resourse).":".$resourse["id"]:"");
 		if(array_key_exists($key, $this->acl_cache)){
-			O_Registry::add("profiler/aclreq", "req $key ".($this->acl_cache[$key]?"passed":"failed")." cache");
-			return $this->acl_cache[$key];
+			O_Registry::add("profiler/aclreq", "req $cache_key ".($this->acl_cache[$cache_key]?"passed":"failed")." cache");
+			return $this->acl_cache[$cache_key];
 		}
 		
 		// Role overrides resourse context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
-			O_Registry::add("profiler/aclreq", "req $key ".($access?"passed":"failed")." native");
-			return $this->acl_cache[$key] = $access;
+			O_Registry::add("profiler/aclreq", "req $cache_key ".($access?"passed":"failed")." native");
+			return $this->acl_cache[$cache_key] = $access;
 		}
 
 		// Getting context role for resourse
@@ -44,17 +44,17 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				foreach ($registry as $key=>$params) {
 					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
 					if (!is_null( $access )){
-						O_Registry::add("profiler/aclreq", "req $key ".($access?"passed":"failed")." acl");
-						return $this->acl_cache[$key] = $access;
+						O_Registry::add("profiler/aclreq", "req $cache_key ".($access?"passed":"failed")." acl");
+						return $this->acl_cache[$cache_key] = $access;
 					}
 				}
 			}
 		}
 
-		O_Registry::add("profiler/aclreq", "req $key failed et al");
+		O_Registry::add("profiler/aclreq", "req $cache_key failed et al");
 		
 		// No rules available et al
-		return $this->acl_cache[$key] = null;
+		return $this->acl_cache[$cache_key] = null;
 	}
 
 	/**
