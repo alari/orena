@@ -25,7 +25,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	public function can( $action, O_Dao_ActiveRecord $resourse = null )
 	{
 		$cache_key = $action.($resourse?"/".get_class($resourse).":".$resourse["id"]:"");
-		if(array_key_exists($key, $this->acl_cache)){
+		if(array_key_exists($cache_key, $this->acl_cache)){
 			O_Registry::add("profiler/aclreq", "req $cache_key ".($this->acl_cache[$cache_key]?"passed":"failed")." cache");
 			return $this->acl_cache[$cache_key];
 		}
