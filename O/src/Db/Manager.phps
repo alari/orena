@@ -19,6 +19,7 @@ class O_Db_Manager {
 	 */
 	static protected function connect( Array $conf, $conn_id = self::CONN_DEFAULT )
 	{
+		try {
 		$dsn = $conf[ "engine" ] . ":";
 		$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
 		$pass = isset( $conf[ "password" ] ) ? $conf[ "password" ] : "";
@@ -27,6 +28,9 @@ class O_Db_Manager {
 				$dsn .= $k . '=' . $v . ';';
 		
 		return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
+		} catch(PDOException $e) {
+			throw new O_Ex_Critical("PDO connection error: ".$e->getMessage());
+		}
 	}
 
 	/**
