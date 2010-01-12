@@ -6,6 +6,7 @@ require_once 'Registry.phps';
  *
  * Class manager stores information about class paths and extensions in "fw/classmanager/prefix" registry key,
  * loaded classes can be found in "fw/classmanager/loaded" key.
+ * "fw/classnamager/default_folder" -- default folder for inclusions
  *
  * @see O_Registry
  * @todo set up and document simple interface to add class prefixes by Registry config
@@ -59,16 +60,9 @@ class O_ClassManager {
 			}
 		}
 		if (!$file) {
-			$file = str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
+			$file = O_Registry::get("fw/classmanager/default_folder").str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
-		try {
-			$f = @fopen( $file, "r", true );
-		}
-		catch (Exception $e) {
-			$f = 0;
-		}
-		if ($f) {
-			fclose( $f );
+		if (is_readable($file)) {
 			require $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 			if (class_exists( $class )) {
@@ -84,5 +78,5 @@ class O_ClassManager {
 
 // Register autoloader and Orena Framework source files
 spl_autoload_register( "O_ClassManager::load" );
-O_ClassManager::registerPrefix( "O", dirname( __FILE__ ), "phps" );
-set_include_path( dirname( __FILE__ ) . "/../inc/" . PATH_SEPARATOR . get_include_path() );
+O_ClassManager::registerPrefix( "O", __DIR__, "phps" );
+O_Registry::set("fw/classmanager/default_folder", O_DOC_ROOT."/O/inc/");
