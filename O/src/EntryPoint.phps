@@ -21,6 +21,8 @@ require_once 'ClassManager.phps';
  */
 class O_EntryPoint {
 
+	static private $APPS_DIR;
+	
 	/**
 	 * Processes request and echoes response.
 	 *
@@ -35,6 +37,8 @@ class O_EntryPoint {
 	{
 		try {
 			O_Registry::set( "start-time", microtime( true ) );
+			
+			self::$APPS_DIR = O_DOC_ROOT."/Apps";
 			
 			// Preparing environment
 			self::prepareEnvironment();
@@ -124,8 +128,8 @@ class O_EntryPoint {
 	static public function selectApp()
 	{
 		// Find application in central applications conditions
-		if (is_file( "./Apps/Conditions.conf" )) {
-			$configs = O_Registry::parseFile( "./Apps/Conditions.conf" );
+		if (is_file( self::$APPS_DIR."/Conditions.conf" )) {
+			$configs = O_Registry::parseFile( self::$APPS_DIR."/Conditions.conf" );
 			foreach ($configs as $app => $cond) {
 				if (self::processConditions( $cond, $app )) {
 					return true;
@@ -133,13 +137,13 @@ class O_EntryPoint {
 			}
 		}
 		// Look into applications directories
-		$d = opendir( "./Apps" );
+		$d = opendir( self::$APPS_DIR."" );
 		while ($f = readdir( $d )) {
 			if ($f == "." || $f == "..")
 				continue;
-			if (!is_dir( "./Apps/" . $f ) || !is_file( "./Apps/" . $f . "/Conf/Conditions.conf" ))
+			if (!is_dir( self::$APPS_DIR."/" . $f ) || !is_file( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" ))
 				continue;
-			$cond = O_Registry::parseFile( "./Apps/" . $f . "/Conf/Conditions.conf" );
+			$cond = O_Registry::parseFile( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" );
 			if (self::processConditions( $cond, $f )) {
 				return true;
 			}
@@ -167,7 +171,7 @@ class O_EntryPoint {
 		
 		foreach ($cond[ "conditions" ] as $mode => $c) {
 			if (self::processCondRules( $c )) {
-				O_ClassManager::registerPrefix( $app_prefix, "./Apps/" . $app_name, $app_ext );
+				O_ClassManager::registerPrefix( $app_prefix, self::$APPS_DIR."/" . $app_name, $app_ext );
 				O_Registry::set( "app/class_prefix", $app_prefix );
 				O_Registry::set( "app/name", $app_name );
 				O_Registry::set( "app/mode", $mode );
@@ -239,8 +243,8 @@ class O_EntryPoint {
 	 * Processes current application configs.
 	 *
 	 * Gets application name from registry key "app/name"
-	 * Parses config allocated in "./Apps/{APP_NAME}/Conf/Registry.conf"
-	 * and "./Apps/{APP_NAME}/Conf/Urls.conf"
+	 * Parses config allocated in self::$APPS_DIR."/{APP_NAME}/Conf/Registry.conf"
+	 * and self::$APPS_DIR."/{APP_NAME}/Conf/Urls.conf"
 	 *
 	 * @throws O_Ex_Critical
 	 */
@@ -248,14 +252,14 @@ class O_EntryPoint {
 	{
 		$app_name = O_Registry::get( "app/name" );
 		
-		if (is_file( "./Apps/" . $app_name . "/Conf/Registry.conf" )) {
-			O_Registry::parseFile( "./Apps/" . $app_name . "/Conf/Registry.conf", "app" );
+		if (is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf" )) {
+			O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf", "app" );
 		}
 		
-		if (!is_file( "./Apps/" . $app_name . "/Conf/Urls.conf" ))
+		if (!is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" ))
 			return false;
 		
-		$conf = O_Registry::parseFile( "./Apps/" . $app_name . "/Conf/Urls.conf" );
+		$conf = O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" );
 		
 		foreach ($conf as $key => $params) {
 			self::processUrlsConfPart( $key, $params );
@@ -351,7 +355,7 @@ class O_EntryPoint {
 	 */
 	static public function processFwConfig()
 	{
-		$src = is_file( "./Apps/Orena.fw.conf" ) ? "./Apps/Orena.fw.conf" : "./O/src/Orena.fw.conf";
+		$src = is_file( self::$APPS_DIR."/Orena.fw.conf" ) ? self::$APPS_DIR."/Orena.fw.conf" : __DIR__."/Orena.fw.conf";
 		if (!is_file( $src ))
 			throw new O_Ex_Critical( "Cannot find framework configuration file." );
 		O_Registry::parseFile( $src, "fw" );
