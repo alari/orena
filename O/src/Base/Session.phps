@@ -240,3 +240,4 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 
 O_ClassManager::registerClassLoadedCallback( array ("O_Base_Session", "registerHandler"),
 		O_Registry::get( "app/classnames/session" ) );
+register_shutdown_function(array("O_Base_Session", "close"));
