@@ -46,11 +46,6 @@ class O_Registry {
 				continue;
 			}
 			// Value not found, trying to get it from parents
-			if(isset(self::$inheritance[$keys[0]])) {
-				$key = self::$inheritance[$keys[0]].(count ( $keys ) > 1 ? "/" . join ( "/", array_slice ( $keys, 1 ) ) : "");
-				return self::get($key);
-			}
-			/*
 			for($j = count ( $keys ); $j > 0; $j --) {
 				$_key = join ( "/", array_slice ( $keys, 0, $j ) );
 				if (isset ( self::$inheritance [$_key] )) {
@@ -58,7 +53,8 @@ class O_Registry {
 					return self::get ( $key );
 				} else
 					continue;
-			}*/
+			}
+			// I really cannot understand how it works
 			if (! $key) {
 				return $value;
 			}
