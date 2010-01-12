@@ -1,4 +1,3 @@
 <?php
-require "Registry.phps";
-require "ClassManager.phps";
+echo "THERE";
 __HALT_COMPILER();
