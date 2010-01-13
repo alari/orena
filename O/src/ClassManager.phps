@@ -80,3 +80,4 @@ class O_ClassManager {
 spl_autoload_register( "O_ClassManager::load" );
 O_ClassManager::registerPrefix( "O", __DIR__, "phps" );
 O_Registry::set("fw/classmanager/default_folder", O_DOC_ROOT."/O/inc/");
+set_include_path(O_DOC_ROOT."/O/inc/".PATH_SEPARATOR.get_include_path());
