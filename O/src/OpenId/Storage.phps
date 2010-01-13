@@ -1,7 +1,5 @@
 <?php
-echo "a";
 require_once 'Auth/OpenID/Interface.php';
-echo "b";
 /**
  *
  */
