@@ -62,6 +62,7 @@ class O_ClassManager {
 		if (!$file) {
 			$file = O_Registry::get("fw/classmanager/default_folder").str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
+
 		if (is_readable($file)) {
 			require $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
