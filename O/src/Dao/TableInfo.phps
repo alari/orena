@@ -67,7 +67,7 @@ class O_Dao_TableInfo {
 	/**
 	 * Tail directives for concrete sql table
 	 *
-	 * @var unknown_type
+	 * @var string
 	 */
 	private $tail = "";
 	
