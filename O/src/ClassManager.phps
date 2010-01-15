@@ -62,9 +62,18 @@ class O_ClassManager {
 		if (!$file) {
 			$file = O_Registry::get("fw/classmanager/default_folder").str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
+		if(!is_readable($file)) {
+			$packages = O_Registry::get("fw/packages");
+			foreach($package as $file => $pattern) {
+				if((is_array($pattern) && in_array($class, $pattern))||strpos($class, $pattern)===0){
+					$file = O_Registry::get( "fw/classmanager/prefix/O/folder").str_replace(" ", "/", $file);
+					include $file;
+				}
+			}
+		}
 
-		if (is_readable($file)) {
-			require $file;
+		else {
+			include $file;
 			O_Registry::set( "fw/classmanager/loaded/$class", $file );
 			if (class_exists( $class )) {
 				$callbacks = O_Registry::get( "fw/classmanager/callback/$class" );
