@@ -50,6 +50,10 @@ class O_Profiler {
 	}
 
 	static public function getStat() {
+		$time = self::getTotal();
+		foreach(self::$stat as &$v) {
+			$v["_"] = (100*round($v["time"]/$time, 4))."%";
+		}
 		return self::$stat;
 	}
 
