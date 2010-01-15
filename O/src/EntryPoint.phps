@@ -1,5 +1,6 @@
 <?php
 // We need to require it manually
+require_once 'Profiler.phps';
 require_once 'ClassManager.phps';
 /**
  * Processes request -- from url and host parsing to response echoing.
@@ -22,7 +23,7 @@ require_once 'ClassManager.phps';
 class O_EntryPoint {
 
 	static private $APPS_DIR;
-	
+
 	/**
 	 * Processes request and echoes response.
 	 *
@@ -37,28 +38,28 @@ class O_EntryPoint {
 	{
 		try {
 			O_Registry::set( "start-time", microtime( true ) );
-			
+
 			self::$APPS_DIR = O_DOC_ROOT."/Apps";
-			
+
 			// Preparing environment
 			self::prepareEnvironment();
-			
+
 			// At first we parse framework registry config
 			self::processFwConfig();
-			
+
 			// Then we handle applications to select what to run
 			self::selectApp();
-			
+
 			// Parsing application registry
 			self::processAppConfig();
-			
+
 			// TODO: get locale from registry
 			setlocale( LC_ALL, "ru_RU.UTF8" );
-			
+
 			if (O_Registry::get( "app/mode" ) == "development") {
 				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
 			}
-			
+
 			// Prepare and echo response
 			return self::makeResponse();
 		}
@@ -98,18 +99,18 @@ class O_EntryPoint {
 		if (strpos( $url, "?" ))
 			$url = substr( $url, 0, strpos( $url, "?" ) );
 		O_Registry::set( "env/request_url", $url );
-		
+
 		// Saving HTTP_HOST value
 		O_Registry::set( "env/http_host", $_SERVER[ 'HTTP_HOST' ] );
 		// Request method
 		O_Registry::set( "env/request_method", $_SERVER[ 'REQUEST_METHOD' ] );
-		
+
 		// Setting registry inheritance
 		O_Registry::setInheritance( "fw", "app" );
-		
+
 		// Adding request params to env/request registry
 		O_Registry::set( "env/params", array_merge( $_POST, $_GET ) );
-		
+
 		// Base URL
 		O_Registry::set( "env/base_url", "/" );
 	}
@@ -153,7 +154,7 @@ class O_EntryPoint {
 
 	/**
 	 * Processes application conditions array as mode=>conf
-	 * 
+	 *
 	 * @param array $cond
 	 * @param string $app_name
 	 * @return bool
@@ -165,17 +166,17 @@ class O_EntryPoint {
 		$app_ext = isset( $cond[ "ext" ] ) ? $cond[ "ext" ] : null;
 		if (!$app_ext)
 			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
-		
+
 		if (!$app_prefix || !$app_name)
 			throw new O_Ex_Config( "Application without name or class prefix cannot be processed." );
-		
+
 		foreach ($cond[ "conditions" ] as $mode => $c) {
 			if (self::processCondRules( $c )) {
 				O_ClassManager::registerPrefix( $app_prefix, self::$APPS_DIR."/" . $app_name, $app_ext );
 				O_Registry::set( "app/class_prefix", $app_prefix );
 				O_Registry::set( "app/name", $app_name );
 				O_Registry::set( "app/mode", $mode );
-				
+
 				if (isset( $c[ "registry" ] ) && is_array( $c[ "registry" ] )) {
 					foreach ($c[ "registry" ] as $rootkey => $values) {
 						if (is_array( $values )) {
@@ -185,9 +186,9 @@ class O_EntryPoint {
 						}
 					}
 				}
-				
+
 				O_Registry::set( "env/process_url", substr( O_Registry::get( "env/request_url" ), strlen( O_Registry::get( "env/base_url" ) ) ) );
-				
+
 				return true;
 			}
 		}
@@ -196,7 +197,7 @@ class O_EntryPoint {
 
 	/**
 	 * Processes app-selecting condition rules
-	 * 
+	 *
 	 * @param array $cond
 	 * #return bool
 	 */
@@ -204,7 +205,7 @@ class O_EntryPoint {
 	{
 		if ($cond[ "pattern" ] == "any")
 			return true;
-		
+
 		foreach ($cond[ "pattern" ] as $name => $part) {
 			switch ($name) {
 				// Checks if url starts with "base" attribute or matches "pattern"
@@ -251,20 +252,20 @@ class O_EntryPoint {
 	static private function processAppConfig()
 	{
 		$app_name = O_Registry::get( "app/name" );
-		
+
 		if (is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf" )) {
 			O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf", "app" );
 		}
-		
+
 		if (!is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" ))
 			return false;
-		
+
 		$conf = O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" );
-		
+
 		foreach ($conf as $key => $params) {
 			self::processUrlsConfPart( $key, $params );
 		}
-		
+
 		// Processing class uses
 		$uses = O_Registry::get( "app/uses" );
 		if (is_array( $uses ))
@@ -274,7 +275,7 @@ class O_EntryPoint {
 
 	/**
 	 * Processes part of Urls.conf configuration file
-	 * 
+	 *
 	 * @param string $key
 	 * @param mixed $params
 	 * @param array $pockets
@@ -315,7 +316,7 @@ class O_EntryPoint {
 				foreach ($params as $k => $v) {
 					self::processUrlsConfPart( $k, $v );
 				}
-			
+
 			break;
 			// Parses hostname with pattern, processes child nodes if matches
 			case "host" :
@@ -389,10 +390,10 @@ class O_EntryPoint {
 				$cmd_name = str_replace( " ", "_", ucwords( $cmd_name ) );
 			}
 		}
-		
+
 		$plugin_name = O_Registry::get( "app/plugin_name" );
 		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
-		
+
 		if (!O_Registry::get( "app/command_full" )) {
 			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
 			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
@@ -404,7 +405,7 @@ class O_EntryPoint {
 			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
 			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
 		}
-		
+
 		if (class_exists( $cmd_class, true )) {
 			$cmd = new $cmd_class( );
 			if ($cmd instanceof O_Command) {
@@ -413,7 +414,7 @@ class O_EntryPoint {
 				return true;
 			}
 		}
-		
+
 		// Else create O_Html_Template
 		if (class_exists( $tpl_class, true )) {
 			$tpl = new $tpl_class( );
