@@ -68,10 +68,7 @@ class O_ClassManager {
 				if((is_array($pattern) && in_array($class, $pattern))||strpos($class, $pattern)===0){
 					$file = O_Registry::get( "fw/classmanager/prefix/O/folder").str_replace(" ", "/", $file).".". O_Registry::get( "fw/classmanager/prefix/O/ext");
 					if(is_readable($file)){
-						echo "package $file had been found";
 						include $file;
-					} else {
-						echo "package $file is not readable";
 					}
 				}
 			}
