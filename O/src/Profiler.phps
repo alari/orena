@@ -15,14 +15,8 @@ class O_Profiler {
 
 	static public function start($name=null){
 		if(!self::$isLaunched) return;
-		$delta = microtime();
 		if(!$name) {
-			$d = debug_backtrace();
-			$d = $d[1];
-			$name = $d["function"];
-			if(array_key_exists("class", $d)){
-				$name = $d["class"]."::".$name;
-			}
+			$name = self::getName();
 		}
 		if(!isset(self::$stat[$name])) {
 			self::$stat[$name] = Array("calls"=>1, "time"=>0);
@@ -36,7 +30,7 @@ class O_Profiler {
 		if(!self::$isLaunched) return;
 		$delta = microtime(true);
 		if(!$name) {
-
+			$name = self::getName();
 		}
 		$delta -= self::$starts[$name];
 		self::$stat[$name]["time"] += $delta;
