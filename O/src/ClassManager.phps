@@ -64,7 +64,7 @@ class O_ClassManager {
 		}
 		if(!is_readable($file)) {
 			$packages = O_Registry::get("fw/packages");
-			foreach($package as $file => $pattern) {
+			foreach($packages as $file => $pattern) {
 				if((is_array($pattern) && in_array($class, $pattern))||strpos($class, $pattern)===0){
 					$file = O_Registry::get( "fw/classmanager/prefix/O/folder").str_replace(" ", "/", $file).".". O_Registry::get( "fw/classmanager/prefix/O/ext");
 					include $file;
