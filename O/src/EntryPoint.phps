@@ -1,7 +1,7 @@
 <?php
 // We need to require it manually
-require_once 'Profiler.phps';
-require_once 'ClassManager.phps';
+require 'Profiler.phps';
+require 'ClassManager.phps';
 /**
  * Processes request -- from url and host parsing to response echoing.
  *

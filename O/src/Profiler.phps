@@ -5,7 +5,7 @@
  *
  */
 class O_Profiler {
-	static private $isLaunched = 0;
+	static private $isLaunched = 1;
 
 	static private $starts = Array();
 
