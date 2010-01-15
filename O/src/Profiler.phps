@@ -31,6 +31,7 @@ class O_Profiler {
 
 	static public function stop($name=null){
 		if(!self::$isLaunched) return;
+		$delta = microtime(true);
 		if(!$name) {
 			$d = debug_backtrace();
 			$d = $d[1];
@@ -39,7 +40,7 @@ class O_Profiler {
 				$name = $d["class"]."::".$name;
 			}
 		}
-		$delta = microtime(true) - self::$starts[$name];
+		$delta -= self::$starts[$name];
 		self::$stat[$name]["time"] += $delta;
 		return $delta;
 	}
