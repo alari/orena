@@ -14,7 +14,7 @@ class O_Db_Query {
 	 * @see Query::setSqlOption(), Query::prepareSelect()
 	 */
 	protected $sql_options = array ();
-	
+
 	/**
 	 * Array of join conditions
 	 *
@@ -22,7 +22,7 @@ class O_Db_Query {
 	 * @see Query::join(), Query::prepareFrom()
 	 */
 	protected $joins = array ();
-	
+
 	/**
 	 * Array of WHERE parameters
 	 *
@@ -30,7 +30,7 @@ class O_Db_Query {
 	 * @see Query::where(), Query::test(), Query::prepareWhere()
 	 */
 	protected $where = array ();
-	
+
 	/**
 	 * Array of fields to select/update/insert/create table
 	 *
@@ -38,7 +38,7 @@ class O_Db_Query {
 	 * @see Query::field(), Query::prepareInsert(), Query::prepareUpdate(), Query::prepareSelect(), Query::prepareCreate
 	 */
 	protected $fields = array ();
-	
+
 	/**
 	 * Array of indexes to create table
 	 *
@@ -46,7 +46,7 @@ class O_Db_Query {
 	 * @see Query::index(), Query::prepareCreate()
 	 */
 	protected $indexes = array ();
-	
+
 	/**
 	 * Array of fields to sort by
 	 *
@@ -54,7 +54,7 @@ class O_Db_Query {
 	 * @see Query::orderBy(), Query::prepareTail()
 	 */
 	protected $orders = array ();
-	
+
 	/**
 	 * Array of fields to group by
 	 *
@@ -62,7 +62,7 @@ class O_Db_Query {
 	 * @see Query::groupBy(), Query::prepareTail()
 	 */
 	protected $group_by = array ();
-	
+
 	/**
 	 * Limit by
 	 *
@@ -77,7 +77,7 @@ class O_Db_Query {
 	 * @see Query::limit(), Query::prepareTail()
 	 */
 	protected $offset = 0;
-	
+
 	/**
 	 * Condition to execute after query
 	 *
@@ -92,7 +92,7 @@ class O_Db_Query {
 	 * @see Query::having(), Query::prepareTail()
 	 */
 	protected $having_params = array ();
-	
+
 	/**
 	 * Array of params used to execute query
 	 *
@@ -101,7 +101,7 @@ class O_Db_Query {
 	 * @access private
 	 */
 	protected $params = array ();
-	
+
 	/**
 	 * ID of database connection
 	 *
@@ -110,7 +110,7 @@ class O_Db_Query {
 	 * @access private
 	 */
 	protected $db_conn = O_Db_Manager::CONN_DEFAULT;
-	
+
 	/**
 	 * Last executed statement object
 	 *
@@ -118,48 +118,48 @@ class O_Db_Query {
 	 * @access private
 	 */
 	protected $stmt;
-	
+
 	/**
 	 * Prepared statements
 	 *
 	 * @var PDOStatement[]
 	 */
 	protected static $prepared_stmts = Array ();
-	
+
 	/**
 	 * Line of tables used in query
 	 *
 	 * @var string
 	 */
 	protected $tables = "";
-	
+
 	/**
 	 * Cached calculation of rows found
 	 *
 	 * @var int
 	 */
 	private $found_rows;
-	
+
 	/**
 	 * Indicator of query state changes
 	 *
 	 * @var int
 	 */
 	protected $state_number = 0;
-	
+
 	/**
 	 * Array of tables with deny to prepare statements
 	 *
 	 * @var Array
 	 */
 	protected static $disable_preparing = Array ();
-	
+
 	/**
 	 * @see Query::setSqlOption()
 	 */
 	const CALC_FOUND_ROWS = "SQL_CALC_FOUND_ROWS";
 	const CACHE = "SQL_CACHE";
-	
+
 	/**
 	 * @see Query::test()
 	 */
@@ -173,14 +173,14 @@ class O_Db_Query {
 	const LT_EQ = "<=";
 	const EXISTS = " EXISTS ";
 	const LIKE = " LIKE ";
-	
+
 	/**
 	 * @access private
 	 */
 	const T_WHERE_SIMPLE = 1;
 	const T_WHERE_TEST = 2;
 	const T_WHERE_OR = 3;
-	
+
 	/**
 	 * Query constructor
 	 *
@@ -194,7 +194,7 @@ class O_Db_Query {
 		}
 		$this->db_conn = $db_conn;
 	}
-	
+
 	/**
 	 * Shortcut for constructor
 	 *
@@ -206,7 +206,7 @@ class O_Db_Query {
 	static public function get($table, $alias = null, $db_conn = O_Db_Manager::CONN_DEFAULT) {
 		return new self ( $table, $alias, $db_conn );
 	}
-	
+
 	/**
 	 * Checks if table exists in database
 	 *
@@ -225,7 +225,7 @@ class O_Db_Query {
 		$stmt->execute ();
 		return ( bool ) count ( $stmt->fetchAll () );
 	}
-	
+
 	/**
 	 * Adds table to the beginning of FROM
 	 *
@@ -238,7 +238,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Joins table by adding it at the end of FROM
 	 *
@@ -251,7 +251,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Removes all tables from FROM section
 	 *
@@ -262,7 +262,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Processes any JOIN condition
 	 *
@@ -276,7 +276,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Joins the table if it's not already joined
 	 *
@@ -292,7 +292,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this->join ( $table, $condition, $type );
 	}
-	
+
 	/**
 	 * Removes all JOIN tables
 	 *
@@ -303,7 +303,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Any WHERE condition
 	 *
@@ -320,7 +320,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Removes all conditions from WHERE
 	 *
@@ -331,7 +331,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * WHERE condition with two fields and one operator
 	 *
@@ -345,7 +345,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds OR in condition
 	 *
@@ -356,7 +356,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Processes field to UPDATE, SELECT or INSERT it
 	 *
@@ -370,7 +370,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Removes all fields
 	 *
@@ -381,7 +381,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds a key to CREATE TABLE
 	 *
@@ -396,7 +396,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds SQL SELECT options like SQL_CACHE or SQL_CALC_FOUND_ROWS
 	 *
@@ -408,7 +408,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds a field to order by
 	 *
@@ -420,7 +420,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Removes all OrderBy fields
 	 *
@@ -431,7 +431,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds field to GROUP BY condition
 	 *
@@ -443,7 +443,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Clears all GroupBy fields
 	 *
@@ -454,7 +454,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Adds offset/limit to SELECT / UPDATE query
 	 *
@@ -468,7 +468,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * WHERE-like condition to process after whole query
 	 *
@@ -482,7 +482,7 @@ class O_Db_Query {
 		++$this->state_number;
 		return $this;
 	}
-	
+
 	/**
 	 * Returns number of founded rows for SQL_CALC_FOUND_ROWS
 	 *
@@ -491,7 +491,7 @@ class O_Db_Query {
 	public function getFoundRows() {
 		return $this->found_rows ? $this->found_rows : $this->conn ()->query ( "SELECT FOUND_ROWS()" )->fetchColumn ();
 	}
-	
+
 	/**
 	 * Processes builded SELECT
 	 *
@@ -499,20 +499,20 @@ class O_Db_Query {
 	 */
 	public function select($mode = PDO::FETCH_ASSOC) {
 		$this->stmt = $this->prepareStmt ( $this->prepareSelect () );
-		
+
 		$this->bindParams ( $this->stmt );
 		$this->executeStmt ();
-		
+
 		if (in_array ( self::CALC_FOUND_ROWS, $this->sql_options )) {
 			$this->found_rows = 0;
 			$this->found_rows = $this->getFoundRows ();
 		}
-		
+
 		$this->stmt->setFetchMode ( $mode );
-		
+
 		return $this->stmt;
 	}
-	
+
 	/**
 	 * CREATE TABLE
 	 *
@@ -521,12 +521,12 @@ class O_Db_Query {
 	 */
 	public function create($tail = "") {
 		$this->stmt = $this->conn ()->prepare ( $this->prepareCreate ( $tail ) );
-		
+
 		$this->executeStmt ();
-		
+
 		return $this->stmt;
 	}
-	
+
 	/**
 	 * Executes ALTER TABLE query with ONE action for each field/index
 	 *
@@ -535,12 +535,12 @@ class O_Db_Query {
 	 */
 	public function alter($command = "ADD") {
 		$this->stmt = $this->conn ()->prepare ( $this->prepareAlter ( $command ) );
-		
+
 		$this->executeStmt ();
-		
+
 		return $this->stmt;
 	}
-	
+
 	/**
 	 * Processes builded UPDATE
 	 *
@@ -548,13 +548,13 @@ class O_Db_Query {
 	 */
 	public function update() {
 		$this->stmt = $this->prepareStmt ( $this->prepareUpdate () );
-		
+
 		$this->bindParams ( $this->stmt );
 		$this->executeStmt ();
-		
+
 		return $this->stmt->rowCount ();
 	}
-	
+
 	/**
 	 * Deletes matching rows
 	 *
@@ -562,13 +562,13 @@ class O_Db_Query {
 	 */
 	public function delete() {
 		$this->stmt = $this->prepareStmt ( $this->prepareDelete () );
-		
+
 		$this->bindParams ( $this->stmt );
 		$this->executeStmt ();
-		
+
 		return $this->stmt->rowCount ();
 	}
-	
+
 	/**
 	 * Processes builded INSERT
 	 *
@@ -577,26 +577,26 @@ class O_Db_Query {
 	 */
 	public function insert($returnLastId = true) {
 		$this->stmt = $this->prepareStmt ( $this->prepareInsert () );
-		
+
 		$this->bindParams ( $this->stmt );
-		
+
 		$this->executeStmt ();
-		
+
 		return $returnLastId ? $this->conn ()->lastInsertId () : $this->stmt->rowCount ();
 	}
-	
+
 	/**
 	 * Executes statement $this->stmt, counts time needed for execution
 	 *
 	 * @return mixed
 	 */
 	private function executeStmt() {
-		O_Registry::startProfiler(__METHOD__);
+		O_Profiler::start();
 		$r = $this->stmt->execute ();
-		O_Registry::stopProfiler(__METHOD__);
+		O_Profiler::stop();
 		return $r;
 	}
-	
+
 	/**
 	 * Disables statements preparing for particular table use
 	 *
@@ -606,7 +606,7 @@ class O_Db_Query {
 		if (! in_array ( $table, self::$disable_preparing ))
 			self::$disable_preparing [] = $table;
 	}
-	
+
 	/**
 	 * Returns prepared statement to execute
 	 *
@@ -625,7 +625,7 @@ class O_Db_Query {
 		}
 		return self::$prepared_stmts [$query];
 	}
-	
+
 	/**
 	 * Binds param values to execute query
 	 *
@@ -647,7 +647,7 @@ class O_Db_Query {
 				$query->bindValue ( $k + 1, $v );
 		}
 	}
-	
+
 	/**
 	 * Returns connection assotiated with this query
 	 *
@@ -656,7 +656,7 @@ class O_Db_Query {
 	protected function conn() {
 		return O_Db_Manager::getConnection ( $this->db_conn );
 	}
-	
+
 	/**
 	 * Prepares CREATE TABLE
 	 *
@@ -672,10 +672,10 @@ class O_Db_Query {
 			$query .= ",\n" . $v [0] . ($v [2] ? " `{$v[2]}` " : "") . "(" . $v [1] . ")";
 		}
 		$query .= ") " . $tail;
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares ALTER TABLE
 	 *
@@ -690,10 +690,10 @@ class O_Db_Query {
 		foreach ( $this->indexes as $k => $v ) {
 			$query .= ($k || count ( $this->fields ) ? ",\n" : "") . $cmd . " " . $v [0] . ($v [2] ? " `{$v[2]}` " : "") . "(" . $v [1] . ")";
 		}
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares INSERT query string and params
 	 *
@@ -702,14 +702,14 @@ class O_Db_Query {
 	 */
 	public function prepareInsert() {
 		$this->params = array ();
-		
+
 		$query = "INSERT INTO " . $this->from [0];
-		
+
 		if (! count ( $this->fields ))
 			return $query . "() VALUES()";
-		
+
 		$query .= " SET ";
-		
+
 		foreach ( $this->fields as $k => $v ) {
 			$query .= ($k ? ", " : "") . $v [0] . "=";
 			if ($v [2]) {
@@ -719,10 +719,10 @@ class O_Db_Query {
 				$this->params [] = $v [1];
 			}
 		}
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares UPDATE query string and params
 	 *
@@ -730,13 +730,13 @@ class O_Db_Query {
 	 */
 	protected function prepareUpdate() {
 		$this->params = array ();
-		
+
 		$query = "UPDATE ";
 		foreach ( $this->from as $k => $v ) {
 			$query .= ($k ? ", " : "") . $v;
 		}
 		$query .= " SET ";
-		
+
 		foreach ( $this->fields as $k => $v ) {
 			$query .= ($k ? ", " : "") . $v [0] . "=";
 			if ($v [2]) {
@@ -746,12 +746,12 @@ class O_Db_Query {
 				$this->params [] = $v [1];
 			}
 		}
-		
+
 		$this->prepareWhere ( $query );
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares DELETE query
 	 *
@@ -759,13 +759,13 @@ class O_Db_Query {
 	 */
 	protected function prepareDelete() {
 		$this->params = array ();
-		
+
 		$query = "DELETE";
 		$this->prepareFrom ( $query );
-		
+
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares SELECT query string and params
 	 *
@@ -773,7 +773,7 @@ class O_Db_Query {
 	 */
 	public function prepareSelect() {
 		$this->params = array ();
-		
+
 		$query = "SELECT ";
 		foreach ( $this->sql_options as $option ) {
 			$query .= $option . " ";
@@ -790,11 +790,11 @@ class O_Db_Query {
 				$tbl = "";
 			$query .= $tbl . "*";
 		}
-		
+
 		$this->prepareFrom ( $query );
 		return $query;
 	}
-	
+
 	/**
 	 * Prepares query from FROM to end
 	 *
@@ -814,7 +814,7 @@ class O_Db_Query {
 		}
 		$this->prepareWhere ( $query );
 	}
-	
+
 	/**
 	 * Prepares query from WHERE to end
 	 *
@@ -822,13 +822,13 @@ class O_Db_Query {
 	 * @access private
 	 */
 	protected function prepareWhere(&$query) {
-		
+
 		if (count ( $this->where )) {
 			$query .= " WHERE ";
-			
+
 			$where = "";
 			$was_or = false;
-			
+
 			foreach ( $this->where as $k => $v ) {
 				switch ($v ["t"]) {
 					case self::T_WHERE_SIMPLE :
@@ -872,17 +872,17 @@ class O_Db_Query {
 						break;
 				}
 			}
-			
+
 			if ($was_or)
 				$where = "($where)";
-			
+
 			$query .= $where;
-		
+
 		}
-		
+
 		$this->prepareTail ( $query );
 	}
-	
+
 	/**
 	 * Prepares group by, orders, limits and having
 	 *
@@ -896,21 +896,21 @@ class O_Db_Query {
 				$query .= ($k ? ", " : "") . $v;
 			}
 		}
-		
+
 		if (count ( $this->group_by )) {
 			$query .= " GROUP BY ";
 			foreach ( $this->group_by as $k => $v ) {
 				$query .= ($k ? ", " : "") . $v;
 			}
 		}
-		
+
 		if ($this->limit) {
 			$query .= " LIMIT " . ($this->offset ? $this->offset . ", " : "") . $this->limit;
 		}
-		
+
 		if ($this->having_condition) {
 			$query .= " HAVING " . $this->having_condition;
-			
+
 			foreach ( $this->having_params as $p ) {
 				$this->params [] = $p;
 			}

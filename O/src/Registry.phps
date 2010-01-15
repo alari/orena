@@ -7,7 +7,7 @@
  * fw:
  * db:
  * env:
- * 
+ *
  * @author Dmitry Kurinskiy
  */
 class O_Registry {
@@ -17,14 +17,14 @@ class O_Registry {
 	 * @var Array
 	 */
 	public static $registry = Array ();
-	
+
 	/**
 	 * Inheritance dependencies between registry keys
 	 *
 	 * @var Array
 	 */
 	private static $inheritance = Array ();
-	
+
 	/**
 	 * Returns registry value or array of values, runtime or default
 	 *
@@ -33,11 +33,12 @@ class O_Registry {
 	 * @return mixed
 	 */
 	static public function get($key, $class = null) {
+		O_Profiler::start();
 		if (is_object ( $class ))
 			$class = get_class ( $class );
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
-		
+
 		$keys = explode ( "/", $key );
 		$value = self::$registry;
 		foreach ( $keys as $k ) {
@@ -55,14 +56,16 @@ class O_Registry {
 					continue;
 			}
 			// I really cannot understand how it works
+			O_Profiler::stop();
 			if (! $key) {
 				return $value;
 			}
 			return null;
 		}
+		O_Profiler::stop();
 		return $value;
 	}
-	
+
 	/**
 	 * Sets runtime registry value, overrides defaults
 	 *
@@ -72,7 +75,7 @@ class O_Registry {
 	static public function set($key, $value) {
 		self::setOrAdd ( $key, $value );
 	}
-	
+
 	/**
 	 * Adds value at the bottom of key array values
 	 *
@@ -82,7 +85,7 @@ class O_Registry {
 	static public function add($key, $value) {
 		self::setOrAdd ( $key, $value, true );
 	}
-	
+
 	/**
 	 * Handler for add and set methods
 	 *
@@ -91,6 +94,7 @@ class O_Registry {
 	 * @param bool $add
 	 */
 	static private function setOrAdd($key, $value, $add = false) {
+		O_Profiler::start();
 		$keys = is_array($key) ? $key : explode ( "/", $key );
 		$registry = &self::$registry;
 		foreach ( $keys as $i => $k ) {
@@ -104,9 +108,11 @@ class O_Registry {
 					if (! isset ( $registry [$k] ) || ! is_array ( $registry [$k] ))
 						$registry [$k] = Array ();
 					$registry [$k] [] = $value;
+					O_Profiler::stop();
 					return;
 				} else {
 					$registry [$k] = $value;
+					O_Profiler::stop();
 					return;
 				}
 			}
@@ -115,8 +121,9 @@ class O_Registry {
 			$registry [] = $value;
 		else
 			$registry = $value;
+		O_Profiler::stop();
 	}
-	
+
 	/**
 	 * Adds inheritance aliasing for registry keys
 	 *
@@ -126,7 +133,7 @@ class O_Registry {
 	static public function setInheritance($base, $inherit) {
 		self::$inheritance [$inherit] = $base;
 	}
-	
+
 	/**
 	 * Parses yaml-like config file, stores its contents in $rootkey
 	 *
@@ -135,11 +142,12 @@ class O_Registry {
 	 * @return Array if $rootkey is not specified
 	 */
 	static public function parseFile($src, $rootkey = null) {
+		O_Profiler::start();
 		if (! is_readable ( $src )) {
 			throw new O_Ex_Config ( "Config file not found (rootkey $rootkey)" );
 		}
 		$f = fopen ( $src, 'r' );
-		
+
 		$links = Array ();
 		if (! $rootkey) {
 			$result = Array ();
@@ -150,16 +158,16 @@ class O_Registry {
 			}
 			$links [0] = & self::$registry [$rootkey];
 		}
-		
+
 		$prev_level = 0;
-		
+
 		while ( $l = fgets ( $f ) ) {
 			$level = strlen ( $l ) - strlen ( $l = ltrim ( $l ) );
 			if ($level - $prev_level > 1) {
 				throw new O_Ex_Config ( "Markup error in config file." );
 			}
 			$prev_level = $level;
-			
+
 			$l = rtrim ( $l );
 			// Don't process empty strings and comments (started with #)
 			if (! $l || $l [0] == "#") {
@@ -182,21 +190,23 @@ class O_Registry {
 				$links [$level] [] = $l;
 			}
 		}
-		
+
 		fclose ( $f );
-		
+
+		O_Profiler::stop();
+
 		if (! $rootkey)
 			return $result;
 		return null;
 	}
-	
+
 	static public function mixIn(Array $values, $rootkey) {
 		if(!isset(self::$registry[$rootkey])) {
 			self::$registry[$rootkey] = Array();
 		}
 		self::mixInArray(self::$registry[$rootkey], $values);
 	}
-	
+
 	static private function mixInArray(&$base,$mix)
     {
         foreach($base as $k => $v) {
@@ -212,13 +222,4 @@ class O_Registry {
         	$base[$k] = $v;
         }
     }
-    
-    static public function startProfiler($name) {
-    	self::set("profiler-start/$name", microtime(true));
-    }
-    
-	static public function stopProfiler($name) {
-		self::set("profiler/$name", self::get("profiler/$name")+microtime(true)-self::get("profiler-start/$name"));
-		self::set("profiler/$name:calls", self::get("profiler/$name:calls")+1);
-	}	
 }
