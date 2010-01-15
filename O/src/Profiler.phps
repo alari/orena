@@ -14,7 +14,8 @@ class O_Profiler {
 	static public function start($name=null){
 		if(!self::$isLaunched) return;
 		if(!$name) {
-			$d = array_shift(debug_backtrace());
+			$d = debug_backtrace();
+			$d = $d[1];
 			$name = $d["function"];
 			if(array_key_exists("class", $d)){
 				$name = $d["class"]."::".$name;
@@ -31,7 +32,8 @@ class O_Profiler {
 	static public function stop($name=null){
 		if(!self::$isLaunched) return;
 		if(!$name) {
-			$d = array_shift(debug_backtrace());
+			$d = debug_backtrace();
+			$d = $d[1];
 			$name = $d["function"];
 			if(array_key_exists("class", $d)){
 				$name = $d["class"]."::".$name;
