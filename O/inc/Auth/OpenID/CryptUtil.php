@@ -85,7 +85,7 @@ class Auth_OpenID_CryptUtil {
 
         $popsize = strlen($population);
 
-        if ($popsize > 256) {echo "B";
+        if ($popsize > 256) {
             $msg = 'More than 256 characters supplied to ' . __FUNCTION__;
             trigger_error($msg, E_USER_ERROR);
         }

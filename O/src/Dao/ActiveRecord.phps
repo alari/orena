@@ -369,6 +369,16 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	}
 
 	/**
+	 * Returns current class query
+	 *
+	 * @return O_Dao_Query
+	 */
+	static public function getQuery()
+	{
+		return O_Dao_Query::get( get_called_class() );
+	}
+
+	/**
 	 * Magic functionality to handle calls to injected methods
 	 *
 	 * @param string $name
