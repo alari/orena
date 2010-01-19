@@ -33,7 +33,7 @@ class O_Dao_TableInfo {
 	 * @var O_Dao_TableInfo[]
 	 */
 	private static $conf = Array ();
-	
+
 	/**
 	 * Name of sql table data stored in
 	 *
@@ -70,7 +70,7 @@ class O_Dao_TableInfo {
 	 * @var string
 	 */
 	private $tail = "";
-	
+
 	/**
 	 * Uses recursion to get table config
 	 *
@@ -78,15 +78,15 @@ class O_Dao_TableInfo {
 	 */
 	private function __construct($class) {
 		$this->class = $class;
-		
+
 		$reflection = new ReflectionClass ( $class );
 		if (! $reflection->isSubclassOf ( "O_Dao_ActiveRecord" ))
 			return;
-			
+
 		// Copy all data from parent object
 		if ($reflection->getParentClass ()) {
 			$parent = self::get ( $reflection->getParentClass ()->getName () );
-			
+
 			$this->table = $parent->table;
 			foreach ( $parent->fields as $name => $info ) {
 				if ($info instanceof O_Dao_FieldInfo) {
@@ -100,14 +100,14 @@ class O_Dao_TableInfo {
 			$this->indexes = $parent->indexes;
 			$this->tail = $parent->tail;
 		}
-		
+
 		// Inherited injections
 		foreach ( O_Dao_ActiveRecord::getInjectedMethods ( $reflection->getParentClass ()->getName () ) as $name => $callback ) {
 			O_Dao_ActiveRecord::injectMethod ( $class, $name, $callback );
 		}
-		
+
 		$docCommentLines = Array ();
-		
+
 		// Import data from plugins
 		$plugins = O_Registry::get ( "plugins", $class );
 		if (is_array ( $plugins )) {
@@ -117,7 +117,7 @@ class O_Dao_TableInfo {
 				$pluginReflection = new ReflectionClass ( $plugin );
 				if (! $pluginReflection->implementsInterface ( "O_Dao_iPlugin" ))
 					throw new O_Ex_Logic ( "Dao plugins must implement interface O_Dao_iPlugin, but $plugin doesn't." );
-					
+
 				// Methods injection
 				foreach ( $pluginReflection->getMethods () as $method ) {
 					if (substr ( $method->getName (), 0, 2 ) != "i_")
@@ -130,12 +130,12 @@ class O_Dao_TableInfo {
 						continue;
 					O_Dao_ActiveRecord::injectMethod ( $class, substr ( $method->getName (), 2 ), array ($plugin, $method->getName () ) );
 				}
-				
+
 				// Attributes injection
 				$docCommentLines = array_merge ( $docCommentLines, explode ( "\n", $pluginReflection->getDocComment () ) );
 			}
 		}
-		
+
 		// Override
 		$docCommentLines = array_merge ( $docCommentLines, explode ( "\n", $reflection->getDocComment () ) );
 		for($line = current ( $docCommentLines ); $line; $line = next ( $docCommentLines )) {
@@ -144,21 +144,21 @@ class O_Dao_TableInfo {
 			if ($matches) {
 				$lineDirective = $matches [1];
 				$lineContent = trim ( $matches [2] );
-				
+
 				// Processing multiline config
 				while ( $lineContent [strlen ( $lineContent ) - 1] == '\\' ) {
 					$line = next ( $docCommentLines );
 					$lineContent = substr ( $lineContent, 0, - 1 ) . " " . trim ( substr ( $line, 2 ) );
 				}
-				
+
 				// Processing tail directive before parsing subkeys (tail have no subkeys)
 				if ($lineDirective == "tail") {
 					$this->tail = $lineContent;
 					continue;
 				}
-				
+
 				$_subkeys = explode ( " -", $lineContent );
-				
+
 				$value = array_shift ( $_subkeys );
 				$subkeys = array ();
 				if (count ( $_subkeys )) {
@@ -174,7 +174,7 @@ class O_Dao_TableInfo {
 							$this->table = self::getPrefix () . $value;
 						$this->params = array_merge ( $this->params, $subkeys );
 						break;
-					
+
 					case "field" :
 						$name = $value;
 						$type = null;
@@ -182,7 +182,7 @@ class O_Dao_TableInfo {
 							list ( $name, $type ) = explode ( " ", $value, 2 );
 						$this->fields [$name] = array ($type, $subkeys );
 						break;
-					
+
 					case "field:config" :
 						$name = $value;
 						if ((isset ( $this->fields [$name] ))) {
@@ -194,7 +194,7 @@ class O_Dao_TableInfo {
 						} else
 							throw new O_Ex_Config ( "field:config for unexistent field." );
 						break;
-					
+
 					case "field:replace" :
 						// Just replace field positions in array
 						if (! strpos ( $value, "," ))
@@ -215,11 +215,11 @@ class O_Dao_TableInfo {
 								$this->fields [$name] = $info;
 						}
 						break;
-					
+
 					case "index" :
 						$this->indexes [$value] = $subkeys;
 						break;
-					
+
 					case "registry" :
 						list ( $key, $value ) = explode ( " ", $value, 2 );
 						if (isset ( $subkeys ["add"] )) {
@@ -232,7 +232,7 @@ class O_Dao_TableInfo {
 			}
 		}
 	}
-	
+
 	/**
 	 * Returns param given in @table config line
 	 *
@@ -242,7 +242,7 @@ class O_Dao_TableInfo {
 	public function getParam($name) {
 		return isset ( $this->params [$name] ) ? $this->params [$name] : null;
 	}
-	
+
 	/**
 	 * Checks if table exists in database
 	 *
@@ -253,7 +253,7 @@ class O_Dao_TableInfo {
 			throw new O_Ex_Config ( "Table name isn't specified for " . $this->class );
 		return O_Db_Query::get ( $this->table )->tableExists ();
 	}
-	
+
 	/**
 	 * Tries to create table
 	 *
@@ -262,15 +262,15 @@ class O_Dao_TableInfo {
 	public function createTable() {
 		if (! $this->table)
 			throw new O_Ex_Config ( "Can't create unnamed table." );
-		
+
 		$query = new O_Db_Query ( $this->table );
-		
+
 		$query->field ( "id", "int auto_increment primary key" );
-		
+
 		foreach ( array_keys ( $this->fields ) as $name ) {
 			$this->getFieldInfo ( $name )->addFieldTypeToQuery ( $query );
 		}
-		
+
 		foreach ( $this->indexes as $fields => $keys ) {
 			$indexType = "index";
 			if (isset ( $keys ["unique"] ))
@@ -279,10 +279,16 @@ class O_Dao_TableInfo {
 				$indexType = "fulltext";
 			$query->index ( $fields, $indexType, isset ( $keys ["name"] ) ? $keys ["name"] : null );
 		}
-		
-		return $query->create ( $this->tail ? $this->tail : O_Registry::get ( "app/dao-params/default_tail" ) );
+
+		try {
+			$r = $query->create ( $this->tail ? $this->tail : O_Registry::get ( "app/dao-params/default_tail" ) );
+		} catch(PDOException $e){
+			if($e->getCode() == "42S01") return true;
+		}
+
+		return $r;
 	}
-	
+
 	/**
 	 * Returns field info object
 	 *
@@ -301,7 +307,7 @@ class O_Dao_TableInfo {
 		}
 		return $this->fields [$name];
 	}
-	
+
 	/**
 	 * Returns table name
 	 *
@@ -310,7 +316,7 @@ class O_Dao_TableInfo {
 	public function getTableName() {
 		return $this->table;
 	}
-	
+
 	/**
 	 * Returns array of field info
 	 *
@@ -323,7 +329,7 @@ class O_Dao_TableInfo {
 		}
 		return $this->fields;
 	}
-	
+
 	/**
 	 * Returns instance of table info object
 	 *
@@ -337,7 +343,7 @@ class O_Dao_TableInfo {
 			self::$conf [$class] = new self ( $class );
 		return self::$conf [$class];
 	}
-	
+
 	/**
 	 * Sets the prefix for all table names
 	 *
@@ -352,7 +358,7 @@ class O_Dao_TableInfo {
 			$prefix .= "_";
 		O_Registry::set ( "app/dao-params/table_prefix", $prefix );
 	}
-	
+
 	/**
 	 * Returns the prefix for all table names
 	 *
@@ -361,7 +367,7 @@ class O_Dao_TableInfo {
 	static public function getPrefix() {
 		return O_Registry::get ( "app/dao-params/table_prefix" );
 	}
-	
+
 	/**
 	 * Sets default query tail to be used in CREATE TABLE
 	 *
@@ -370,7 +376,7 @@ class O_Dao_TableInfo {
 	static public function setDefaultTail($tail) {
 		O_Registry::set ( "app/dao-params/default_tail", $tail );
 	}
-	
+
 	/**
 	 * Returns array of fields to process by key.
 	 * Can be used by renderers, form builders or any other automated fields processors
