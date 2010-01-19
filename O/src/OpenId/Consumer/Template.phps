@@ -22,7 +22,7 @@ abstract class O_OpenId_Consumer_Template extends O_Html_Template {
 			case self::MODE_AUTH :
 			case self::MODE_OUR_USER :
 				?>
-<form method="GET" id="openid-login-form"
+<form method="post" id="openid-login-form"
 	action="<?=
 				O_Registry::get( "env/request_url" )?>"><label><span>OpenId:</span> <input
 	type="text" name="openid_identifier" value="<?=
@@ -32,12 +32,12 @@ abstract class O_OpenId_Consumer_Template extends O_Html_Template {
 				if ($this->mode == "our") {
 					?>
 	<br />
-<label><span>Пароль:</span> <input type="password" name="pwd" /></label>
-<label><input type="submit" value="Войти" /></label>
+<label><span>Password:</span> <input type="password" name="pwd" /></label>
+<label><input type="submit" value="Sign Up" /></label>
 <?
 				} else {
 					?>
-<input type="submit" value="Войти" />
+<input type="submit" value="Sign Up" />
 <?
 				}
 				?>
