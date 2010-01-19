@@ -3,14 +3,13 @@ abstract class O_OpenId_Consumer_Command extends O_Command {
 
 	public function process()
 	{
-		if (isset( $_GET[ 'openid_action' ] ) && $_GET[ 'openid_action' ] == "login" && !empty(
-				$_GET[ 'openid_identifier' ] )) {
+		if ($this->getParam('openid_action') == "login" && $this->getParam('openid_identifier')) {
 
 			return $this->tryAuth();
 
 		}
 
-		if (isset( $_GET[ 'openid_mode' ] )) {
+		if ($this->getParam( 'openid_mode' )) {
 			return $this->finishAuth();
 		}
 
