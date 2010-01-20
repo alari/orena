@@ -160,6 +160,7 @@ class O_Registry {
 		}
 
 		$prev_level = 0;
+		// Lines counter for error displaying
 		$i = 0;
 
 		while ( $l = fgets ( $f ) ) {
