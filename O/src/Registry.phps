@@ -165,16 +165,17 @@ class O_Registry {
 		while ( $l = fgets ( $f ) ) {
 			++$i;
 			$level = strlen ( $l ) - strlen ( $l = ltrim ( $l ) );
+			// Don't process empty strings and comments (started with #)
+			if (! $l || $l [0] == "#") {
+				continue;
+			}
 			if ($level - $prev_level > 1) {
 				throw new O_Ex_Config ( "Markup error in config file ($src:$i)." );
 			}
 			$prev_level = $level;
 
 			$l = rtrim ( $l );
-			// Don't process empty strings and comments (started with #)
-			if (! $l || $l [0] == "#") {
-				continue;
-			}
+
 			// Line has keypart
 			$l = str_replace("\\:", "\t", $l);
 			if (strpos ( $l, ":" )) {
