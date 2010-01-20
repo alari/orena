@@ -256,8 +256,11 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 * @param array $row
 	 * @return O_Dao_ActiveRecord
 	 */
-	static public function getById( $id, $class, Array $row = null )
+	static public function getById( $id, $class = null, Array $row = null )
 	{
+		if(!$class) {
+			$class = get_called_class();
+		}
 		if(array_key_exists($class, self::$objs) && array_key_exists($id, self::$objs[$class])){
 			return self::$objs[ $class ][ $id ];
 		}
