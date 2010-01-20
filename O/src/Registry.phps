@@ -160,11 +160,13 @@ class O_Registry {
 		}
 
 		$prev_level = 0;
+		$i = 0;
 
 		while ( $l = fgets ( $f ) ) {
+			++$i;
 			$level = strlen ( $l ) - strlen ( $l = ltrim ( $l ) );
 			if ($level - $prev_level > 1) {
-				throw new O_Ex_Config ( "Markup error in config file ($src)." );
+				throw new O_Ex_Config ( "Markup error in config file ($src:$i)." );
 			}
 			$prev_level = $level;
 
