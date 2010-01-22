@@ -67,16 +67,18 @@ $files = Array(
 $placeholders = Array("?PHP" => '<?php');
 foreach($files as $f) {
 	println("Creating: $f");
-	$txt = file_get_contents(__DIR__."/App/".$f);
-	$txt = preg_replace_callback('#${([^:]+)(:([^:}]+):([^:}]+))?}#i', $txt, function($matches) use ($placeholders){
+	$text = file_get_contents(__DIR__."/App/".$f);
+	$text = preg_replace_callback('#\${([^:]+)(:([^:}]+):([^:}]+))?}#i', function($matches) use ($placeholders){
 		if($matches[2]) {
 			$def = $matches[3];
 			$v = request($matches[4], "%s");
 			$placeholders[$matches[1]] = $v ? $v : $def;
 		}
 		return  $placeholders[$matches[1]];
-	});
-	file_put_contents($dirname.$f, $txt."GG");
+	}, $text);
+	file_put_contents($dirname.$f, (string)$text."GG");
 }
 
 println("Finished!");
+
+
