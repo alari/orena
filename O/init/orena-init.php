@@ -56,14 +56,13 @@ println("Hello world!");
 // Handle project root
 
 $root= askForDirectory("Enter path to your site root directory (default is current).");
-copy(__DIR__.‘.htaccess‘, $root.".htaccess");
-$text = file_get_contents(__DIR__."entry.php");
-file_put_contents($dirname.$f, (string)replacePatterns($text));
+copy(__DIR__."/.htaccess", $root.".htaccess");
+$text = file_get_contents(__DIR__."/entry.php");
+file_put_contents($dirname."entry.php", (string)replacePatterns($text));
 
 // Handling base directory
 $dirname = askForDirectory("Enter path to your Apps directory (default is current).");
-
-copy(__DIR__.".htaccess", $dirname.".htaccess");
+copy(__DIR__."/.htaccess", $dirname.".htaccess");
 
 // Requesting application name
 do {
