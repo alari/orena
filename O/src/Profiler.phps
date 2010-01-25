@@ -63,7 +63,7 @@ class O_Profiler {
 	}
 
 	static public function getTotal() {
-		return microtime(true)-self::$launchTime;
+		return self::$isLaunched ? (microtime(true)-self::$launchTime) : "";
 	}
 }
 

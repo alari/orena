@@ -56,6 +56,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	/**
 	 * Creates a new object in database
 	 *
+	 * @throws PDOException
 	 */
 	public function __construct()
 	{
