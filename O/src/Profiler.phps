@@ -67,4 +67,4 @@ class O_Profiler {
 	}
 }
 
-O_Profiler::launch();
+//O_Profiler::launch();
