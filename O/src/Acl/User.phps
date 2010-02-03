@@ -14,7 +14,7 @@
 class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 
 	private $acl_cache = Array();
-	
+
 	/**
 	 * Returns bool for access rule, null if no rule specified
 	 *
@@ -28,7 +28,15 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if(array_key_exists($cache_key, $this->acl_cache)){
 			return $this->acl_cache[$cache_key];
 		}
-		
+
+		// Resourse acl logic delegation
+		if($resourse instanceof O_Acl_iResourse) {
+			$access = $resourse->aclUserCan($action, $this);
+			if(!is_null($access)) {
+				return $this->acl_cache[$cache_key] = $access;
+			}
+		}
+
 		// Role overrides resourse context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
 			return $this->acl_cache[$cache_key] = $access;
@@ -47,7 +55,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				}
 			}
 		}
-		
+
 		// No rules available et al
 		return $this->acl_cache[$cache_key] = null;
 	}
@@ -74,7 +82,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			list($key, $subkey) = explode(" ", $key, 2);
 		}
 		if(!is_array($params)) $params = trim($params);
-		
+
 		switch ($key) {
 			case "delegate" :
 				$res = $resourse->$params;
@@ -113,14 +121,14 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				}
 				$field = rtrim($field);
 				$value = ltrim($value);
-								
+
 				if($field[0] == "(" && strpos($field, ")")) {
 					list($related, $field) = explode(")", substr($field, 1),2);
 					$obj = $obj->{trim($related)};
 					$field = ltrim($field);
 				}
 				$field = $obj[ $field ];
-				
+
 				switch ($type) {
 					case ">":
 						$is_true = $field > $value;
