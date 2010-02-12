@@ -150,7 +150,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function close()
 	{
-		trigger_error("start closing", E_USER_NOTICE);
+		trigger_error("start closing ".print_r(self::get(),1), E_USER_NOTICE);
 		self::get()->time = time();
 		self::get()->views += 1;
 		self::get()->save();
