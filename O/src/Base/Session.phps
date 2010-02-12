@@ -31,7 +31,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 *
 	 * @var array
 	 */
-	public static $objs = Array ();
+	private static $objs = Array ();
 
 	/**
 	 * Returns session active record
@@ -52,7 +52,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 		if (!$id) {
 			throw new O_Ex_Critical( "Session ID is undefined or inaccessible" );
 		}
-		$obj = isset( self::$objs[ $id ] ) ? self::$objs[ $id ] : O_Dao_Query::get(
+		$obj = array_key_exists( $id, self::$objs ) ? self::$objs[ $id ] : O_Dao_Query::get(
 				self::getClassName() )->test( "ses_id", $id )->limit(1)->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
