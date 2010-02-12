@@ -67,7 +67,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 			$obj->user_agent = $_SERVER['HTTP_USER_AGENT'];
 			$obj->save();
 			$objs[ $id ] = $obj;
-		} elseif(!isset(self::$objs[$id])) {
+		} elseif(!isset($objs[$id])) {
 			$objs[$id] = $obj;
 		}
 		return $obj;
