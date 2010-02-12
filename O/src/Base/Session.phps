@@ -147,6 +147,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function close()
 	{
+		fputs(STDERR, "Session::close\n");
 		self::get()->time = time();
 		self::get()->views += 1;
 		self::get()->save();
