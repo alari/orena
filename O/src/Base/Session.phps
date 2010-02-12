@@ -150,12 +150,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function close()
 	{
-		trigger_error("start closing ".print_r(self::get(),1), E_USER_NOTICE);
 		self::get()->time = time();
 		self::get()->views += 1;
-		self::get()->data = serialize($_SESSION);
 		self::get()->save();
-		trigger_error("stop closing", E_USER_NOTICE);
 		return true;
 	}
 
@@ -181,10 +178,8 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function write( $id, $sess_data )
 	{
-		return $sess_data;
-		trigger_error("WRITE $id => $sess_data", E_USER_NOTICE);
-		self::get( $id )->data = $sess_data;
-		trigger_error("END WRITE");
+		self::get()->data = $sess_data;
+		self::get()->save();
 		return $sess_data;
 	}
 
