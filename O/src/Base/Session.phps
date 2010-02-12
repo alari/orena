@@ -42,8 +42,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	static public function get( $id = null )
 	{
 		global $O_SESSION_OBJS;
-
-		$objs =& $O_SESSION_OBJS;
+		if(!is_array($O_SESSION_OBJS)) $O_SESSION_OBJS = Array();
 
 		if (!$id) {
 			$id = session_id();
@@ -56,7 +55,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 		if (!$id) {
 			throw new O_Ex_Critical( "Session ID is undefined or inaccessible" );
 		}
-		$obj = array_key_exists( $id, $objs ) ? $objs[ $id ] : O_Dao_Query::get(
+		$obj = array_key_exists( $id, $O_SESSION_OBJS ) ? $O_SESSION_OBJS[ $id ] : O_Dao_Query::get(
 				self::getClassName() )->test( "ses_id", $id )->limit(1)->getOne();
 		if (!$obj) {
 			$class = self::getClassName();
@@ -66,9 +65,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 			$obj->time = time();
 			$obj->user_agent = $_SERVER['HTTP_USER_AGENT'];
 			$obj->save();
-			$objs[ $id ] = $obj;
-		} elseif(!isset($objs[$id])) {
-			$objs[$id] = $obj;
+			$O_SESSION_OBJS[ $id ] = $obj;
+		} elseif(!array_key_exists($id, $O_SESSION_OBJS)) {
+			$O_SESSION_OBJS[$id] = $obj;
 		}
 		return $obj;
 	}
