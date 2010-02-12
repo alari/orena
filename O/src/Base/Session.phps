@@ -181,7 +181,9 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	static public function write( $id, $sess_data )
 	{
 		trigger_error("WRITE $id => $sess_data", E_USER_NOTICE);
-		return self::get( $id )->data = $sess_data;
+		self::get( $id )->data = $sess_data;
+		trigger_error("END WRITE");
+		return $sess_data;
 	}
 
 	/**
