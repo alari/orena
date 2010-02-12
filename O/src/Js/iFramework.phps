@@ -32,4 +32,11 @@ interface O_Js_iFramework {
 	 * @return string
 	 */
 	public function ajaxHtml( $elementId, $url, array $send_params = array(), O_Html_Layout $layout = null );
+
+	/**
+	 * Adds ajax form sender script
+	 *
+	 * @param string $instanceId
+	 */
+	public function ajaxForm($instanceId);
 }

@@ -31,7 +31,7 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 *
 	 * @var array
 	 */
-	private static $objs = Array ();
+	protected static $objs = Array ();
 
 	/**
 	 * Returns session active record
