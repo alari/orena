@@ -150,9 +150,11 @@ class O_Base_Session extends O_Dao_ActiveRecord {
 	 */
 	static public function close()
 	{
+		fputs(fopen("php://stderr", "w"), "start closing / ".$_SERVER["REQUEST_URI"]);
 		self::get()->time = time();
 		self::get()->views += 1;
 		self::get()->save();
+		fputs(fopen("php://stderr", "w"), "stop closing / ".$_SERVER["REQUEST_URI"]);
 		return true;
 	}
 
