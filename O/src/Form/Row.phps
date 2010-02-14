@@ -54,13 +54,13 @@ abstract class O_Form_Row {
 		}
 		echo "<div class=\"{$this->cssClass}\">";
 		if ($this->title) {
-			echo "<div class=\"form-row-title\">$this->title</div>";
+			echo "<div class=\"form-row-title\">$this->title:</div>";
 		}
-		
+
 		echo "<div class=\"form-row-content\">";
 		$this->renderInner( $layout, $isAjax );
 		echo "</div>";
-		
+
 		if ($this->error) {
 			echo "<div class=\"form-row-error\">$this->error</div>";
 		}

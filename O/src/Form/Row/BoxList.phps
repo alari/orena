@@ -37,12 +37,7 @@ class O_Form_Row_BoxList extends O_Form_Row_Select {
 			if ($echoed) {
 				echo ", ";
 			}
-			?><label> <input type="<?=$type?>"
-	name="<?=$this->name . ($this->multiple ? "[]" : "")?>"
-	value="<?=htmlspecialchars( $k )?>"
-	<?=(isset( $this->value[ $k ] ) ? " checked=\"yes\"" : "")?> />
-			 &nbsp;&ndash;&nbsp;<?=$v?>
-			</label><?
+			?><label><input type="<?=$type?>" name="<?=$this->name . ($this->multiple ? "[]" : "")?>" value="<?=htmlspecialchars( $k )?>"<?=(isset( $this->value[ $k ] ) ? " checked=\"yes\"" : "")?> />&nbsp;&ndash;&nbsp;<?=trim($v)?></label><?
 			$echoed = 1;
 		}
 	}
