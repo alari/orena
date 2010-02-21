@@ -418,7 +418,7 @@ abstract class O_Dao_NestedSet_Node extends O_Dao_ActiveRecord implements O_Dao_
 	/**
 	 * Injects child node after this, on the same level
 	 *
-	 * @param mr_abstract_node $child
+	 * @param O_Dao_NestedSet_iNode $child
 	 */
 	public function injectAfter( O_Dao_NestedSet_iNode $child )
 	{
