@@ -8,7 +8,7 @@ abstract class O_Form_FieldActionProducer {
 	 */
 	protected $name;
 	/**
-	 * Callable resourse to generate a row
+	 * Callable resource to generate a row
 	 *
 	 * @var callback
 	 */

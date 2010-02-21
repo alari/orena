@@ -6,8 +6,8 @@
  * To use acl via registry:
  * Way #1: add "can" attribute to any registry node with O_Dao_ActiveRecord inside, type
  * action name in it.
- * Way #2: add registry to key "app/cmd/can", format for values: $action#$resourse_registry,
- * resourse registry key is not required.
+ * Way #2: add registry to key "app/cmd/can", format for values: $action#$resource_registry,
+ * resource registry key is not required.
  *
  * @author Dmitry Kurinskiy
  */
@@ -53,14 +53,14 @@ abstract class O_Command extends O_Dict_Access {
 		$can = O_Registry::get( "app/cmd/can" );
 		if (is_array( $can )) {
 			foreach ($can as $acl) {
-				list ($action, $resourse) = strpos( $acl, "#" ) ? explode( "#", $acl, 2 ) : array (
-																									$acl, 
+				list ($action, $resource) = strpos( $acl, "#" ) ? explode( "#", $acl, 2 ) : array (
+																									$acl,
 																									null);
-				if ($resourse)
-					$resourse = O_Registry::get( $resourse );
-				if (!$resourse instanceof O_Dao_ActiveRecord)
-					$resourse = null;
-				if (!O_Acl_Session::can( $action, $resourse ))
+				if ($resource)
+					$resource = O_Registry::get( $resource );
+				if (!$resource instanceof O_Dao_ActiveRecord)
+					$resource = null;
+				if (!O_Acl_Session::can( $action, $resource ))
 					return false;
 			}
 		}
@@ -81,7 +81,7 @@ abstract class O_Command extends O_Dict_Access {
 	 */
 	public function redirect( $href = null )
 	{
-		$href = O_UrlBuilder::get( 
+		$href = O_UrlBuilder::get(
 				is_null( $href ) ? O_Registry::get( "env/process_url" ) : $href );
 		Header( "Location: $href" );
 		return null;
