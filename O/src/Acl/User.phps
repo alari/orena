@@ -19,7 +19,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * Returns bool for access rule, null if no rule specified
 	 *
 	 * @param string $action
-	 * @param O_Dao_ActiveRecord $resourse
+	 * @param O_Dao_ActiveRecord $resource
 	 * @return bool or null
 	 */
 	public function can( $action, O_Dao_ActiveRecord $resource = null )
@@ -29,20 +29,20 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 			return $this->acl_cache[$cache_key];
 		}
 
-		// Resourse acl logic delegation
-		if($resource instanceof O_Acl_iResourse) {
+		// Resource acl logic delegation
+		if($resource instanceof O_Acl_iResource) {
 			$access = $resource->aclUserCan($action, $this);
 			if(!is_null($access)) {
 				return $this->acl_cache[$cache_key] = $access;
 			}
 		}
 
-		// Role overrides resourse context
+		// Role overrides resource context
 		if ($this->role && !is_null( $access = $this->role->can( $action ) )) {
 			return $this->acl_cache[$cache_key] = $access;
 		}
 
-		// Getting context role for resourse
+		// Getting context role for resource
 		if ($resource) {
 			$registry = O_Registry::get( "acl", $resource );
 			if(is_array($registry)) {
@@ -64,15 +64,15 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * Returns access by rules given in registry
 	 *
 	 * Nodes:
-	 * delegate: target -- use resourse stored in resourse's .target to get access rights
+	 * delegate: target -- use resource stored in resource's .target to get access rights
 	 * role: name -- set access rules as for this role
-	 * user-in field: -- process inner instructions if user is in .field of resourse
-	 * (user|resourse) (related)field(operator)value: ... -- take an object to process
+	 * user-in field: -- process inner instructions if user is in .field of resource
+	 * (user|resource) (related)field(operator)value: ... -- take an object to process
 	 *
 	 * @param string $action
 	 * @param string $key
 	 * @param string|array $params
-	 * @param O_Dao_ActiveRecord $resourse
+	 * @param O_Dao_ActiveRecord $resource
 	 * @return bool or null
 	 */
 	private function getAccessByParams( $action, $key, $params, O_Dao_ActiveRecord $resource )

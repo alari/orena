@@ -18,7 +18,7 @@ class O_Acl_Visitor extends O_Base_Visitor implements O_Acl_iUser {
 	 */
 	public function can( $action, O_Dao_ActiveRecord $resource = null )
 	{
-		// For resourse try to get access rule from -visitor role
+		// For resource try to get access rule from -visitor role
 		if ($resource) {
 			$registry = O_Registry::get( "acl", $resource );
 			if ($registry instanceof SimpleXMLElement && isset( $registry->Visitor )) {

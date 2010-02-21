@@ -104,15 +104,15 @@ class O_Cmd_Edit extends O_Command {
 				// User related field
 				case "user field" :
 					$resource = O_Acl_Session::getUser();
-				// Resourse related field
+				// Resource related field
 				case "field" :
-					if (!$resource && isset( $params[ "resourse" ] )) {
-						$resource = O_Registry::get( $params[ "resourse" ] );
+					if (!$resource && isset( $params[ "resource" ] )) {
+						$resource = O_Registry::get( $params[ "resource" ] );
 					}
 					if (!$resource instanceof O_Dao_ActiveRecord) {
-						throw new O_Ex_NotFound( "Resourse not found.", 404 );
+						throw new O_Ex_NotFound( "Resource not found.", 404 );
 					}
-					if (iset( $params[ "field" ] )) {
+					if (isset( $params[ "field" ] )) {
 						$field = $params[ "field" ];
 						$query = $resource->$field;
 					}
