@@ -2,7 +2,7 @@
 /**
  * User pattern with ACL.
  *
- * Resourse context for acl is stored in resourse's "acl" registry section.
+ * Resource context for acl is stored in resource's "acl" registry section.
  * @see O_Acl_User::getAccessByNode()
  *
  * Classname is stored in "app/classnames/user" registry.
@@ -22,16 +22,16 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * @param O_Dao_ActiveRecord $resourse
 	 * @return bool or null
 	 */
-	public function can( $action, O_Dao_ActiveRecord $resourse = null )
+	public function can( $action, O_Dao_ActiveRecord $resource = null )
 	{
-		$cache_key = $action.($resourse?"/".get_class($resourse).":".$resourse["id"]:"");
+		$cache_key = $action.($resource?"/".get_class($resource).":".$resource["id"]:"");
 		if(array_key_exists($cache_key, $this->acl_cache)){
 			return $this->acl_cache[$cache_key];
 		}
 
 		// Resourse acl logic delegation
-		if($resourse instanceof O_Acl_iResourse) {
-			$access = $resourse->aclUserCan($action, $this);
+		if($resource instanceof O_Acl_iResourse) {
+			$access = $resource->aclUserCan($action, $this);
 			if(!is_null($access)) {
 				return $this->acl_cache[$cache_key] = $access;
 			}
@@ -43,12 +43,12 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		}
 
 		// Getting context role for resourse
-		if ($resourse) {
-			$registry = O_Registry::get( "acl", $resourse );
+		if ($resource) {
+			$registry = O_Registry::get( "acl", $resource );
 			if(is_array($registry)) {
 				$access = null;
 				foreach ($registry as $key=>$params) {
-					$access = $this->getAccessByParams( $action, $key, $params, $resourse );
+					$access = $this->getAccessByParams( $action, $key, $params, $resource );
 					if (!is_null( $access )){
 						return $this->acl_cache[$cache_key] = $access;
 					}
@@ -75,7 +75,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * @param O_Dao_ActiveRecord $resourse
 	 * @return bool or null
 	 */
-	private function getAccessByParams( $action, $key, $params, O_Dao_ActiveRecord $resourse )
+	private function getAccessByParams( $action, $key, $params, O_Dao_ActiveRecord $resource )
 	{
 		$is_true = 0;
 		if(strpos($key, " ")) {
@@ -85,14 +85,14 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 
 		switch ($key) {
 			case "delegate" :
-				$res = $resourse->$params;
+				$res = $resource->$params;
 				return $this->can( $action, $res );
 			break;
 			case "role" :
 				return O_Acl_Role::getByName( $params )->can( $action );
 			break;
 			case "user-in" :
-				$value = $resourse->$subkey;
+				$value = $resource->$subkey;
 				// It's an user object
 				if ($value instanceof $this) {
 					if ($value->id == $this->id) {
@@ -106,8 +106,8 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 				}
 			break;
 			case "user" :
-			case "resourse" :
-				$obj = $key == "user" ? $this : $resourse;
+			case "resource" :
+				$obj = $key == "user" ? $this : $resource;
 				$type = null;
 				foreach(Array("!=", "==", "=", ">", "<") as $possible_type){
 					if(strpos($subkey, $possible_type)) {
@@ -149,7 +149,7 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 		if ($is_true) {
 			$access = null;
 			foreach ($params as $k=>$p) {
-				$access = $this->getAccessByParams( $action, $k, $p, $resourse );
+				$access = $this->getAccessByParams( $action, $k, $p, $resource );
 				if (!is_null( $access ))
 					return $access;
 			}
