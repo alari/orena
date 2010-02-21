@@ -170,7 +170,7 @@ class O_Form_Handler extends O_Form_Generator {
 		}
 
 		// Start transaction
-		O_Db_Manager::getConnection()->beginTransaction();
+		#O_Db_Manager::getConnection()->beginTransaction();
 
 		try {
 			// Check and prepare values, find errors if they are
@@ -214,7 +214,7 @@ class O_Form_Handler extends O_Form_Generator {
 			return $this->handleResult = 0;
 		}
 
-		O_Db_Manager::getConnection()->commit();
+		#O_Db_Manager::getConnection()->commit();
 		// Succeed
 		return $this->handleResult = 1;
 	}
