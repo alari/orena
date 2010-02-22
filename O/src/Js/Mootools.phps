@@ -5,16 +5,15 @@
  * @see O_Js_Middleware
  * @see O_Js_iFramework
  *
- * app/js/use_depender = true to use depender
- * app/js/depender_url to set custom depender url
+ * app/js/depender = path to depender (opt)
  *
  * @author Dmitry Kurinskiy
  */
 class O_Js_Mootools implements O_Js_iFramework {
-	private $dependerUsed = null;
+	private $dependerUrl = null;
 
 	public function __construct() {
-		$this->dependerUsed = O_Registry::get("app/js/use_depender");
+		$this->dependerUrl = O_Registry::get("app/js/depender");
 	}
 
 	/**
@@ -29,7 +28,7 @@ class O_Js_Mootools implements O_Js_iFramework {
 		$code = "$(window).addEvent('domready', function(){ $code });";
 		if ($layout) {
 			$this->addSrc($layout);
-			if($this->dependerUsed) {
+			if($this->dependerUrl) {
 				$code = "Om.domready(function(){ $code });";
 			}
 			$layout->addJavaScriptCode( $code );
@@ -44,9 +43,8 @@ class O_Js_Mootools implements O_Js_iFramework {
 	 */
 	public function addSrc( O_Html_Layout $layout )
 	{
-		if($this->dependerUsed) {
-			$src = O_Registry::get("app/js/depender_url");
-			$layout->addJavaScriptSrc( $src ? $src : $layout->staticUrl("mootools/depender/php/build.php?client=true&require=Om",1) );
+		if($this->dependerUrl) {
+			$layout->addJavaScriptSrc( $$this->dependerUrl );
 		} else {
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
@@ -73,7 +71,7 @@ class O_Js_Mootools implements O_Js_iFramework {
 			}
 			$params = "{" . $params . "}";
 		}
-		if($this->dependerUsed) {
+		if($this->dependerUrl) {
 			return "Om.getHtml('$url','$elementId',$params);";
 		} else {
 			return "new Request.HTML({url:'$url',method:'POST',update:$('$elementId')}).post($params);";
@@ -83,7 +81,7 @@ class O_Js_Mootools implements O_Js_iFramework {
 	public function ajaxForm($instanceId) {
 ?>
 <script language="JavaScript" type="text/javascript">
-<?if($this->dependerUsed) echo "Om.use('Om.FormSender', function(){Om.attachFormSender('$instanceId');});"; else {?>
+<?if($this->dependerUrl) echo "Om.use('Om.FormSender', function(){Om.attachFormSender('$instanceId');});"; else {?>
 var _getEl = function(){
 	el = $('<?=$instanceId?>');
 	if(!el) {
