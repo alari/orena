@@ -1,0 +1,8 @@
+{
+  "UtilityClasses":{
+    "RadClass":{
+      "deps":["Element.Style","Class.Extras"],
+      "desc":"Makes the passed-in element rad."
+    }
+  }
+}

@@ -1,0 +1,12 @@
+:dependency_paths:
+  - :path: ../mootools-core/Source # path to scripts.json file
+    :info: # used in export.rb for exporting to the Mootools Forge
+      :name: moo-core 
+      :repo: git-repo-url
+      :tag:  1.2.3
+        
+  - :path: ../mootools-more/Source
+    :info:
+      :name: moo-more
+      :repo: git-repo-url
+      :tag:  1.2.2.3

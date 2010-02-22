@@ -1,0 +1,9 @@
+<IfModule env_module>
+SetEnv MOO_ADD_CONF my/config.json
+# Must be like moo/_config/config.json
+# Scripts root is moo folder, not the site root! Use relative or absolute filepaths
+</IfModule>
+
+RewriteEngine On
+
+RewriteRule ^moo-get$ /moo/get.php [L]

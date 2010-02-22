@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <!-- Mootools Builder -->
+    <script type="text/javascript" src="../Builder.js"></script>
+    <script type="text/javascript">
+  		Builder.included.Sample = {};
+
+  		Builder.paths.Sample = 'Source';
+  		Builder.scripts.Sample = {
+  		  'UtilityClasses': ['RadClass']
+  		};
+  		
+  		Builder.root = "../../mootools-core/";
+  		Builder.includeType('source');
+
+  		Builder.root = "../";
+  		Builder.includeType('Sample');
+  	</script>
+  	<script type="text/javascript" src="demo.js"></script>
+  </head>
+  <body>
+    Click these to make them rad:
+    <div class="not-rad">I am not rad.</div>
+    <div class="not-rad">I am not rad.</div>        
+  </body>
+</html>

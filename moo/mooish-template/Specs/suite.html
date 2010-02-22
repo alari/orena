@@ -1,0 +1,46 @@
+<html>
+  <head>
+    <!-- Screw Unit Library -->
+    <script src="screw_unit/jquery-1.2.3.js"></script>
+    <script src="screw_unit/jquery.fn.js"></script>
+    <script src="screw_unit/jquery.print.js"></script>
+    <script src="screw_unit/screw.builder.js"></script>
+    <script src="screw_unit/screw.matchers.js"></script>
+    <script src="screw_unit/screw.events.js"></script>
+    <script src="screw_unit/screw.behaviors.js"></script>
+    
+    <!-- Helpers and Matchers -->
+    <script src="spec_helper.js"></script>
+    
+    <!-- Mootools Builder -->
+    <script type="text/javascript" src="../Builder.js"></script>
+    <script type="text/javascript">
+  		Builder.included.Sample = {};
+
+  		Builder.paths.Sample = 'Source';
+  		Builder.scripts.Sample = {
+  		  'UtilityClasses': ['RadClass']
+  		};
+  		
+  		Builder.root = "../../mootools-core/";
+  		Builder.includeType('source');
+
+  		Builder.root = "../";
+  		Builder.includeType('Sample');
+  	</script>
+    
+    <!-- Spec files for Lets Roll code -->
+    <script src="sample_specs.js"></script>
+    
+    <link rel="stylesheet" href="screw_unit/screw.css">
+  </head>
+  <body>
+    
+    <div style="position: absolute; left: -9999" id='sample-data'>      
+      <div id='hella-tight'>hella tight</div>      
+    </div>
+    
+    <div id="test-sandbox" style="position: absolute; left: -9999"></div>
+    
+  </body>
+</html>

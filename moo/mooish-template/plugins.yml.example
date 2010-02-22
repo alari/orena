@@ -1,0 +1,18 @@
+---
+:globals:
+  :author: Ian Collins
+  :website: http://www.iancollins.me
+  :contact: ian.collins@gmail.com
+
+:plugins:
+	:plugin_name:
+  	:build_path: /directory/to/dump/files/
+  	:scripts:
+    	- Plugin
+  		- Plugin.Ajax
+  	:tags:
+  	  - animation
+  	  - ajax
+  	:category: Interface
+  	:docs: url_for_docs
+  	:demo: url_for_demo			
