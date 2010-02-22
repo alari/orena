@@ -17,7 +17,7 @@
 			"scripts": "libs/om/Source"
 		}
 	},
-	"compression": "yui",
+	"compression": "jsmin",
 	"available_compressions": ["yui", "jsmin"],
 	"output filename": "mootools",
 
