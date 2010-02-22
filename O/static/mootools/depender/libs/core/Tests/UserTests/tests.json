@@ -1,0 +1,9 @@
+{
+	"Element": {
+		"Element":["iframe"],
+		"Element.Dimensions":["offsets", "scrollSize"]
+	},
+	"Request": {
+		"Request":["all"]
+	}
+}
