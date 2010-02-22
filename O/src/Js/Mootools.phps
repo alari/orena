@@ -8,6 +8,11 @@
  * @author Dmitry Kurinskiy
  */
 class O_Js_Mootools implements O_Js_iFramework {
+	private $dependerUsed = null;
+
+	public function __construct() {
+		$this->dependerUsed = O_Registry::get("app/js/use_depender");
+	}
 
 	/**
 	 * Adds JS code to be executed when DOM is ready
@@ -20,7 +25,10 @@ class O_Js_Mootools implements O_Js_iFramework {
 	{
 		$code = "$(window).addEvent('domready', function(){ $code });";
 		if ($layout) {
-			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
+			$this->addSrc($layout);
+			if($this->dependerUsed) {
+				$code = "Depender.require({scripts:['DomReady'],callback:function(){ $code }});";
+			}
 			$layout->addJavaScriptCode( $code );
 		}
 		return $code;
@@ -33,8 +41,12 @@ class O_Js_Mootools implements O_Js_iFramework {
 	 */
 	public function addSrc( O_Html_Layout $layout )
 	{
-		$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
-		$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
+		if($this->dependerUsed) {
+			$layout->addJavaScriptSrc( $layout->staticUrl("mootools/depender/php/builder.php?client=true&requireLibs=Om",1) );
+		} else {
+			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
+			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
+		}
 	}
 
 	/**
@@ -57,13 +69,18 @@ class O_Js_Mootools implements O_Js_iFramework {
 			}
 			$params = "{" . $params . "}";
 		}
-		return "new Request.HTML({url:'$url',method:'POST',update:$('$elementId')}).post($params);";
+		if($this->dependerUsed) {
+			return "Om.getHtml('$url','$elementId',$params);";
+		} else {
+			return "new Request.HTML({url:'$url',method:'POST',update:$('$elementId')}).post($params);";
+		}
 	}
 
 	public function ajaxForm($instanceId) {
 ?>
 <script language="JavaScript" type="text/javascript">
-_getEl = function(){
+<?if($this->dependerUsed) echo "Om.use('Om.FormSender', function(){Om.attachFormSender('$instanceId');});"; else {?>
+var _getEl = function(){
 	el = $('<?=$instanceId?>');
 	if(!el) {
 		_getEl.delay(50);
@@ -99,8 +116,9 @@ _getEl = function(){
 			}
 	 	 }}).post(el);
 	 });
-}
+};
 _getEl();
+<?}?>
  </script>
 <?
 	}

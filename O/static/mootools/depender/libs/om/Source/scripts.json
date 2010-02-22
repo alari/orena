@@ -1,0 +1,12 @@
+{
+	"Om": {
+		"Om": {
+			"deps": ["Om","Array","Class"],
+			"desc": "Om utility."
+		},
+		"Om.FormSender": {
+			"deps": ["Function","Request.JSON","Element"],
+			"desc": "Sender for auto-generated ajax forms."
+		}
+	}
+}
