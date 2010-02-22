@@ -5,6 +5,9 @@
  * @see O_Js_Middleware
  * @see O_Js_iFramework
  *
+ * app/js/use_depender = true to use depender
+ * app/js/depender_url to set custom depender url
+ *
  * @author Dmitry Kurinskiy
  */
 class O_Js_Mootools implements O_Js_iFramework {
@@ -42,7 +45,8 @@ class O_Js_Mootools implements O_Js_iFramework {
 	public function addSrc( O_Html_Layout $layout )
 	{
 		if($this->dependerUsed) {
-			$layout->addJavaScriptSrc( $layout->staticUrl("mootools/depender/php/build.php?client=true&require=Om",1) );
+			$src = O_Registry::get("app/js/depender_url");
+			$layout->addJavaScriptSrc( $src ? $src : $layout->staticUrl("mootools/depender/php/build.php?client=true&require=Om",1) );
 		} else {
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
