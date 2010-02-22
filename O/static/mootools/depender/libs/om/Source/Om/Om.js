@@ -8,6 +8,11 @@ var OmClass = new Class({
 		this.use("Request.HTML", function(){
 			new Request.HTML({url:url,update:$(updateElementId)}).post(params);
 		});
+	},
+	domready: function(callback){
+		this.use("DomReady", function(
+				$(window).addEvent("domready", callback);
+		));
 	}
 });
 var Om = new OmClass();

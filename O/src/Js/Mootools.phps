@@ -30,7 +30,7 @@ class O_Js_Mootools implements O_Js_iFramework {
 		if ($layout) {
 			$this->addSrc($layout);
 			if($this->dependerUsed) {
-				$code = "Depender.require({scripts:['DomReady'],callback:function(){ $code }});";
+				$code = "Om.domready(function(){ $code });";
 			}
 			$layout->addJavaScriptCode( $code );
 		}
