@@ -14,10 +14,10 @@ Class Depender {
 
 	private static $config;
 	private static $flat;
-	private static $addConfig;
+	private static $addConfFile;
 
-	public function __construct(Array $addConfig) {
-		self::$addConfig = $addConfig;
+	public function __construct($addConfFile=null) {
+		self::$addConfFile = $addConfFile;
 	}
 
 	public function getConfig($reset=false) {
@@ -25,7 +25,8 @@ Class Depender {
 		$file = $this->getVar('project') ? $this->getVar('project') : self::ConfigFilename;
 		$file = self::ConfigPath . $file . '.json';
 		$this->checkFile($file);
-		self::$config = json_decode( file_get_contents( $file ), True ) + self::$addConfig;
+		self::$config = json_decode( file_get_contents( $file ), True );
+		if(file_exists(self::$addConfFile)) self::$config += json_decode( file_get_contents(self::$addConfFile), True );
 		return self::$config;
 	}
 

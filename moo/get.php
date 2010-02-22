@@ -1,25 +1,20 @@
 <?php
-const SOURCES_ENV = "MOO_SCRIPT_SOURCES";
-$addLibs = Array();
-$addLibsKey = null;
-if(array_key_exists(SOURCES_ENV, $_SERVER)) {
-	$addLibsKey = SOURCES_ENV;
-} elseif(array_key_exists("REDIRECT_".SOURCES_ENV, $_SERVER)) {
-	$addLibsKey = "REDIRECT_".SOURCES_ENV;
+const ADD_CONF = "MOO_ADD_CONF";
+$addConfFile = null;
+$addConfKey = null;
+if(array_key_exists(ADD_CONF, $_SERVER)) {
+	$addConfKey = ADD_CONF;
+} elseif(array_key_exists("REDIRECT_".ADD_CONF, $_SERVER)) {
+	$addConfKey = "REDIRECT_".ADD_CONF;
 }
-$addConfig = Array("libs"=>Array());
-if($addLibsKey) {
-	$addLibs = explode(",", $_SERVER[$addLibsKey]);
-	foreach($addLibs as $conf) {
-		list($lib, $scripts) = explode(":", $conf, 2);
-		$addConfig["libs"]["lib"] = Array("scripts"=>"../".$scripts);
-	}
+if($addConfKey) {
+	$addConfFile = $_SERVER[$addConfKey];
 }
 
 if (!file_exists('_cache')) mkdir('_cache');
 require_once '_php/depender.php';
 
-$depender = New Depender($addConfig);
+$depender = New Depender($addConfFile);
 if ($depender->getVar('require') || $depender->getVar('requireLibs') || $depender->getVar('client')) {
 	$depender->build();
 } else if ($depender->getVar('reset')) {
