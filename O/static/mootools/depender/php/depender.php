@@ -253,7 +253,7 @@ Class Depender {
 		$out .= "Depender.loaded.combine(['".join($scripts, "','")."']);".PHP_EOL;
 		$out .= "Depender.setOptions({".PHP_EOL;
 		list($url,) = explode("?", $this->getPageUrl());
-		$out .= "	builder: '".$url[0]."'".PHP_EOL;
+		$out .= "	builder: '".$url."'".PHP_EOL;
 		$out .= "});";
 		return $out;
 	}

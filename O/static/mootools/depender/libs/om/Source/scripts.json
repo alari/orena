@@ -1,7 +1,7 @@
 {
 	"Om": {
 		"Om": {
-			"deps": ["Om","Array","Class"],
+			"deps": ["Om","Array","Class","Depender.Client"],
 			"desc": "Om utility."
 		},
 		"Om.FormSender": {
