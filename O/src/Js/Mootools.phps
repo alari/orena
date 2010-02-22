@@ -42,7 +42,7 @@ class O_Js_Mootools implements O_Js_iFramework {
 	public function addSrc( O_Html_Layout $layout )
 	{
 		if($this->dependerUsed) {
-			$layout->addJavaScriptSrc( $layout->staticUrl("mootools/depender/php/builder.php?client=true&requireLibs=Om",1) );
+			$layout->addJavaScriptSrc( $layout->staticUrl("mootools/depender/php/build.php?client=true&require=Om",1) );
 		} else {
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/core.js", 1 ) );
 			$layout->addJavaScriptSrc( $layout->staticUrl( "mootools/more.js", 1 ) );
