@@ -1,0 +1,3 @@
+RewriteEngine On
+
+RewriteRule ^moo-build$ /Moo/build.php [L]

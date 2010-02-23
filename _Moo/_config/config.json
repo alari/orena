@@ -1,25 +1,38 @@
 {
 	"libs": {
 		"depender": {
-			"copyright": "//",
+			"name": "Depender client source",
+			"version": "-",
 			"scripts": "depender/Source"
 		},
 		"mootools-core": {
+			"name": "MooTools Core Library",
+			"version": "1.2.5dev",
 			"copyright": "//MooTools, <http://mootools.net>, My Object Oriented (JavaScript) Tools. Copyright (c) 2006-2009 Valerio Proietti, <http://mad4milk.net>, MIT Style License.",
 			"scripts": "mootools-core/Source"
 		},
 		"mootools-more": {
+			"name": "MooTools More Library",
+			"version": "1.2.4.4",
 			"copyright": "//MooTools More, <http://mootools.net/more>. Copyright (c) 2006-2009 Aaron Newton <http://clientcide.com/>, Valerio Proietti <http://mad4milk.net> & the MooTools team <http://mootools.net/developers>, MIT Style License.",
 			"scripts": "mootools-more/Source"
 		},
+		"clientcide": {
+			"name": "Clientcide library",
+			"version": "2.2.1dev",
+			"copyright": "//Clientcide",
+			"scripts": "clientcide/Source"
+		},
 		"om": {
-			"copyright": "//Orena Framework Development Team <http://orena.org/> / Dmitry Kurinskiy <http://alari.name/>",
+			"name": "Orena Framework javascript utility addons",
+			"version": "0.dev",
+			"copyright": "//Orena Framework javascript utilities, <http://orena.org/>. Copyright (c) 2010 Dmitry Kurinskiy <http://alari.name/>",
 			"scripts": "orena/Source"
 		}
 	},
 	"compression": "jsmin",
 	"available_compressions": ["yui", "jsmin"],
-	"output filename": "mootools",
+	"output filename": "org.orena.moo",
 
 	"php: cache scripts.json": false
 }

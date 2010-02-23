@@ -1,5 +1,4 @@
-OmClass.implement({
-	attachFormSender: function(instanceId){
+Om.attachFormSender = function(instanceId){
 			var _getEl = function(){
 				el = $(instanceId);
 				if(!el) {
@@ -38,5 +37,4 @@ OmClass.implement({
 			 });
 		};
 		_getEl();
-	}
-});
+	};

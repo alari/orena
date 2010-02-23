@@ -16,8 +16,8 @@ Class Depender {
 	private static $flat;
 	private static $addConfFile;
 
-	public function __construct($addConfFile=null) {
-		self::$addConfFile = $addConfFile;
+	public function __construct() {
+		self::$addConfFile = "../Libs/_config/config.json";
 	}
 
 	public function getConfig($reset=false) {
