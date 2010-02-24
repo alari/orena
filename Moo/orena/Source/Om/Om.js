@@ -10,8 +10,8 @@ var Om = {
 		});
 	},
 	domready: function(callback){
-		this.use("DomReady", function(
+		this.use("DomReady", function(){
 			$(window).addEvent("domready", callback);
-		));
+		});
 	}
 }
