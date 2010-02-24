@@ -27,7 +27,7 @@ Class Depender {
 		$this->checkFile($file);
 		self::$config = json_decode( file_get_contents( $file ), True );
 		if(file_exists(self::$addConfFile)) {
-			$addConfFile = json_decode(self::$config, file_get_contents(self::$addConfFile), True );
+			$addConfFile = json_decode(file_get_contents(self::$addConfFile), True );
 			self::mixInArray(self::$config, $addConfFile);
 			echo "/*add*", print_r($addConfFile, 1), "*/";
 			echo "/*", print_r(self::$config, 1), "*/";
