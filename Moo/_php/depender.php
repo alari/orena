@@ -27,11 +27,29 @@ Class Depender {
 		$this->checkFile($file);
 		self::$config = json_decode( file_get_contents( $file ), True );
 		if(file_exists(self::$addConfFile)) {
-			self::$config = array_merge_recursive(json_decode(self::$config, file_get_contents(self::$addConfFile), True ));
+			$addConfFile = json_decode(self::$config, file_get_contents(self::$addConfFile), True );
+			self::mixInArray(self::$config, $addConfFile);
+			echo "/*add*", print_r($addConfFile, 1), "*/";
 			echo "/*", print_r(self::$config, 1), "*/";
 		}
 		return self::$config;
 	}
+
+	static private function mixInArray(&$base,$mix)
+    {
+        foreach($base as $k => $v) {
+            if(!array_key_exists($k,$mix)) continue;
+            if(is_array($v) && is_array($mix[$k])){
+            	self::mixInArray($base[$k], $mix[$k]);
+            }else{
+                $base[$k] = $mix[$k];
+            }
+        }
+        foreach($mix as $k=>$v) {
+        	if(array_key_exists($k, $base)) continue;
+        	$base[$k] = $v;
+        }
+    }
 
 	private function checkFile($file) {
 		if (!file_exists($file)) die('Could not load file: '. realpath($file));
