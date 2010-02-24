@@ -59,6 +59,9 @@ class O_ClassManager {
 				break;
 			}
 		}
+
+		O_Registry::add("fw/classmanager/requested", $class." ".$file);
+
 		if (!$file) {
 			$file = O_Registry::get("fw/classmanager/default_folder").str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
