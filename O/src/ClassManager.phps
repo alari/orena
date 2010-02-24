@@ -66,6 +66,7 @@ class O_ClassManager {
 			$file = O_Registry::get("fw/classmanager/default_folder").str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
 		}
 		if(!is_readable($file)) {
+			O_Registry::add("fw/classmanager/not_readable", $class." ".$file);
 			$packages = O_Registry::get("fw/packages");
 			foreach($packages as $file => $pattern) {
 				if((is_array($pattern) && in_array($class, $pattern))||strpos($class, $pattern)===0){
