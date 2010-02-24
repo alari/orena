@@ -27,7 +27,7 @@ Class Depender {
 		$this->checkFile($file);
 		self::$config = json_decode( file_get_contents( $file ), True );
 		if(file_exists(self::$addConfFile)) {
-			self::$config += json_decode( file_get_contents(self::$addConfFile), True );
+			self::$config = array_merge_recursive(json_decode(self::$config, file_get_contents(self::$addConfFile), True ));
 			echo "/*", print_r(self::$config, 1), "*/";
 		}
 		return self::$config;
