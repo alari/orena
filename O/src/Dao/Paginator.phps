@@ -226,12 +226,13 @@ class O_Dao_Paginator {
 		return $pages;
 	}
 
-	private function get_page_link($page, $caption="") {
+	private function getPageLink($page, $caption="") {
 		$url = call_user_func( $this->url_callback, $page,
 				$this->order . ($this->order_desc ? "-desc" : "") );
 		
-		//if ($this->ajax_id) 
-		//	return "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
+		if ($this->ajax_id) 
+			return "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml(
+				$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>"; 
 		return  "<a href=\"" . $url . "\">$caption</a>";
 	}
 
@@ -245,7 +246,8 @@ class O_Dao_Paginator {
 	public function getPagesHtml( $range = null, $tailsRange = null )
 	{
 		$pages = $this->getPagesRange( $range, $tailsRange );
-		$numPages = count($pages);
+		$numPages = $this->numPages();
+		$maxPageNo = max(pages);
 		$html = Array ();
 		if($numPages > 3){
 			$html[-2] = $this->get_page_link(1, O_Registry::get( "app/paginator/first" ));
@@ -261,10 +263,10 @@ class O_Dao_Paginator {
 			}
 		}
 		if($this->page < $numPages) {
-			$html[count($html)] = $this->get_page_link($this->page+1, O_Registry::get( "app/paginator/next" ));
+			$html[$maxPageNo+1] = $this->get_page_link($this->page+1, O_Registry::get( "app/paginator/next" ));
 		}
 		if($numPages > 3){
-			$html[count($html)] = $this->get_page_link($numPages,  O_Registry::get( "app/paginator/last" ));
+			$html[$maxPageNo+2] = $this->get_page_link($numPages,  O_Registry::get( "app/paginator/last" ));
 		}
 		return $html;
 	}
