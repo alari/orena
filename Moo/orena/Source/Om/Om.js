@@ -14,4 +14,4 @@ var Om = {
 			$(window).addEvent("domready", callback);
 		});
 	}
-}
+};

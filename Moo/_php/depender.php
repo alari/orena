@@ -17,7 +17,7 @@ Class Depender {
 	private static $addConfFile;
 
 	public function __construct() {
-		self::$addConfFile = "../Libs/_config/config.json";
+		 self::$addConfFile = "../Libs/_config/config.json";
 	}
 
 	public function getConfig($reset=false) {
@@ -26,7 +26,10 @@ Class Depender {
 		$file = self::ConfigPath . $file . '.json';
 		$this->checkFile($file);
 		self::$config = json_decode( file_get_contents( $file ), True );
-		if(file_exists(self::$addConfFile)) self::$config += json_decode( file_get_contents(self::$addConfFile), True );
+		if(file_exists(self::$addConfFile)) {
+			self::$config += json_decode( file_get_contents(self::$addConfFile), True );
+			echo "/*", print_r(self::$config, 1), "*/";
+		}
 		return self::$config;
 	}
 
