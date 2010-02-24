@@ -226,6 +226,15 @@ class O_Dao_Paginator {
 		return $pages;
 	}
 
+	private function get_page_link($page, $caption="") {
+		$url = call_user_func( $this->url_callback, $page,
+				$this->order . ($this->order_desc ? "-desc" : "") );
+		
+		//if ($this->ajax_id) 
+		//	return "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml( 
+		return  "<a href=\"" . $url . "\">$caption</a>";
+	}
+
 	/**
 	 * Returns array of formatted page numbers, with anchors or bold tag (for current page)
 	 *
@@ -236,33 +245,26 @@ class O_Dao_Paginator {
 	public function getPagesHtml( $range = null, $tailsRange = null )
 	{
 		$pages = $this->getPagesRange( $range, $tailsRange );
+		$numPages = count($pages);
 		$html = Array ();
+		if($numPages > 3){
+			$html[-2] = $this->get_page_link(1, O_Registry::get( "app/paginator/first" ));
+		}
+		if($this->page>1){
+			$html[-1] =$this->get_page_link($this->page-1, O_Registry::get( "app/paginator/prev" ));
+		}
 		foreach ($pages as $page) {
-			$v = $page;
-			if ($v != $this->page) {
-				if ($v == 1 && $this->page > 3)
-					$v = O_Registry::get( "app/paginator/first" );
-				elseif ($v == $this->numPages() && $this->page < $this->numPages() - 3)
-					$v = O_Registry::get( "app/paginator/last" );
-				elseif ($v == $this->numPages() - 1 && $this->page < $this->numPages() - 3)
-					$v = O_Registry::get( "app/paginator/next" );
-				elseif ($v == 2 && $this->page > 3)
-					$v = O_Registry::get( "app/paginator/prev" );
-				if (!$v)
-					$v = $page;
-			}
 			if ($page == $this->page) {
-				$html[ $page ] = "<b>" . $v . "</b>";
+				$html[ $page ] = "<b>" . $page . "</b>";
 			} else {
-				$url = call_user_func( $this->url_callback, $page,
-						$this->order . ($this->order_desc ? "-desc" : "") );
-				if ($this->ajax_id) {
-					$html[ $page ] = "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml(
-							$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>";
-				} else {
-					$html[ $page ] = "<a href=\"" . $url . "\">$v</a>";
-				}
+				$html[ $page ] = $this->get_page_link($page, $page);
 			}
+		}
+		if($this->page < $numPages) {
+			$html[count($html)] = $this->get_page_link($this->page+1, O_Registry::get( "app/paginator/next" ));
+		}
+		if($numPages > 3){
+			$html[count($html)] = $this->get_page_link($numPages,  O_Registry::get( "app/paginator/last" ));
 		}
 		return $html;
 	}
