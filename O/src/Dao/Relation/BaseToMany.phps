@@ -12,7 +12,7 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 
 	protected $defStateNumber;
 	static protected $cachedObjects = Array();
-	
+
 	/**
 	 * Overrides getAll() to keep cache between cloned objects
 	 *
@@ -21,11 +21,11 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 	 * @return O_Dao_ActiveRecord[]
 	 */
 	public function getAll($forceCacheReload=false, $processPreload=true) {
-		if($this->state_number != $this->defStateNumber) { 
+		if($this->state_number != $this->defStateNumber) {
 			return parent::getAll($forceCacheReload, $processPreload);
 		}
 		$key = $this->getCacheKey();
-		
+
 		if(!array_key_exists($key, self::$cachedObjects) || $forceCacheReload) {
 			self::$cachedObjects[$key] = parent::getAll($forceCacheReload, $processPreload);
 		}
@@ -34,14 +34,14 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 		}
 		return self::$cachedObjects[$key];
 	}
-	
+
 	/**
 	 * Returns unique string for identifying relation
 	 *
 	 * @return string
 	 */
 	abstract protected function getCacheKey();
-	
+
 	/**
 	 * Removes linked object from relation.
 	 *
@@ -81,6 +81,6 @@ abstract class O_Dao_Relation_BaseToMany extends O_Dao_Query implements Countabl
 	public function reload(){
 		if(array_key_exists($this->getCacheKey(), self::$cachedObjects)) {
 			unset(self::$cachedObjects[$this->getCacheKey()]);
-		}	
+		}
 	}
 }

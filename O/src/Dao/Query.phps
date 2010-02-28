@@ -10,7 +10,7 @@
  *
  * @author Dmitry Kurinskiy
  */
-class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
+class O_Dao_Query extends O_Db_Query implements ArrayAccess, IteratorAggregate {
 	/**
 	 * Classname we're selecting objects from
 	 *
@@ -109,10 +109,10 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			}
 			throw $e;
 		}
-		
+
 		$this->objects = Array ();
 		foreach ($r as $o) {
-			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class, 
+			$this->objects[ $o[ "id" ] ] = O_Dao_ActiveRecord::getById( $o[ "id" ], $this->class,
 					$o );
 		}
 		// Process fields preload
@@ -127,7 +127,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			if (count( $preloadFields ))
 				$this->preload( $preloadFields );
 		}
-		
+
 		return $this->objects;
 	}
 
@@ -151,7 +151,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 			foreach ($preloadClasses as $field => $class) {
 				if (!isset( $preloadIds[ $class ] ))
 					$preloadIds[ $class ] = Array ();
-				if (!in_array( $o[ $field ], $preloadIds[ $class ] ) && !O_Dao_ActiveRecord::objectLoaded( 
+				if (!in_array( $o[ $field ], $preloadIds[ $class ] ) && !O_Dao_ActiveRecord::objectLoaded(
 						$o[ $field ], $class ))
 					$preloadIds[ $class ][] = $o[ $field ];
 			}
@@ -184,7 +184,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	{
 		try {
 			$q = clone $this;
-			return $q->clearFields()->field( $func . "($field) AS c" )->select()->fetch( 
+			return $q->clearFields()->field( $func . "($field) AS c" )->select()->fetch(
 					PDO::FETCH_OBJ )->c;
 		}
 		catch (PDOException $e) {
@@ -206,7 +206,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 */
 	public function getPaginator( $url_callback, $perpage = null, $page_registry = "paginator/page", array $orders = array(), $order_registry = "paginator/order" )
 	{
-		return new O_Dao_Paginator( $this, $url_callback, $perpage, $page_registry, $orders, 
+		return new O_Dao_Paginator( $this, $url_callback, $perpage, $page_registry, $orders,
 				$order_registry );
 	}
 
@@ -229,7 +229,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	{
 		parent::disablePreparing( O_Dao_TableInfo::get( $class )->getTableName() );
 	}
-	
+
 	/**
 	 * Returns true if an object is in result
 	 *
@@ -246,66 +246,14 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 		$this->getAll();
 		return array_key_exists($objectOrId, $this->objects);
 	}
-	
 
 	/**
-	 * For Iterator
+	 * For iterator aggregate
 	 *
-	 * @return bool
-	 * @access private
+	 * @return Array
 	 */
-	public function rewind()
-	{
-		$this->getAll();
-		return reset( $this->objects );
-	}
-
-	/**
-	 * For Iterator
-	 *
-	 * @return O_Dao_ActiveRecord
-	 * @access private
-	 */
-	public function current()
-	{
-		$this->getAll();
-		return current( $this->objects );
-	}
-
-	/**
-	 * For Iterator
-	 *
-	 * @return int
-	 * @access private
-	 */
-	public function key()
-	{
-		$this->getAll();
-		return key( $this->objects );
-	}
-
-	/**
-	 * For Iterator
-	 *
-	 * @return O_Dao_ActiveRecord
-	 * @access private
-	 */
-	public function next()
-	{
-		$this->getAll();
-		return next( $this->objects );
-	}
-
-	/**
-	 * For Iterator
-	 *
-	 * @return bool
-	 * @access private
-	 */
-	public function valid()
-	{
-		$this->getAll();
-		return $this->current() !== false;
+	public function getIterator() {
+		return $this->getAll();
 	}
 
 	/**
