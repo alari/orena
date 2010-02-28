@@ -10,7 +10,7 @@
  *
  * @author Dmitry Kurinskiy
  */
-class O_Dao_Query extends O_Db_Query implements ArrayAccess, IteratorAggregate {
+class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	/**
 	 * Classname we're selecting objects from
 	 *
@@ -247,13 +247,65 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, IteratorAggregate {
 		return array_key_exists($objectOrId, $this->objects);
 	}
 
+
 	/**
-	 * For iterator aggregate
+	 * For Iterator
 	 *
-	 * @return Array
+	 * @return bool
+	 * @access private
 	 */
-	public function getIterator() {
-		return $this->getAll();
+	public function rewind()
+	{
+		$this->getAll();
+		return reset( $this->objects );
+	}
+
+	/**
+	 * For Iterator
+	 *
+	 * @return O_Dao_ActiveRecord
+	 * @access private
+	 */
+	public function current()
+	{
+		$this->getAll();
+		return current( $this->objects );
+	}
+
+	/**
+	 * For Iterator
+	 *
+	 * @return int
+	 * @access private
+	 */
+	public function key()
+	{
+		$this->getAll();
+		return key( $this->objects );
+	}
+
+	/**
+	 * For Iterator
+	 *
+	 * @return O_Dao_ActiveRecord
+	 * @access private
+	 */
+	public function next()
+	{
+		$this->getAll();
+		return next( $this->objects );
+	}
+
+	/**
+	 * For Iterator
+	 *
+	 * @return bool
+	 * @access private
+	 */
+	public function valid()
+	{
+		$this->getAll();
+		return $this->current() !== false;
 	}
 
 	/**
