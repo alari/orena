@@ -19,17 +19,17 @@ namespace O {
 		const VAR_APP = "_app";
 		const VAR_FW = "_fw";
 
+		private static $_app = Array ();
+		private static $_context = Array ();
+		private static $_fw = Array ();
+		private static $_env = Array ();
+
 		const CONFIG_FILE_FW = "Orena.fw.conf";
 		const CONFIG_FILE_APP = "Conf/Registry.conf";
 		const CONFIG_FILE_APP_FW = "Conf/Orena.fw.conf";
 
 		private static $APPS_DIR;
 		private static $APP_NAME;
-
-		private static $_app = Array ();
-		private static $_context = Array ();
-		private static $_fw = Array ();
-		private static $_env = Array ();
 
 		/**
 		 * Returns variable by its simple name
@@ -54,7 +54,7 @@ namespace O {
 		/**
 		 * Sets (or adds) variable by its simple name
 		 *
-		 * @param string $name (*cont ~env `fw _app %local)
+		 * @param string $name (*cont ~env `fw _app)
 		 * @param mixed $value
 		 * @param bool $add
 		 */
@@ -73,7 +73,7 @@ namespace O {
 		/**
 		 * Returns variable type
 		 *
-		 * @param string $name (*cont ~env `fw _app %local)
+		 * @param string $name (*cont ~env `fw _app)
 		 * @return const
 		 */
 		static public function getVarType( $name )
@@ -88,10 +88,138 @@ namespace O {
 				return self::VAR_FW;
 			} elseif ($name[ 0 ] == '_') {
 				return self::VAR_APP;
-			} elseif ($name[ 0 ] == '%') {
-				return self::VAR_LOCAL;
 			}
 			return null;
+		}
+
+		/**
+		 * Initiates app processor
+		 */
+		static public function init()
+		{
+			self::$_env["start_time"] = microtime(true);
+			try {
+				self::$APPS_DIR = O_DOC_ROOT . "/Apps/";
+				self::initEnv();
+				self::initFw();
+			}
+			catch (Exception $e) {
+				self::log( $e->getMessage() . " / in " . $e->getFile() . ":" . $e->getLine(), LOG_EMERG );
+			}
+		}
+
+		/**
+		 * Processes application, shows result
+		 */
+		static public function process()
+		{
+			try {
+				if (!self::$APPS_DIR)
+					self::init();
+				self::selectApp();
+
+				// TODO: get locale from registry
+				setlocale( LC_ALL, "ru_RU.UTF8" );
+
+				if (self::get( "_mode" ) == "development") {
+					set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
+				}
+
+				self::processAppUrls();
+
+				// Prepare and echo response
+				return self::makeResponse();
+			}
+			catch (Exception $e) {
+				$errTpl = self::get( "_err_tpl" );
+				$tpl = new $errTpl( $e );
+				if ($tpl instanceof O_Html_Template) {
+					$tpl->display();
+					return true;
+				}
+			}
+		}
+
+		/**
+		 * Processes application urls configuration file
+		 */
+		static public function processAppUrls()
+		{
+			if(!is_file(self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.conf")) return false;
+			$interpreter = new Conf\Interpreter();
+			$interpreter->processArray(Conf\Parser::parseConfFile(self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.conf"));
+		}
+
+		/**
+		 * Throws exception for every php errer
+		 * @param int $code
+		 * @param string $msg
+		 */
+		static public function errorException( $code, $msg )
+		{
+			throw new O_Ex_CodeError( $msg, $code );
+		}
+
+		/**
+		 * Makes responce by registry
+		 */
+		static public function makeResponce()
+		{
+			// Create O_Command and process it
+			$cmd_name = self::get( "*command_name" );
+			if (!$cmd_name) {
+				$url = self::get( "~process_url" );
+				// Remove extension
+				if (self::get( "_pages_extension" )) {
+					$ext = self::get( "_pages_extension" );
+					if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
+						$url = substr( $url, 0, -strlen( $ext ) );
+					}
+				}
+				// Remove slashes
+				$url = trim( $url, "/" );
+				if (!$url) {
+					$cmd_name = self::get("_default_command");
+				} else {
+					$cmd_name = str_replace( " ", "", ucwords( str_replace( "-", " ", $url ) ) );
+					$cmd_name = str_replace( array (".", "/"), array (" ", " "), $cmd_name );
+					$cmd_name = str_replace( " ", "_", ucwords( $cmd_name ) );
+				}
+			}
+
+			$plugin_name = self::get( "*plugin_name" );
+			$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
+
+			if (!self::get( "*command_full" )) {
+				$cmd_class = self::get( "_class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+				$tpl_class = self::get( "_class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+			} else {
+				$cmd_class = $cmd_name;
+			}
+			if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != self::get("_default_command")) {
+				$cmd_name = self::get("_default_command");
+				$cmd_class = self::get( "_class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+				$tpl_class = self::get( "_class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+			}
+
+			if (class_exists( $cmd_class, true )) {
+				$cmd = new $cmd_class( );
+				if ($cmd instanceof O_Command) {
+					/* @var $cmd O_Command */
+					$cmd->run();
+					return true;
+				}
+			}
+
+			// Else create O_Html_Template
+			if (class_exists( $tpl_class, true )) {
+				$tpl = new $tpl_class( );
+				if ($tpl instanceof O_Html_Template) {
+					$tpl->display();
+					return true;
+				}
+			}
+			throw new O_Ex_PageNotFound( "Page Not Found", 404 );
 		}
 
 		/**
@@ -157,10 +285,11 @@ namespace O {
 			// Get application extension
 			$app_ext = isset( self::$_app[ "ext" ] ) ? self::$_app[ "ext" ] : null;
 			if (!$app_ext)
-				$app_ext = O_ClassManager::DEFAULT_EXTENSION;
+				$app_ext = ClassManager::DEFAULT_EXTENSION;
 
 			// Register application classes
-			O_ClassManager::registerPrefix( $app_prefix, self::$APPS_DIR . "/" . self::$APP_NAME, $app_ext );
+			ClassManager::registerPrefix( $app_prefix, self::$APPS_DIR . "/" . self::$APP_NAME, $app_ext );
+			return true;
 		}
 
 		/**
@@ -171,11 +300,42 @@ namespace O {
 		 * ext
 		 * ~base_url
 		 */
-		static private function selectApp()
+		static public function selectApp()
 		{
-			;
+			if (self::$APP_NAME)
+				return true;
+				// Find application in central applications conditions
+			if (is_file( self::$APPS_DIR . "/Conditions.conf" )) {
+				$configs = Conf\Parser::parseConfFile( self::$APPS_DIR . "/Conditions.conf" );
+				foreach ($configs as $appName => $cond) {
+					if (self::processConditions( $cond, $appName ))
+						return true;
+				}
+			}
+			// Look into applications directories
+			$d = opendir( self::$APPS_DIR . "" );
+			while ($f = readdir( $d )) {
+				if ($f == "." || $f == "..")
+					continue;
+				if (!is_dir( self::$APPS_DIR . "/" . $f ) || !is_file( self::$APPS_DIR . "/" . $f . "/Conf/Conditions.conf" ))
+					continue;
+				$cond = Conf\Parser::parseConfFile( self::$APPS_DIR . "/" . $f . "/Conf/Conditions.conf" );
+				if (self::processConditions( $cond, $f ))
+					return true;
+			}
+			throw new O_Ex_Critical( "Neither app-selecting config nor app config found." );
+
 		}
 
+		/**
+		 * Sets application params to initiate single application
+		 *
+		 * @param string $name
+		 * @param string $prefix
+		 * @param string $ext
+		 * @param string $mode
+		 * @param string $baseUrl
+		 */
 		static public function setApp( $name, $prefix = null, $ext = null, $mode = null, $baseUrl = "/" )
 		{
 			if (self::$APP_NAME)
@@ -187,7 +347,7 @@ namespace O {
 			if (!self::$_app[ "mode" ]) {
 				$cond = Conf\Parser::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/Conf/Conditions.conf" );
 				self::$_app[ "prefix" ] = Utils::first( $cond[ "prefix" ], self::$_app[ "prefix" ] );
-				self::$_app[ "ext" ] = Utils::first( $cond[ "ext" ], self::$_app[ "ext" ], O_ClassManager::DEFAULT_EXTENSION );
+				self::$_app[ "ext" ] = Utils::first( $cond[ "ext" ], self::$_app[ "ext" ], ClassManager::DEFAULT_EXTENSION );
 				foreach ($cond[ "conditions" ] as $mode => $params) {
 					if (self::processCondition( $params )) {
 						self::$_app[ "mode" ] = $mode;
@@ -199,9 +359,15 @@ namespace O {
 				}
 			}
 
-			self::initApp();
+			return self::initApp();
 		}
 
+		/**
+		 * Processes app-selection pattern and registry
+		 *
+		 * @param array $cond
+		 * @return bool
+		 */
 		static private function processCondition( Array $cond )
 		{
 			if ($cond[ "pattern" ] != "any") {
@@ -209,10 +375,32 @@ namespace O {
 				if (!$interpreter->processArray( $cond[ "pattern" ] ))
 					return false;
 			}
-			if(is_array($cond["registry"])) {
-				Utils::mixInArray(self::$_app, $cond["registry"]);
+			if (is_array( $cond[ "registry" ] )) {
+				Utils::mixInArray( self::$_app, $cond[ "registry" ] );
 			}
 			return true;
+		}
+
+		/**
+		 * Processes several app-selecting conditions
+		 *
+		 * @param array $cond application root conditions array
+		 * @param string $appName
+		 * @return bool
+		 */
+		static private function processConditions( Array $cond, $appName )
+		{
+			foreach ($cond[ "conditions" ] as $mode => $params) {
+				if (self::processCondition( $params )) {
+					self::$_app[ "mode" ] = $mode;
+					self::$_app[ "prefix" ] = $cond[ "prefix" ];
+					self::$_app[ "ext" ] = Utils::first( $cond[ "ext" ], ClassManager::DEFAULT_EXTENSION );
+					self::$_app[ "name" ] = $appName;
+					self::$APP_NAME = $appName;
+					return self::initApp();
+				}
+			}
+			return false;
 		}
 
 		/**
