@@ -1,6 +1,8 @@
 <?php
 namespace O {
 
+	use O\Conf;
+
 	function get( $name )
 	{
 		return Core::get( $name );
@@ -41,10 +43,10 @@ namespace O {
 			if (!$varType)
 				return $name;
 			$name = substr( $name, 1 );
-			$res = self::getFromArray( $name, self::$$varType );
+			$res = Utils::getFromArray( $name, self::$$varType );
 			// Return framework value for app request
 			if ($res === null && $varType == self::VAR_APP) {
-				return self::getFromArray( $name, self::$_fw );
+				return Utils::getFromArray( $name, self::$_fw );
 			}
 			return $res;
 		}
@@ -61,24 +63,11 @@ namespace O {
 			$varType = self::getVarType( $name );
 			if (!$varType)
 				return null;
-			$name = substr( $name, 1 );
 			if ($varType != self::VAR_CONTEXT) {
 				self::log( "You should set only context variables from scripts. (Setting '$name')", LOG_NOTICE );
 			}
-			self::setIntoArray( $name, self::$$varType, $value, $add );
-		}
-
-		/**
-		 * Adds message to system log
-		 *
-		 * @param string $message
-		 * @param int $level the lesser, the more important
-		 */
-		static public function log( $message, $level = LOG_INFO )
-		{
-			if ($level <= LOG_CRIT) {
-				fwrite( fopen( "php://stderr", "r" ), $message . "\n" );
-			}
+			$name = substr( $name, 1 );
+			Utils::setIntoArray( $name, self::$$varType, $value, $add );
 		}
 
 		/**
@@ -137,7 +126,7 @@ namespace O {
 			} else {
 				throw new O_Ex_Critical( "Cannot find framework configuration file." );
 			}
-			self::parseConfFile( $src, self::$_fw );
+			Conf\Parser::parseConfFile( $src, self::$_fw );
 		}
 
 		/**
@@ -153,11 +142,11 @@ namespace O {
 
 			// Parse app own configs
 			if (is_file( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP )) {
-				self::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP, self::$_app );
+				Conf\Parser::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP, self::$_app );
 			}
 			// Mix in fw conf
 			if (is_file( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP_FW )) {
-				self::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP_FW, self::$_fw );
+				Conf\Parser::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/" . self::CONFIG_FILE_APP_FW, self::$_fw );
 			}
 
 			// Find application prefix
@@ -196,15 +185,14 @@ namespace O {
 			self::$_env[ "base_url" ] = $baseUrl;
 
 			if (!self::$_app[ "mode" ]) {
-				$cond = self::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/Conf/Conditions.conf" );
-				self::$_app[ "prefix" ] = self::first( $cond[ "prefix" ], self::$_app[ "prefix" ] );
-				self::$_app[ "ext" ] = self::first( $cond[ "ext" ], self::$_app[ "ext" ], O_ClassManager::DEFAULT_EXTENSION );
+				$cond = Conf\Parser::parseConfFile( self::$APPS_DIR . "/" . self::$APP_NAME . "/Conf/Conditions.conf" );
+				self::$_app[ "prefix" ] = Utils::first( $cond[ "prefix" ], self::$_app[ "prefix" ] );
+				self::$_app[ "ext" ] = Utils::first( $cond[ "ext" ], self::$_app[ "ext" ], O_ClassManager::DEFAULT_EXTENSION );
 				foreach ($cond[ "conditions" ] as $mode => $params) {
-					if ($params[ "pattern" ] == "any") {
+					if (self::processCondition( $params )) {
 						self::$_app[ "mode" ] = $mode;
 						break;
 					}
-					// FIXME: check pattern
 				}
 				if (!self::$_app[ "mode" ]) {
 					throw new O_Ex_Critical( "Cannot find valid mode for application processing." );
@@ -216,11 +204,127 @@ namespace O {
 
 		static private function processCondition( Array $cond )
 		{
-			if ($cond[ "pattern" ] == "any")
-				foreach ($cond[ "pattern" ] as $name => $params) {
-
-				}
+			if ($cond[ "pattern" ] != "any") {
+				$interpreter = new Conf\Interpreter( );
+				if (!$interpreter->processArray( $cond[ "pattern" ] ))
+					return false;
+			}
+			if(is_array($cond["registry"])) {
+				Utils::mixInArray(self::$_app, $cond["registry"]);
+			}
+			return true;
 		}
+
+		/**
+		 * Adds message to system log
+		 *
+		 * @param string $message
+		 * @param int $level the lesser, the more important
+		 */
+		static public function log( $message, $level = LOG_INFO )
+		{
+			if ($level <= LOG_CRIT) {
+				fwrite( fopen( "php://stderr", "r" ), $message . "\n" );
+			}
+		}
+	}
+
+	class ClassManager {
+		const DEFAULT_EXTENSION = "php";
+
+		private static $prefixes = Array ();
+		private static $callbacks = Array ();
+		private static $requested = Array ();
+		private static $defaultFolder;
+		private static $notReadable = Array ();
+		private static $loaded = Array ();
+
+		/**
+		 * Adds classname prefix to source folder assotiation
+		 *
+		 * @param string $prefix E.g. "O"
+		 * @param string $source_folder E.g. "src/my/O"
+		 * @param string $extension
+		 */
+		static public function registerPrefix( $prefix, $source_folder, $extension = self::DEFAULT_EXTENSION )
+		{
+			if ($source_folder[ strlen( $source_folder ) - 1 ] != "/")
+				$source_folder .= "/";
+			self::$prefixes = Array ("folder" => $source_folder, "ext" => $extension);
+		}
+
+		/**
+		 * Registers callback to be called when class will be loaded
+		 *
+		 * @param callback $callback
+		 * @param string $class
+		 */
+		static public function registerClassLoadedCallback( $callback, $class )
+		{
+			if (!isset( self::$callbacks[ $class ] ))
+				self::$callbacks[ $class ] = Array ();
+			self::$callbacks[ $class ][] = $callback;
+		}
+
+		/**
+		 * Includes class source file -- autoload implementation
+		 *
+		 * @param string $class
+		 */
+		static public function load( $class )
+		{
+			$file = "";
+			foreach (self::$prefixes as $prefix => $params) {
+				if (strpos( $class, $prefix ) === 0) {
+					$file = $params[ "folder" ] . str_replace( array ('\\', '_'), array ('/', '/'), substr( $class, strlen( $prefix ) + 1 ) ) . "." . $params[ "ext" ];
+					break;
+				}
+			}
+
+			self::$requested[ $class ] = $file;
+
+			if (!$file) {
+				$file = self::$defaultFolder . str_replace( array ('\\', '_'), array ('/', '/'), $class ) . "." . self::DEFAULT_EXTENSION;
+			}
+			if (!is_readable( $file )) {
+				self::$notReadable[ $class ] = $file;
+				$packages = get( "_packages" );
+				foreach ($packages as $file => $pattern) {
+					if ((is_array( $pattern ) && in_array( $class, $pattern )) || strpos( $class, $pattern ) === 0) {
+						$file = self::$prefixes[ "O" ][ "folder" ] . str_replace( " ", "/", $file ) . "." . self::$prefixes[ "O" ][ "ext" ];
+						if (is_readable( $file )) {
+							include $file;
+						}
+					}
+				}
+			}
+
+			else {
+				include $file;
+				self::$loaded[ $class ] = $file;
+				O_Registry::set( "fw/classmanager/loaded/$class", $file );
+				if (class_exists( $class )) {
+					$callbacks = self::$callbacks[ $class ];
+					if (count( $callbacks ))
+						foreach ($callbacks as $callback)
+							call_user_func( $callback );
+				}
+			}
+		}
+
+		static public function init()
+		{
+			// Register autoloader and Orena Framework source files
+			spl_autoload_register( __CLASS__ . "::load" );
+			self::registerPrefix( "O", __DIR__, "phps" );
+			self::$defaultFolder = O_DOC_ROOT . "/O/inc/";
+			set_include_path( O_DOC_ROOT . "/O/inc" . PATH_SEPARATOR . get_include_path() );
+			;
+		}
+	}
+	ClassManager::init();
+
+	class Utils {
 
 		/**
 		 * Mixes $mix into $base array
@@ -307,6 +411,27 @@ namespace O {
 		}
 
 		/**
+		 * Returns first argument
+		 *
+		 * @return mixed
+		 */
+		static public function first()
+		{
+			foreach (func_get_args() as $arg) {
+				if ($arg)
+					return $arg;
+			}
+			return null;
+		}
+	}
+}
+namespace O\Conf {
+
+	use O\Core;
+
+	class Parser {
+
+		/**
 		 * Parses yaml-like config file, stores its contents in $mixInto array
 		 *
 		 * @param string $src
@@ -315,7 +440,6 @@ namespace O {
 		 */
 		static public function parseConfFile( $src, &$mixInto = null )
 		{
-			O_Profiler::start();
 			if (!is_readable( $src )) {
 				throw new O_Ex_Config( "Config file not found ($src)" );
 			}
@@ -367,35 +491,10 @@ namespace O {
 
 			fclose( $f );
 
-			O_Profiler::stop();
-
 			if (!$mixInto)
 				return $result;
 			return null;
 		}
-
-		/**
-		 * Returns first argument
-		 *
-		 * @return mixed
-		 */
-		static public function first()
-		{
-			foreach (func_get_args() as $arg) {
-				if ($arg)
-					return $arg;
-			}
-			return null;
-		}
-	}
-
-}
-namespace O\Conf {
-
-	use O\Core;
-
-	class Parser {
-
 	}
 
 	class Interpreter {
@@ -411,8 +510,10 @@ namespace O\Conf {
 		const T_VAR = "t_var";
 		const T_RETURN = "t_return";
 		const T_END = "t_end";
+		const T_VALUE = "t_value";
+		const T_ASSIGN = "t_assign";
 
-		private static $TOKENS_FIRST = Array("if" => self::T_IF,
+		private static $TOKENS_FIRST = Array ("if" => self::T_IF,
 				"else" => self::T_ELSE,
 				"elif" => self::T_ELIF,
 				"choose" => self::T_CHOOSE,
@@ -423,14 +524,15 @@ namespace O\Conf {
 				"end" => self::T_END,
 				"procedure" => self::T_PROCEDURE,
 				"call" => self::T_CALL);
-		private static $TOKENS_SECOND = Array("==" => self::T_COMPARE,
+		private static $TOKENS_SECOND = Array ("==" => self::T_COMPARE,
 				"!=" => self::T_COMPARE,
 				"~" => self::T_COMPARE,
 				"<" => self::T_COMPARE,
 				">" => self::T_COMPARE,
 				"<=" => self::T_COMPARE,
 				">=" => self::T_COMPARE,
-				"is" => self::T_COMPARE);
+				"is" => self::T_COMPARE,
+				"=" => self::T_ASSIGN);
 
 		private $_local = Array ();
 		private $_local_level = 0;
@@ -443,47 +545,119 @@ namespace O\Conf {
 
 		public function processArray( Array $array )
 		{
+			$level = $this->_local_level;
+			$return = null;
 			try {
-				foreach($array as $k=>$v) {
-					if(is_numeric($k)) {
+				foreach ($array as $k => $v) {
+					if (is_numeric( $k )) {
 						$k = $v;
 						$v = null;
 					}
-					$this->processExpression($k, $v);
+					$this->setLocalLevel( $level + 1 );
+					$return = $this->processExpression( $k, $v );
+					$this->setLocalLevel( $level );
 				}
-			} catch(Exception $e) {
-
 			}
+			catch (Ex $e) {
+				$this->setLocalLevel( $level );
+				if ($e instanceof ExReturn) {
+					return $e->getValue();
+				}
+				throw $e;
+			}
+			return $return;
 		}
 
-		private function processExpression($expression, $value=null) {
-			$params = Array();
-			$type = $this->getExpressionType($expression, $params);
+		private function t_compare( $l, $r, $op, $vals )
+		{
+			$r = $this->processExpression( $r, $vals );
+			$l = $this->getVar( $l );
+			switch ($op) {
+				case "==" :
+					return $l == $r;
+				case "!=" :
+					return $l != $r;
+				case "<" :
+					return $l < $r;
+				case ">" :
+					return $l > $r;
+				case "<=" :
+					return $l <= $r;
+				case ">=" :
+					return $l >= $r;
+				case "~" :
+					$ret = preg_match( "#^$r$#", $l, $m );
+					if ($ret)
+						$this->setLocal( "match", $m );
+					return $ret;
+				case "is" :
+					if ($r == "null")
+						return $l === null;
+					if ($r == "not null")
+						return $l !== null;
+					if ($r == "present")
+						return (bool)$l;
+					if (is_object( $l ))
+						return $l instanceof $r;
+			}
+			throw new ExSyntax( "Compare via '$op': don't know what to do." );
+		}
+
+		private function t_value( $name )
+		{
+			return $this->getVar( $name );
+		}
+
+		private function t_assign( $name, $value, $op, $vals )
+		{
+			if ($value == "Ar") {
+				$this->setVar( $name, $vals );
+			} elseif ($value == "Ad") {
+				$this->setVar( $name, $vals, true );
+			} elseif (!$value && is_array( $vals )) {
+				$this->setVar( $name, $this->processArray( $vals ) );
+			}
+			$this->setVar( $name, $this->processExpression( $value, $vals ) );
+		}
+
+		private function processExpression( $expression, $value = null )
+		{
+			if (!$expression) {
+				if (is_array( $value ))
+					return $this->processArray( $value );
+				else
+					return null;
+			}
+			$params = Array ();
+			$type = $this->getExpressionType( $expression, $params );
 			$params[] = $value;
-			if($type) {
-				call_user_func_array(array($this, $type), $params);
+			if ($type) {
+				return call_user_func_array( array ($this, $type), $params );
 			}
-			throw new ExSyntax("Unknown expression: $expression.");
+			throw new ExSyntax( "Unknown expression: $expression." );
 		}
 
-		private function getExpressionType($expr, &$params) {
+		private function getExpressionType( $expr, &$params )
+		{
 			$first = $expr;
 			$second = "";
 			$other = "";
-			if(strpos($expr, " ")) {
-				list($first, $second) = explode(" ", $expr, 2);
-				if(strpos($second, " ")) {
-					list($second, $other) = explode(" ", $second, 2);
+			if (strpos( $expr, " " )) {
+				list ($first, $second) = explode( " ", $expr, 2 );
+				if (strpos( $second, " " )) {
+					list ($second, $other) = explode( " ", $second, 2 );
 				}
 			}
-			if(array_key_exists($first, self::$TOKENS_FIRST)) {
-				$params = Array(substr($expr, strlen($first)+1));
-				return self::$TOKENS_FIRST[$first];
+			if (array_key_exists( $first, self::$TOKENS_FIRST )) {
+				$params = Array (substr( $expr, strlen( $first ) + 1 ), $first);
+				return self::$TOKENS_FIRST[ $first ];
 			}
-			if(array_key_exists($second, self::$TOKENS_SECOND)) {
-				$params = Array($first, $other);
-				return self::$TOKENS_SECOND[$second];
+			if (array_key_exists( $second, self::$TOKENS_SECOND )) {
+				$params = Array ($first, $other, $second);
+				return self::$TOKENS_SECOND[ $second ];
 			}
+			$params = Array ($expr);
+			return self::T_VALUE;
 		}
 
 		/**
@@ -493,12 +667,12 @@ namespace O\Conf {
 		 * @param mixed $value
 		 * @param bool $add
 		 */
-		private function setVar($name, $value, $add=false)
+		private function setVar( $name, $value, $add = false )
 		{
-			if($name[0] == "%") {
-				return $this->setLocal($name, $value, $add);
+			if ($name[ 0 ] == "%") {
+				return $this->setLocal( $name, $value, $add );
 			}
-			Core::set($name, $value, $add);
+			Core::set( $name, $value, $add );
 		}
 
 		/**
@@ -506,12 +680,12 @@ namespace O\Conf {
 		 *
 		 * @param string $name
 		 */
-		private function getVar($name)
+		private function getVar( $name )
 		{
-			if($name[0] == "%") {
-				return $this->getLocal($name);
+			if ($name[ 0 ] == "%") {
+				return $this->getLocal( $name );
 			}
-			return Core::get($name);
+			return Core::get( $name );
 		}
 
 		/**
@@ -581,16 +755,22 @@ namespace O\Conf {
 		}
 	}
 
-	class Exception extends \Exception {
+	class Ex {
 	}
-	class ExError extends Exception{}
-	class ExSyntax extends Exception{}
-	class ExReturn extends Exception{
+	class ExError extends Ex {
+	}
+	class ExSyntax extends ExError {
+	}
+	class ExReturn extends Ex {
 		private $value;
-		public function __construct($value) {
+
+		public function __construct( $value )
+		{
 			$this->value = $value;
 		}
-		public function getValue() {
+
+		public function getValue()
+		{
 			return $this->value;
 		}
 	}
