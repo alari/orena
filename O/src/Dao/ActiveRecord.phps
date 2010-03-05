@@ -119,7 +119,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 		}
 
 		return $this->getFieldInfo( $name )->getValue( $this,
-				isset( $this->fields[ $name ] ) ? $this->fields[ $name ] : null,
+				$this[ $name ],
 				array_key_exists( $name, $this->fields ) );
 	}
 
@@ -468,6 +468,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	{
 		if (!$this->offsetExists( $offset ))
 			return false;
+		if(array_key_exists($offset, $this->changed)) return $this->changed[$offset];
 		return $this->fields[ $offset ];
 	}
 
