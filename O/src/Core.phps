@@ -119,7 +119,7 @@ namespace O {
 				self::selectApp();
 
 				// TODO: get locale from registry
-				setlocale( LC_ALL, "ru_RU.UTF8" );
+				setlocale( LC_ALL, self::get("_locale") );
 
 				if (self::get( "_mode" ) == "development") {
 					set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
@@ -157,6 +157,7 @@ namespace O {
 		 */
 		static public function errorException( $code, $msg )
 		{
+			self::log("Code error $code: $msg", LOG_WARNING);
 			throw new O_Ex_CodeError( $msg, $code );
 		}
 
@@ -700,6 +701,8 @@ namespace O\Conf {
 		const T_END = "t_end";
 		const T_VALUE = "t_value";
 		const T_ASSIGN = "t_assign";
+		const T_DAO = "t_dao";
+		const T_QUERY = "t_query";
 
 		private static $TOKENS_FIRST = Array ("if" => self::T_IF,
 				"else" => self::T_ELSE,
@@ -711,7 +714,9 @@ namespace O\Conf {
 				"return" => self::T_RETURN,
 				"end" => self::T_END,
 				"procedure" => self::T_PROCEDURE,
-				"call" => self::T_CALL);
+				"call" => self::T_CALL,
+				"dao"=>self::T_DAO,
+				"query"=>self::T_QUERY);
 		private static $TOKENS_SECOND = Array ("==" => self::T_COMPARE,
 				"!=" => self::T_COMPARE,
 				"~" => self::T_COMPARE,
@@ -807,6 +812,11 @@ namespace O\Conf {
 			}
 			$this->setVar( $name, $this->processExpression( $value, $vals ) );
 		}
+
+		private function t_call( $arg, $vals ) {
+			;
+		}
+
 
 		private function processExpression( $expression, $value = null )
 		{
@@ -928,7 +938,7 @@ namespace O\Conf {
 		 *
 		 * @param int $level
 		 */
-		static private function setLocalLevel( $level )
+		private function setLocalLevel( $level )
 		{
 			if ($level == $this->_local_level)
 				return;
