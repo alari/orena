@@ -76,10 +76,11 @@ class O_EntryPoint {
 	}
 
 	static public function runTests() {
+		require "PHPUnit/Framework.php";
 		$suite = O_Registry::get( "app/class_prefix" ) . "_Tests_Suite";
 		if(!class_exists($suite, true)) $suite = O_Registry::get( "app/class_prefix" ) . "_Suite";
 		if(!class_exists($suite, true)) return "Cannot find test suite.";
-		echo "<pre>";
+		echo "<pre>";PHPUnit_Framework_TestSuite::test();
 		PHPUnit_TextUI_TestRunner::run( new $suite );
 		echo "</pre><br/>";
 	}
