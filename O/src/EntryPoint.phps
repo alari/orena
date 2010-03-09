@@ -81,6 +81,7 @@ class O_EntryPoint {
 		if(!class_exists($suite, true)) $suite = O_Registry::get( "app/class_prefix" ) . "_Suite";
 		if(!class_exists($suite, true)) return "Cannot find test suite.";
 		Header("Content-type: text/plain; charset=utf-8");
+		// TODO: drop all tables
 		PHPUnit_TextUI_TestRunner::run( new $suite );
 	}
 

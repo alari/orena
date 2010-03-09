@@ -6,7 +6,7 @@ class O_Db_Manager {
 	 * @var PDO
 	 */
 	private static $connections = Array ();
-	
+
 	const CONN_DEFAULT = "default";
 
 	/**
@@ -20,14 +20,14 @@ class O_Db_Manager {
 	static protected function connect( Array $conf, $conn_id = self::CONN_DEFAULT )
 	{
 		try {
-		$dsn = $conf[ "engine" ] . ":";
-		$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
-		$pass = isset( $conf[ "password" ] ) ? $conf[ "password" ] : "";
-		foreach ($conf as $k => $v)
-			if ($k != "engine" && $k != "user" && $k != "password")
-				$dsn .= $k . '=' . $v . ';';
-		
-		return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
+			$dsn = $conf[ "engine" ] . ":";
+			$user = isset( $conf[ "user" ] ) ? $conf[ "user" ] : "";
+			$pass = isset( $conf[ "password" ] ) ? $conf[ "password" ] : "";
+			foreach ($conf as $k => $v)
+				if ($k != "engine" && $k != "user" && $k != "password")
+					$dsn .= $k . '=' . $v . ';';
+
+			return self::$connections[ $conn_id ] = new PDO( $dsn, $user, $pass );
 		} catch(PDOException $e) {
 			throw new O_Ex_Critical("PDO connection error: ".$e->getMessage());
 		}
@@ -47,7 +47,7 @@ class O_Db_Manager {
 				self::connect( $conf )->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
 				self::$connections[ $conn_id ]->query( "SET character_set_client='utf8'" );
 				self::$connections[ $conn_id ]->query( "SET character_set_results='utf8'" );
-				self::$connections[ $conn_id ]->query( 
+				self::$connections[ $conn_id ]->query(
 						"SET collation_connection='utf8_general_ci'" );
 			}
 		}
