@@ -21,10 +21,10 @@ class O_Acl_Visitor extends O_Base_Visitor implements O_Acl_iUser {
 		// For resource try to get access rule from -visitor role
 		if ($resource) {
 			$registry = O_Registry::get( "acl", $resource );
-			if ($registry instanceof SimpleXMLElement && isset( $registry->Visitor )) {
-				$visitor = $registry->Visitor[ 0 ];
-				if ($visitor && (string)$visitor[ "role" ]) {
-					$access = O_Acl_Role::getByName( (string)$visitor[ "role" ] )->can( $action );
+			if (is_array($registry) && isset( $registry["visitor"] )) {
+				$visitor = $registry["visitor"];
+				if ($visitor) {
+					$access = O_Acl_Role::getByName( $visitor )->can( $action );
 					if (!is_null( $access ))
 						return $access;
 				}
