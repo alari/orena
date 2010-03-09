@@ -59,8 +59,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	public function allow( $action )
 	{
 		$this->clear( $action );
-		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"),
-				array ($action, O_Acl_Action::TYPE_ALLOW) );
+		$this->actions[] = O_Acl_Action::getByRule($action, O_Acl_Action::TYPE_ALLOW);
 	}
 
 	/**
@@ -71,8 +70,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 	public function deny( $action )
 	{
 		$this->clear( $action );
-		$this->actions[] = call_user_func_array( array (O_Acl_Action::getClassName(), "getByRule"),
-				array ($action, O_Acl_Action::TYPE_DENY) );
+		$this->actions[] = O_Acl_Action::getByRule($action, O_Acl_Action::TYPE_DENY );
 	}
 
 	/**

@@ -35,6 +35,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	public function testAllow()
 	{
 		self::$role->allow( "test allow" );
+		print_r(self::$role->actions->getAll());
 		$this->assertEquals( O_Acl_Action::TYPE_ALLOW, self::$role->getActionStatus("test allow") );
 	}
 
