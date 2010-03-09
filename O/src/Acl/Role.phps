@@ -85,6 +85,7 @@ class O_Acl_Role extends O_Dao_ActiveRecord {
 				$this->actions->remove( $act );
 			}
 		}
+		$this->actions->reload();
 	}
 
 	/**
