@@ -3,16 +3,6 @@ namespace O {
 
 	use O\Conf;
 
-	function get( $name )
-	{
-		return Core::get( $name );
-	}
-
-	function set( $name, $value, $add = false )
-	{
-		return Core::set( $name, $value, $add );
-	}
-
 	class Core {
 		const VAR_CONTEXT = "_context";
 		const VAR_ENV = "_env";
@@ -145,9 +135,9 @@ namespace O {
 		 */
 		static public function processAppUrls()
 		{
-			if(!is_file(self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.conf")) return false;
-			$interpreter = new Conf\Interpreter();
-			$interpreter->processArray(Conf\Parser::parseConfFile(self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.conf"));
+			if(!is_file(self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.phps")) return false;
+			include self::$APPS_DIR."/".self::$APP_NAME."/Conf/Urls.phps";
+			self::$_context["url_dispatcher"]();
 		}
 
 		/**
@@ -167,7 +157,7 @@ namespace O {
 		static public function makeResponce()
 		{
 			// Create O_Command and process it
-			$cmd_name = self::get( "*command_name" );
+			$cmd_name = self::get( "*command" );
 			if (!$cmd_name) {
 				$url = self::get( "~process_url" );
 				// Remove extension
@@ -188,19 +178,19 @@ namespace O {
 				}
 			}
 
-			$plugin_name = self::get( "*plugin_name" );
-			$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
+			$plugin = self::get( "*plugin" );
+			$plugin = $plugin && $plugin != "-" ? "_" . $plugin : "";
 
 			if (!self::get( "*command_full" )) {
-				$cmd_class = self::get( "_class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-				$tpl_class = self::get( "_class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+				$cmd_class = self::get( "_class_prefix" ) . $plugin . "_Cmd_" . $cmd_name;
+				$tpl_class = self::get( "_class_prefix" ) . $plugin . "_Tpl_" . $cmd_name;
 			} else {
 				$cmd_class = $cmd_name;
 			}
 			if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != self::get("_default_command")) {
 				$cmd_name = self::get("_default_command");
-				$cmd_class = self::get( "_class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-				$tpl_class = self::get( "_class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+				$cmd_class = self::get( "_class_prefix" ) . $plugin . "_Cmd_" . $cmd_name;
+				$tpl_class = self::get( "_class_prefix" ) . $plugin . "_Tpl_" . $cmd_name;
 			}
 
 			if (class_exists( $cmd_class, true )) {
@@ -372,6 +362,7 @@ namespace O {
 		static private function processCondition( Array $cond )
 		{
 			if ($cond[ "pattern" ] != "any") {
+				// FIXME
 				$interpreter = new Conf\Interpreter( );
 				if (!$interpreter->processArray( $cond[ "pattern" ] ))
 					return false;
@@ -685,291 +676,18 @@ namespace O\Conf {
 			return null;
 		}
 	}
+}
 
-	class Interpreter {
-		const T_COMPARE = "t_compare";
-		const T_IF = "t_if";
-		const T_ELSE = "t_else";
-		const T_ELIF = "t_elif";
-		const T_CHOOSE = "t_choose";
-		const T_TEST = "t_test";
-		const T_OTHERWISE = "t_otherwise";
-		const T_CALL = "t_call";
-		const T_PROCEDURE = "t_procedure";
-		const T_VAR = "t_var";
-		const T_RETURN = "t_return";
-		const T_END = "t_end";
-		const T_VALUE = "t_value";
-		const T_ASSIGN = "t_assign";
-		const T_DAO = "t_dao";
-		const T_QUERY = "t_query";
-
-		private static $TOKENS_FIRST = Array ("if" => self::T_IF,
-				"else" => self::T_ELSE,
-				"elif" => self::T_ELIF,
-				"choose" => self::T_CHOOSE,
-				"test" => self::T_TEST,
-				"otherwise" => self::T_OTHERWISE,
-				"var" => self::T_VAR,
-				"return" => self::T_RETURN,
-				"end" => self::T_END,
-				"procedure" => self::T_PROCEDURE,
-				"call" => self::T_CALL,
-				"dao"=>self::T_DAO,
-				"query"=>self::T_QUERY);
-		private static $TOKENS_SECOND = Array ("==" => self::T_COMPARE,
-				"!=" => self::T_COMPARE,
-				"~" => self::T_COMPARE,
-				"<" => self::T_COMPARE,
-				">" => self::T_COMPARE,
-				"<=" => self::T_COMPARE,
-				">=" => self::T_COMPARE,
-				"is" => self::T_COMPARE,
-				"=" => self::T_ASSIGN);
-
-		private $_local = Array ();
-		private $_local_level = 0;
-		private $_procedures = Array ();
-
-		public function __construct()
-		{
-			;
-		}
-
-		public function processArray( Array $array )
-		{
-			$level = $this->_local_level;
-			$return = null;
-			try {
-				foreach ($array as $k => $v) {
-					if (is_numeric( $k )) {
-						$k = $v;
-						$v = null;
-					}
-					$this->setLocalLevel( $level + 1 );
-					$return = $this->processExpression( $k, $v );
-					$this->setLocalLevel( $level );
-				}
-			}
-			catch (Ex $e) {
-				$this->setLocalLevel( $level );
-				if ($e instanceof ExReturn) {
-					return $e->getValue();
-				}
-				throw $e;
-			}
-			return $return;
-		}
-
-		private function t_compare( $l, $r, $op, $vals )
-		{
-			$r = $this->processExpression( $r, $vals );
-			$l = $this->getVar( $l );
-			switch ($op) {
-				case "==" :
-					return $l == $r;
-				case "!=" :
-					return $l != $r;
-				case "<" :
-					return $l < $r;
-				case ">" :
-					return $l > $r;
-				case "<=" :
-					return $l <= $r;
-				case ">=" :
-					return $l >= $r;
-				case "~" :
-					$ret = preg_match( "#^$r$#", $l, $m );
-					if ($ret)
-						$this->setLocal( "match", $m );
-					return $ret;
-				case "is" :
-					if ($r == "null")
-						return $l === null;
-					if ($r == "not null")
-						return $l !== null;
-					if ($r == "present")
-						return (bool)$l;
-					if (is_object( $l ))
-						return $l instanceof $r;
-			}
-			throw new ExSyntax( "Compare via '$op': don't know what to do." );
-		}
-
-		private function t_value( $name )
-		{
-			return $this->getVar( $name );
-		}
-
-		private function t_assign( $name, $value, $op, $vals )
-		{
-			if ($value == "Ar") {
-				$this->setVar( $name, $vals );
-			} elseif ($value == "Ad") {
-				$this->setVar( $name, $vals, true );
-			} elseif (!$value && is_array( $vals )) {
-				$this->setVar( $name, $this->processArray( $vals ) );
-			}
-			$this->setVar( $name, $this->processExpression( $value, $vals ) );
-		}
-
-		private function t_call( $arg, $vals ) {
-			;
-		}
-
-
-		private function processExpression( $expression, $value = null )
-		{
-			if (!$expression) {
-				if (is_array( $value ))
-					return $this->processArray( $value );
-				else
-					return null;
-			}
-			$params = Array ();
-			$type = $this->getExpressionType( $expression, $params );
-			$params[] = $value;
-			if ($type) {
-				return call_user_func_array( array ($this, $type), $params );
-			}
-			throw new ExSyntax( "Unknown expression: $expression." );
-		}
-
-		private function getExpressionType( $expr, &$params )
-		{
-			$first = $expr;
-			$second = "";
-			$other = "";
-			if (strpos( $expr, " " )) {
-				list ($first, $second) = explode( " ", $expr, 2 );
-				if (strpos( $second, " " )) {
-					list ($second, $other) = explode( " ", $second, 2 );
-				}
-			}
-			if (array_key_exists( $first, self::$TOKENS_FIRST )) {
-				$params = Array (substr( $expr, strlen( $first ) + 1 ), $first);
-				return self::$TOKENS_FIRST[ $first ];
-			}
-			if (array_key_exists( $second, self::$TOKENS_SECOND )) {
-				$params = Array ($first, $other, $second);
-				return self::$TOKENS_SECOND[ $second ];
-			}
-			$params = Array ($expr);
-			return self::T_VALUE;
-		}
-
-		/**
-		 * Sets local or public variable
-		 *
-		 * @param string $name
-		 * @param mixed $value
-		 * @param bool $add
-		 */
-		private function setVar( $name, $value, $add = false )
-		{
-			if ($name[ 0 ] == "%") {
-				return $this->setLocal( $name, $value, $add );
-			}
-			Core::set( $name, $value, $add );
-		}
-
-		/**
-		 * Returns local or public variable's value
-		 *
-		 * @param string $name
-		 */
-		private function getVar( $name )
-		{
-			if ($name[ 0 ] == "%") {
-				return $this->getLocal( $name );
-			}
-			return Core::get( $name );
-		}
-
-		/**
-		 * Sets local variable
-		 *
-		 * @param string $name
-		 * @param mixed $value
-		 * @param bool $add
-		 */
-		private function setLocal( $name, $value, $add = false )
-		{
-			$i = $this->_local_level;
-			for (; $i >= 0; --$i) {
-				$res = Core::getFromArray( $name, $this->_local[ $i ] );
-				if ($res !== null) {
-					Core::setIntoArray( $name, $this->_local[ $i ], $value, $add );
-					return;
-				}
-			}
-			Core::setIntoArray( $name, $this->_local[ $this->_local_level ], $value, $add );
-		}
-
-		/**
-		 * Returns local variable
-		 *
-		 * @param string $name
-		 * @return mixed
-		 */
-		private function getLocal( $name )
-		{
-			$i = $this->_local_level;
-			for (; $i >= 0; --$i) {
-				$res = Core::getFromArray( $name, $this->_local[ $i ] );
-				if ($res !== null)
-					return $res;
-			}
-			return null;
-		}
-
-		/**
-		 * Initiates local variable in current level
-		 *
-		 * @param string $name
-		 */
-		private function varLocal( $name )
-		{
-			Core::setIntoArray( $name, $this->_local[ $this->_local_level ], "" );
-		}
-
-		/**
-		 * Changes level for local variables
-		 *
-		 * @param int $level
-		 */
-		private function setLocalLevel( $level )
-		{
-			if ($level == $this->_local_level)
-				return;
-			if ($level > $this->_local_level) {
-				$i = $this->_local_level + 1;
-				for (; $i <= $level; ++$i)
-					$this->_local[ $i ] = Array ();
-			} else {
-				$this->_local = array_slice( $this->_local, 0, $level + 1 );
-			}
-			$this->_local_level = $level;
-		}
-	}
-
-	class Ex {
-	}
-	class ExError extends Ex {
-	}
-	class ExSyntax extends ExError {
-	}
-	class ExReturn extends Ex {
-		private $value;
-
-		public function __construct( $value )
-		{
-			$this->value = $value;
-		}
-
-		public function getValue()
-		{
-			return $this->value;
-		}
+namespace {
+	/**
+	 * Shortcut for setting and getting registry
+	 *
+	 * @param string $name
+	 * @param notnull $value
+	 * @param bool $add
+	 */
+	function O($name, $value=null, $add=false) {
+		if($value !== null) return \O\Core::set($name, $value, $add);
+		return \O\Core::get($name);
 	}
 }
