@@ -47,18 +47,18 @@ class O_Image_Resizer {
 	public function resize( $max_width, $max_height, $target_file = null, $substitute_ext = false )
 	{
 		list ($width, $height, $type, ) = getimagesize( $this->src );
-		
+
 		if (!$target_file) {
 			$target_file = $this->src;
 		} elseif ($substitute_ext) {
 			$target_file .= $this->ext ? $this->ext : image_type_to_extension( $type );
 		}
-		
+
 		if ($type != IMAGETYPE_GIF && $type != IMAGETYPE_JPEG && $type != IMAGETYPE_PNG) {
-			throw new O_Ex_WrongArgument( 
+			throw new O_Ex_WrongArgument(
 					"Need the image to be in png, jpg or gif format to process it correctly." );
 		}
-		
+
 		// We do not need to resize image, so just copy it if needed
 		if (($width <= $max_width && $height <= $max_height) || (!$max_height && !$max_width)) {
 			if ($this->src != $target_file) {
@@ -68,7 +68,7 @@ class O_Image_Resizer {
 			}
 			return $target_file;
 		}
-		
+
 		// Resizing is necessary
 		$k = $width / $max_width > $height / $max_height ? $width / $max_width : $height /
 						 $max_height;
@@ -84,10 +84,10 @@ class O_Image_Resizer {
 			break;
 		}
 		$newim = imagecreatetruecolor( round( $width / $k ), round( $height / $k ) );
-		imagecopyresized( $newim, $im, 0, 0, 0, 0, imagesx( $newim ), imagesy( $newim ), $width, 
+		imagecopyresampled( $newim, $im, 0, 0, 0, 0, imagesx( $newim ), imagesy( $newim ), $width,
 				$height );
 		imagedestroy( $im );
-		
+
 		if (is_file( $target_file ))
 			unlink( $target_file );
 		switch ($type) {
@@ -101,7 +101,7 @@ class O_Image_Resizer {
 				imagepng( $newim, $target_file );
 			break;
 		}
-		
+
 		imagedestroy( $newim );
 		return $target_file;
 	}
