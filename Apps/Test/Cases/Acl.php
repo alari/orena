@@ -17,7 +17,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 		try {
 			O_Acl_Role::getQuery()->delete();
 		} catch(PDOException $e) {
-
+			echo $e;
 		}
 	}
 
@@ -49,10 +49,10 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	 * Tests O_Acl_Role->can()
 	 * @depends testAllow
 	 * @depends testDeny
+	 * @depends testGetInh
 	 */
 	public function testCan()
 	{
-		self::$role->reload();
 		self::$role->parent->allow( "test inherit" );
 		$this->assertTrue( self::$role->can( "test allow" ) );
 		$this->assertFalse( self::$role->can( "test deny" ) );
@@ -62,6 +62,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Tests O_Acl_Role->clear()
+	 * @depends testCan
 	 */
 	public function testClear()
 	{
@@ -87,6 +88,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Tests O_Acl_Role::getVisitorRole()
+	 * @depends testSetAsVisitorRole
 	 */
 	public function testGetVisitorRole()
 	{
