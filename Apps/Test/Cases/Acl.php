@@ -52,6 +52,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	 */
 	public function testCan()
 	{
+		self::$role->reload();
 		self::$role->parent->allow( "test inherit" );
 		$this->assertTrue( self::$role->can( "test allow" ) );
 		$this->assertFalse( self::$role->can( "test deny" ) );
