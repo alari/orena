@@ -35,6 +35,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	public function testAllow()
 	{
 		self::$role->allow( "test allow" );
+		$this->assertEquals( O_Acl_Action::TYPE_ALLOW, self::$role->getActionStatus("test allow") );
 	}
 
 	/**
@@ -43,6 +44,7 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	public function testDeny()
 	{
 		self::$role->deny( "test deny" );
+		$this->assertEquals( O_Acl_Action::TYPE_DENY, self::$role->getActionStatus("test deny") );
 	}
 
 	/**
@@ -68,14 +70,6 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 	{
 		self::$role->clear( "test allow" );
 		$this->assertNull( self::$role->can( "test allow" ) );
-	}
-
-	/**
-	 * Tests O_Acl_Role->getActionStatus()
-	 */
-	public function testGetActionStatus()
-	{
-		$this->assertEquals( O_Acl_Action::TYPE_DENY, self::$role->getActionStatus( "test deny" ) );
 	}
 
 	/**
