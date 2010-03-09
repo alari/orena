@@ -47,6 +47,8 @@ class Test_Cases_Acl extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * Tests O_Acl_Role->can()
+	 * @depends testAllow
+	 * @depends testDeny
 	 */
 	public function testCan()
 	{
