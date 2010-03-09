@@ -22,10 +22,10 @@ class O_Acl_User extends O_Base_User implements O_Acl_iUser {
 	 * @param O_Dao_ActiveRecord $resource
 	 * @return bool or null
 	 */
-	public function can( $action, O_Dao_ActiveRecord $resource = null )
+	public function can( $action, O_Dao_ActiveRecord $resource = null, $clearCache = false )
 	{
 		$cache_key = $action.($resource?"/".get_class($resource).":".$resource["id"]:"");
-		if(array_key_exists($cache_key, $this->acl_cache)){
+		if(!$clearCache && array_key_exists($cache_key, $this->acl_cache)){
 			return $this->acl_cache[$cache_key];
 		}
 
