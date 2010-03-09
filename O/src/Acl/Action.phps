@@ -12,7 +12,7 @@
  */
 class O_Acl_Action extends O_Dao_ActiveRecord {
 	private static $objs = array ();
-	
+
 	const TYPE_ALLOW = "allow";
 	const TYPE_DENY = "deny";
 
@@ -42,18 +42,18 @@ class O_Acl_Action extends O_Dao_ActiveRecord {
 		$class = self::getClassName();
 		if(!count(self::$objs)) {
 			foreach( O_Dao_Query::get($class) as $action){
-				if(!isset(self::$objs[$action->name])) {
+				if(!array_key_exists($action->name, self::$objs)) {
 					self::$objs[$action->name] = Array();
 				}
 				self::$objs[$action->name][$action->type] = $action;
 			}
 		}
-		if (!isset( self::$objs[ $name ][ $type ] )) {
-			if(!isset(self::$objs[ $name ])) {
-				self::$objs[ $name ] = Array();
-			}
+		if(!array_key_exists($name, self::$objs)) {
+			self::$objs[$name] = Array();
+		}
+		if(!array_key_exists($type, self::$objs[$name])) {
 			self::$objs[ $name ][ $type ] = O_Dao_Query::get($class)->test("name", $name)->test("type", $type)->getOne();
-			if(!self::$objs[ $name ]) {
+			if(!self::$objs[ $name ][ $type ]) {
 				self::$objs[ $name ][ $type ] = new $class( $name, $type );
 			}
 		}
