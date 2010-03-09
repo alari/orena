@@ -80,9 +80,8 @@ class O_EntryPoint {
 		$suite = O_Registry::get( "app/class_prefix" ) . "_Tests_Suite";
 		if(!class_exists($suite, true)) $suite = O_Registry::get( "app/class_prefix" ) . "_Suite";
 		if(!class_exists($suite, true)) return "Cannot find test suite.";
-		echo "<pre>";PHPUnit_Framework_TestSuite::test();
+		Header("Content-type: text/plain; charset=utf-8");
 		PHPUnit_TextUI_TestRunner::run( new $suite );
-		echo "</pre><br/>";
 	}
 
 	/**
