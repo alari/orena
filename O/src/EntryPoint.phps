@@ -58,6 +58,8 @@ class O_EntryPoint {
 
 			if (O_Registry::get( "app/mode" ) == "development") {
 				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
+			} elseif (O_Registry::get("app/mode") == "testing") {
+				return self::runTests();
 			}
 
 			// Prepare and echo response
@@ -71,6 +73,15 @@ class O_EntryPoint {
 				return true;
 			}
 		}
+	}
+
+	static public function runTests() {
+		$suite = O_Registry::get( "app/class_prefix" ) . "_Tests_Suite";
+		if(!class_exists($suite, true)) $suite = O_Registry::get( "app/class_prefix" ) . "_Suite";
+		if(!class_exists($suite, true)) return "Cannot find test suite.";
+		echo "<pre>";
+		PHPUnit_TextUI_TestRunner::run( new $suite );
+		echo "</pre><br/>";
 	}
 
 	/**
