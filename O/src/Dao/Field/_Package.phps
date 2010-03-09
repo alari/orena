@@ -1326,6 +1326,9 @@ class O_Dao_Field_ToOne extends O_Dao_Field_Bases implements O_Dao_Field_iFace, 
 		if (!$fieldExists) {
 			$this->addFieldToTable();
 		}
+		if(!$fieldValue) {
+			return null;
+		}
 		return O_Dao_ActiveRecord::getById( $fieldValue, $this->target );
 	}
 
