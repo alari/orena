@@ -247,26 +247,25 @@ class O_Dao_Paginator {
 	{
 		$pages = $this->getPagesRange( $range, $tailsRange );
 		$numPages = $this->numPages();
-		$maxPageNo = max($pages);
 		$html = Array ();
-		if($numPages > 3){
-			$html[-2] = $this->getPageLink(1, O_Registry::get( "app/paginator/first" ));
+		$pageNo = 0;
+		if($this->page>1 && $numPages > 3){
+			$html[$pageNo++] = $this->getPageLink(1, O_Registry::get( "app/paginator/first" ));
+			$html[$pageNo] = $this->getPageLink($this->page-1, O_Registry::get( "app/paginator/prev" ));
 		}
-		if($this->page>1){
-			$html[-1] = $this->getPageLink($this->page-1, O_Registry::get( "app/paginator/prev" ));
-		}
+        
 		foreach ($pages as $page) {
+			
 			if ($page == $this->page) {
-				$html[ $page ] = "<b>" . $page . "</b>";
+				$html[ $page + $pageNo ] = "<b>" . $page . "</b>";
 			} else {
-				$html[ $page ] = $this->getPageLink($page, $page);
+				$html[ $page + $pageNo ] = $this->getPageLink($page, $page);
 			}
 		}
-		if($this->page < $numPages) {
-			$html[$maxPageNo+1] = $this->getPageLink($this->page+1, O_Registry::get( "app/paginator/next" ));
-		}
-		if($numPages > 3){
-			$html[$maxPageNo+2] = $this->getPageLink($numPages,  O_Registry::get( "app/paginator/last" ));
+		if($numPages>3 && $this->page < $numPages) {
+			$pageNo = max(array_keys($html));
+			$html[++$pageNo] = $this->getPageLink($this->page+1, O_Registry::get( "app/paginator/next" ));
+			$html[++$pageNo] = $this->getPageLink($numPages,  O_Registry::get( "app/paginator/last" ));
 		}
 		return $html;
 	}
