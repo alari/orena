@@ -232,7 +232,7 @@ class O_Dao_Paginator {
 		
 		if ($this->ajax_id) 
 			return "<a href=\"javascript:void(0)\" onclick=\"" . O_Js_Middleware::getFramework()->ajaxHtml(
-				$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$v</a>"; 
+				$this->ajax_id, $url, array ("mode" => $this->ajax_id) ) . "\">$caption</a>"; 
 		return  "<a href=\"" . $url . "\">$caption</a>";
 	}
 
