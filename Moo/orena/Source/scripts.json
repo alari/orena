@@ -11,7 +11,7 @@
 	},
 	"3rdParty": {
 		"OpenIdSelector": {
-			"deps": ["Class","Cookie","Element.Style","Element.Event"],
+			"deps": ["Class","Cookie","Element.Style","Element.Event","DomReady"],
 			"desc": "OpenId relying party"
 		}
 	}
