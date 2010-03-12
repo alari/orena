@@ -8,5 +8,11 @@
 			"deps": ["Function","Request.JSON","Element"],
 			"desc": "Sender for auto-generated ajax forms."
 		}
+	},
+	"3rdParty": {
+		"OpenIdSelector": {
+			"deps": ["Class","Cookie","Element.Style","Element.Event"],
+			"desc": "OpenId relying party"
+		}
 	}
 }
