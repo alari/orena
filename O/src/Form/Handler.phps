@@ -208,7 +208,7 @@ class O_Form_Handler extends O_Form_Generator {
 
 		}
 		catch (Exception $e) {
-			O_Db_Manager::getConnection()->rollBack();
+			//O_Db_Manager::getConnection()->rollBack();
 			if (!isset( $this->errors[ "_" ] ))
 				$this->errors[ "_" ] = $e->getMessage();
 			return $this->handleResult = 0;
