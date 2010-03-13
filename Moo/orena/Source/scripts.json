@@ -8,5 +8,11 @@
 			"deps": ["Function","Request.JSON","Element"],
 			"desc": "Sender for auto-generated ajax forms."
 		}
+	},
+	"3rdParty": {
+		"Rainbow": {
+			"deps": ["Core","Class","Class.Extras","Array","String","Function","Number","Element","Element.Event","Selectors","Element.Dimensions","DomReady","Drag","Color","Assets"],
+			"desc": "Color picker"
+		}
 	}
 }
