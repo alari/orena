@@ -51,6 +51,12 @@ class O_Form_Builder {
 	 * @var string
 	 */
 	protected $instanceId;
+	/**
+	 * Array of field errors
+	 *
+	 * @var Array
+	 */
+	protected $errors = Array ();
 
 	/**
 	 * Constructor
@@ -244,9 +250,31 @@ class O_Form_Builder {
 		foreach ($this->fieldsets as $f)
 			if ($f->hasField( $fieldName )) {
 				$f->setFieldError( $fieldName, $error );
+				$this->errors[$fieldName] = $error;
 				return true;
 			}
 		throw new O_Ex_WrongArgument( "Field $fieldName not found. Cannot assign error '$error'." );
+	}
+
+	/**
+	 * Returns error message for given field
+	 *
+	 * @param string $field
+	 * @return string
+	 */
+	public function getError( $field )
+	{
+		return array_key_exists( $field, $this->errors ) ? $this->errors[ $field ] : null;
+	}
+
+	/**
+	 * Returns array of errors for fields
+	 *
+	 * @return array
+	 */
+	public function getErrors()
+	{
+		return $this->errors;
 	}
 
 	/**
@@ -274,5 +302,22 @@ class O_Form_Builder {
 				O_Js_Middleware::getFramework()->ajaxForm( $this->instanceId );
 			}
 			echo "</form>";
+		}
+
+		public function ajaxSucceedResponse($refreshOrLocation = null) {
+			$response = Array ("status" => "SUCCEED");
+
+			if ($refreshOrLocation === 1 || $refreshOrLocation === true) {
+				$response[ "refresh" ] = 1;
+			} elseif ($refreshOrLocation) {
+				$response[ "redirect" ] = $refreshOrLocation;
+
+			}
+			return json_encode($response);
+		}
+
+		public function ajaxFailedResponse() {
+			$response = Array("status" => "FAILED", "errors" => $this->errors);
+			return json_encode($response);
 		}
 	}

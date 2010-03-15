@@ -19,12 +19,6 @@ class O_Form_Handler extends O_Form_Generator {
 	 */
 	protected $handleResult;
 	/**
-	 * Array of field errors
-	 *
-	 * @var Array
-	 */
-	protected $errors = Array ();
-	/**
 	 * We're creating the new ActiveRecord or editing the old one?
 	 *
 	 * @var array or 0
@@ -73,27 +67,6 @@ class O_Form_Handler extends O_Form_Generator {
 	public function setAjax( $isAjax = true )
 	{
 		$this->isAjax = $isAjax;
-	}
-
-	/**
-	 * Returns error message for given field
-	 *
-	 * @param string $field
-	 * @return string
-	 */
-	public function getError( $field )
-	{
-		return array_key_exists( $field, $this->errors ) ? $this->errors[ $field ] : null;
-	}
-
-	/**
-	 * Returns array of errors for fields
-	 *
-	 * @return array
-	 */
-	public function getErrors()
-	{
-		return $this->errors;
 	}
 
 	/**
