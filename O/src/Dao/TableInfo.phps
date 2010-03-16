@@ -71,6 +71,8 @@ class O_Dao_TableInfo {
 	 */
 	private $tail = "";
 
+	private $registry = Array();
+
 	/**
 	 * Uses recursion to get table config
 	 *
@@ -78,6 +80,8 @@ class O_Dao_TableInfo {
 	 */
 	private function __construct($class) {
 		$this->class = $class;
+
+		if(!is_subclass_of($class, "O_Dao_ActiveRecord")) return;
 
 		$reflection = new ReflectionClass ( $class );
 		if (! $reflection->isSubclassOf ( "O_Dao_ActiveRecord" ))
@@ -222,11 +226,7 @@ class O_Dao_TableInfo {
 
 					case "registry" :
 						list ( $key, $value ) = explode ( " ", $value, 2 );
-						if (isset ( $subkeys ["add"] )) {
-							O_Registry::add ( $key, $value );
-						} else {
-							O_Registry::set ( $key, $value );
-						}
+						$this->registry[$key] = Array($value, isset($subkeys["add"]));
 						break;
 				}
 			}
@@ -339,8 +339,23 @@ class O_Dao_TableInfo {
 	static public function get($class) {
 		if (is_object ( $class ))
 			$class = get_class ( $class );
-		if (! isset ( self::$conf [$class] ))
-			self::$conf [$class] = new self ( $class );
+
+
+		if (! array_key_exists( $class, self::$conf )) {
+			$cacheKey = O_Registry::get("app/name")."table$".$class;
+			$conf = O_Dao_ApcCache::retrieve($cacheKey);
+			if($conf instanceof self) {
+				self::$conf[$class] = $conf;
+			} else {
+				self::$conf [$class] = new self ( $class );
+				O_Dao_ApcCache::store($cacheKey);
+			}
+			if(self::$conf[$class]) {
+				foreach(self::$conf[$class]->registry as $k=>$v) {
+					$v[1] ? O_Registry::add("app/".$k, $v[0]) : O_Registry::set("app/".$k, $v[0]);
+				}
+			}
+		}
 		return self::$conf [$class];
 	}
 
