@@ -303,13 +303,7 @@ class O_Dao_TableInfo {
 			return $this->fields [$name];
 		}
 		if (is_array ( $this->fields [$name] )) {
-			$cacheKey = O_Registry::get("app/name")."fieldinfo$".$this->class."$".$name;
-			if($field = O_Dao_ApcCache::retrieve($cacheKey) && $fiend instanceof O_Dao_FieldInfo) {
-				$this->fields [$name] = $field;
-			} else {
-				$this->fields [$name] = new O_Dao_FieldInfo ( $this->class, $name, $this->fields [$name] [0], $this->fields [$name] [1] );
-				O_Dao_ApcCache::store($cacheKey, $this->fields [$name]);
-			}
+			$this->fields [$name] = new O_Dao_FieldInfo ( $this->class, $name, $this->fields [$name] [0], $this->fields [$name] [1] );
 		}
 		return $this->fields [$name];
 	}
@@ -348,14 +342,7 @@ class O_Dao_TableInfo {
 
 
 		if (! array_key_exists( $class, self::$conf )) {
-			$cacheKey = O_Registry::get("app/name")."table$".$class;
-			$conf = O_Dao_ApcCache::retrieve($cacheKey);
-			if($conf instanceof self) {
-				self::$conf[$class] = $conf;
-			} else {
-				self::$conf [$class] = new self ( $class );
-				O_Dao_ApcCache::store($cacheKey);
-			}
+			self::$conf [$class] = new self ( $class );
 			if(self::$conf[$class]) {
 				foreach(self::$conf[$class]->registry as $k=>$v) {
 					$v[1] ? O_Registry::add("app/".$k, $v[0]) : O_Registry::set("app/".$k, $v[0]);
