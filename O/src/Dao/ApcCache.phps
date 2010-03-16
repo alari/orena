@@ -6,7 +6,10 @@ class O_Dao_ApcCache {
 	}
 
 	static public function retrieve($name) {
-		if(function_exists("apc_fetch")) apc_fetch($name);
+		if(function_exists("apc_fetch")) {
+			$f = apc_fetch($name);
+			if($f) setcookie("test", "+f");
+		}
 	}
 
 	static public function delete($name) {
