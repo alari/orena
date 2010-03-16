@@ -303,7 +303,13 @@ class O_Dao_TableInfo {
 			return $this->fields [$name];
 		}
 		if (is_array ( $this->fields [$name] )) {
-			$this->fields [$name] = new O_Dao_FieldInfo ( $this->class, $name, $this->fields [$name] [0], $this->fields [$name] [1] );
+			$cacheKey = O_Registry::get("app/name")."fieldinfo$".$this->class."$".$name;
+			if($field = O_Dao_ApcCache::retrieve($cacheKey) && $fiend instanceof O_Dao_FieldInfo) {
+				$this->fields [$name] = $field;
+			} else {
+				$this->fields [$name] = new O_Dao_FieldInfo ( $this->class, $name, $this->fields [$name] [0], $this->fields [$name] [1] );
+				O_Dao_ApcCache::store($cacheKey, $this->fields [$name]);
+			}
 		}
 		return $this->fields [$name];
 	}
