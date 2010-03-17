@@ -226,7 +226,7 @@ class O_Dao_TableInfo {
 
 					case "registry" :
 						list ( $key, $value ) = explode ( " ", $value, 2 );
-						$this->registry[$key] = Array($value, isset($subkeys["add"]));
+						isset($subkeys["add"]) ? O_Registry::add($key, $value) : O_Registry::set($key, $value);
 						break;
 				}
 			}
