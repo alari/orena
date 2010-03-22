@@ -11,24 +11,33 @@
  * @author Dmitry Kurinskiy
  */
 class O_Registry {
-	/**
-	 * Parsed registry
-	 *
-	 * @var Array
-	 */
-	public static $registry = Array ();
+	const VAR_CONTEXT = "_context";
+	const VAR_ENV = "_env";
+	const VAR_APP = "_app";
+	const VAR_FW = "_fw";
 
-	/**
-	 * Inheritance dependencies between registry keys
-	 *
-	 * @var Array
-	 */
-	private static $inheritance = Array ();
+	private static $_app = Array ();
+	private static $_context = Array ();
+	private static $_fw = Array ();
+	private static $_env = Array ();
+
+	private static $symbols = Array(
+		"*"=>self::VAR_CONTEXT,
+		"~"=>self::VAR_ENV,
+		"_"=>self::VAR_APP,
+		"`"=>self::VAR_FW
+	);
+	private static $prefixes = Array(
+		"app/current" => self::VAR_CONTEXT,
+		"app" => self::VAR_APP,
+		"env" => self::VAR_ENV,
+		"fw" => self::VAR_FW
+	);
 
 	/**
 	 * Returns registry value or array of values, runtime or default
 	 *
-	 * @param string $key like ini-file[/ini-section[/key]]
+	 * @param string $key
 	 * @params string|object $class Returns value from app/class/$classname registry key
 	 * @return mixed
 	 */
@@ -39,31 +48,35 @@ class O_Registry {
 		if ($class)
 			$key = "app/class/" . $class . "/$key";
 
-		$keys = explode ( "/", $key );
-		$value = self::$registry;
-		foreach ( $keys as $k ) {
-			if (isset ( $value [$k] )) {
-				$value = $value [$k];
-				continue;
-			}
-			// Value not found, trying to get it from parents
-			for($j = count ( $keys ); $j > 0; $j --) {
-				$_key = join ( "/", array_slice ( $keys, 0, $j ) );
-				if (isset ( self::$inheritance [$_key] )) {
-					$key = self::$inheritance [$_key] . ($j < count ( $keys ) ? "/" . join ( "/", array_slice ( $keys, $j ) ) : "");
-					return self::get ( $key );
-				} else
-					continue;
-			}
-			// I really cannot understand how it works
-			O_Profiler::stop();
-			if (! $key) {
-				return $value;
-			}
-			return null;
+		$varType = self::getVarType($key);
+		if(!$varType) return $key;
+		$r = O_Utils::getFromArray($key, self::$$varType);
+		if($r === null && $varType == self::VAR_APP) {
+			$r = O_Utils::getFromArray($key, self::$_fw);
 		}
 		O_Profiler::stop();
-		return $value;
+		return $r;
+	}
+
+	/**
+	 * Returns variable type, modifies key
+	 *
+	 * @param string $key
+	 */
+	static public function getVarType(&$key) {
+		if(array_key_exists($key[0], self::$symbols)) {
+			$type = self::$symbols[$key[0]];
+			$key = substr($key, 1);
+			return $type;
+		}
+		foreach(self::$prefixes as $k=>$type) {
+			if(strpos($key, $k) === 0) {
+				$key = substr($key, strlen($k));
+				if($key && $key[0] === '/') $key = substr($key, 1);
+				return $type;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -93,45 +106,16 @@ class O_Registry {
 	 * @param mixed $value
 	 * @param bool $add
 	 */
-	static private function setOrAdd($key, $value, $add = false) {
+	static public function setOrAdd($key, $value, $add = false) {
 		O_Profiler::start();
-		$keys = is_array($key) ? $key : explode ( "/", $key );
-		$registry = &self::$registry;
-		foreach ( $keys as $i => $k ) {
-			if (isset ( $registry [$k] )) {
-				$registry = &$registry [$k];
-			} elseif ($i < count ( $keys ) - 1) {
-				$registry [$k] = Array ();
-				$registry = &$registry [$k];
-			} else {
-				if ($add) {
-					if (! isset ( $registry [$k] ) || ! is_array ( $registry [$k] ))
-						$registry [$k] = Array ();
-					$registry [$k] [] = $value;
-					O_Profiler::stop();
-					return;
-				} else {
-					$registry [$k] = $value;
-					O_Profiler::stop();
-					return;
-				}
-			}
+		$varType = self::getVarType( $key );
+		if (!$varType)
+			return null;
+		if ($varType != self::VAR_CONTEXT) {
+			//self::log( "You should set only context variables from scripts. (Setting '$key')", LOG_NOTICE );
 		}
-		if ($add)
-			$registry [] = $value;
-		else
-			$registry = $value;
+		O_Utils::setIntoArray( $key, self::$$varType, $value, $add );
 		O_Profiler::stop();
-	}
-
-	/**
-	 * Adds inheritance aliasing for registry keys
-	 *
-	 * @param string $base Key to inherit from
-	 * @param string $inherit Key to inherit to
-	 */
-	static public function setInheritance($base, $inherit) {
-		self::$inheritance [$inherit] = $base;
 	}
 
 	/**
@@ -142,88 +126,29 @@ class O_Registry {
 	 * @return Array if $rootkey is not specified
 	 */
 	static public function parseFile($src, $rootkey = null) {
-		O_Profiler::start();
-		if (! is_readable ( $src )) {
-			throw new O_Ex_Config ( "Config file not found (rootkey $rootkey)" );
-		}
-		$f = fopen ( $src, 'r' );
-
-		$links = Array ();
-		if (! $rootkey) {
-			$result = Array ();
-			$links [0] = & $result;
-		} else {
-			if (! isset ( self::$registry [$rootkey] )) {
-				self::$registry [$rootkey] = Array ();
-			}
-			$links [0] = & self::$registry [$rootkey];
-		}
-
-		$prev_level = 0;
-		// Lines counter for error displaying
-		$i = 0;
-
-		while ( $l = fgets ( $f ) ) {
-			++$i;
-			$level = strlen ( $l ) - strlen ( $l = ltrim ( $l ) );
-			// Don't process empty strings and comments (started with #)
-			if (! $l || $l [0] == "#") {
-				continue;
-			}
-			if ($level - $prev_level > 1) {
-				throw new O_Ex_Config ( "Markup error in config file ($src:$i)." );
-			}
-			$prev_level = $level;
-
-			$l = rtrim ( $l );
-
-			// Line has keypart
-			$l = str_replace("\\:", "\t", $l);
-			if (strpos ( $l, ":" )) {
-				list ( $k, $v ) = explode ( ":", $l, 2 );
-				$k = str_replace("\t", ":", $k);
-				$v = str_replace("\t", ":", $v);
-				$k = rtrim ( $k );
-				$v = ltrim ( $v );
-				if ($v) {
-					$links [$level] [$k] = $v;
-				} else {
-					$links [$level + 1] = & $links [$level] [$k];
-				}
-			} else {
-				$links [$level] [] = $l;
-			}
-		}
-
-		fclose ( $f );
-
-		O_Profiler::stop();
-
-		if (! $rootkey)
-			return $result;
-		return null;
+		if(!$rootkey) return O_Conf_Parser::parseConfFile($src);
+		$varType = self::getVarType($rootkey);
+		return O_Conf_Parser::parseConfFile($src, self::$$varType);
 	}
 
+	/**
+	 * Mixes values into registry root
+	 *
+	 * @param array $values
+	 * @param string $rootkey
+	 */
 	static public function mixIn(Array $values, $rootkey) {
-		if(!isset(self::$registry[$rootkey])) {
-			self::$registry[$rootkey] = Array();
-		}
-		self::mixInArray(self::$registry[$rootkey], $values);
+		$varType = self::getVarType($rootkey);
+		O_Utils::mixInArray(self::$$varType, $values);
 	}
+}
 
-	static private function mixInArray(&$base,$mix)
-    {
-        foreach($base as $k => $v) {
-            if(!array_key_exists($k,$mix)) continue;
-            if(is_array($v) && is_array($mix[$k])){
-            	self::mixInArray($base[$k], $mix[$k]);
-            }else{
-                $base[$k] = $mix[$k];
-            }
-        }
-        foreach($mix as $k=>$v) {
-        	if(array_key_exists($k, $base)) continue;
-        	$base[$k] = $v;
-        }
-    }
+function O($name, $value=null, $add=false) {
+	if($value === null) return O_Registry::get($name);
+	return O_Registry::setOrAdd($name, $value, $add);
+}
+function O_cl($name, $class, $value=null, $add=false) {
+	if($value === null) return O_Registry::get($name, $class);
+	$name = "_class/".(is_object($class)?get_class($class):$class)."/".$name;
+	return O_Registry::setOrAdd($name, $value, $add);
 }
