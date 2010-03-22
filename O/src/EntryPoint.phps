@@ -16,7 +16,7 @@ require 'ClassManager.phps';
  * ./Apps/Orena.fw.conf -- framework registry configuration (to be used instead of default one, located in ./O/src/)
  * ./Apps/{APP_NAME}/Conf/Conditions.php -- application conditions
  * ./Apps/{APP_NAME}/Conf/Registry.conf -- registry in app rootkey
- * ./Apps/{APP_NAME}/Conf/Urls.conf -- url parser
+ * ./Apps/{APP_NAME}/Conf/Urls.php -- url parser
  *
  * @author Dmitry Kurinskiy
  */
@@ -179,99 +179,13 @@ class O_EntryPoint {
 			include self::$APPS_DIR."/" . $app_name . "/Conf/Urls.php";
 			$dispatcher = O("*url_dispatcher");
 			$dispatcher();
-			return true;
-		}
-
-		if (!is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" ))
-			return false;
-
-		$conf = O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" );
-
-		foreach ($conf as $key => $params) {
-			self::processUrlsConfPart( $key, $params );
 		}
 
 		// Processing class uses
-		$uses = O_Registry::get( "app/uses" );
+		$uses = O( "_uses" );
 		if (is_array( $uses ))
 			foreach ($uses as $class)
 				class_exists( $class );
-	}
-
-	/**
-	 * Processes part of Urls.conf configuration file
-	 *
-	 * @param string $key
-	 * @param mixed $params
-	 * @param array $pockets
-	 */
-	static private function processUrlsConfPart( $key, $params, $pockets = Array() )
-	{
-		$subkey = "";
-		if (strpos( $key, " " )) {
-			list ($key, $subkey) = explode( " ", $key, 2 );
-			$subkey = trim( $subkey );
-		}
-		switch ($key) {
-			// Process registry in "app" rootkey
-			case "registry" :
-				if (is_array( $params )) {
-					$v = null;
-					if (isset( $params[ "pocket" ] )) {
-						$v = isset( $pockets[ $params[ "pocket" ] ] ) ? $pockets[ $params[ "pocket" ] ] : null;
-					}
-					if (isset( $params[ "call" ] ) && is_callable( $params[ "call" ] )) {
-						$v = call_user_func( $params[ "call" ], $v );
-					} elseif (isset( $params[ "class" ] ) && class_exists( $params[ "class" ] )) {
-						$v = O_Dao_ActiveRecord::getById( $v, $params[ "class" ] );
-					}
-				} else
-					$v = $params;
-				O_Registry::set( "app/" . $subkey, $v );
-			break;
-			// Condition based on mode name and plugin name
-			case "if" :
-				list ($what, $to_what) = explode( "=", $subkey, 2 );
-				$what = trim( $what );
-				$to_what = trim( $to_what );
-				if ($what == "mode" && O_Registry::get( "app/mode" ) != $to_what)
-					break;
-				if ($what == "plugin" && O( "*plugin" ) != $to_what)
-					break;
-				foreach ($params as $k => $v) {
-					self::processUrlsConfPart( $k, $v );
-				}
-
-			break;
-			// Parses hostname with pattern, processes child nodes if matches
-			case "host" :
-				if (preg_match( "#^$subkey$#i", O_Registry::get( "env/http_host" ), $pockets )) {
-					foreach ($params as $k => $v)
-						self::processUrlsConfPart( $k, $v, $pockets );
-				}
-			break;
-			// Parses URL with pattern, processes child nodes if matches
-			case "url" :
-				$url = O_Registry::get( "env/process_url" );
-				if (preg_match( "#^$subkey$#i", $url, $pockets )) {
-					// Set command for URL, if available
-					foreach ($params as $k => $v)
-						self::processUrlsConfPart( $k, $v, $pockets );
-				}
-			break;
-			// Sets "app/command_name" registry key, continues processing
-			case "command" :
-				// TODO: add command type and so on processing
-				if (!O( "*command" ))
-					O( "command*", $params );
-			break;
-			// Set plugin into "app/plugin_name" registry
-			case "plugin" :
-				O( "*plugin", $params );
-			break;
-			default :
-				throw new O_Ex_Config( "Unknown key in urls configuration file." );
-		}
 	}
 
 	/**
