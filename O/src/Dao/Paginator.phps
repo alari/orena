@@ -76,13 +76,13 @@ class O_Dao_Paginator {
 	 * @param string $order_registry in app rootkey
 	 * @param array $orders like urlpart => array("title", "field") or field=>title
 	 */
-	public function __construct( O_Dao_Query $query, $url_callback, $perpage = null, $page_registry = "*paginator/page", array $orders = array(), $order_registry = "paginator/order" )
+	public function __construct( O_Dao_Query $query, $url_callback, $perpage = null, $page_registry = "*paginator/page", array $orders = array(), $order_registry = "*paginator/order" )
 	{
 		$this->query = clone $query;
-		$this->perpage = (int)($perpage ? $perpage : O_Registry::get( "app/paginator/perpage" ));
+		$this->perpage = (int)($perpage ? $perpage : O( "_paginator/perpage" ));
 		if (!$this->perpage)
 			throw new O_Ex_WrongArgument( "Cannot build paginator for 0 objects per page." );
-		$this->page = (int)O_Registry::get( $page_registry );
+		$this->page = (int)O( $page_registry );
 		if (!$this->page)
 			$this->page = 1;
 
@@ -91,7 +91,7 @@ class O_Dao_Paginator {
 		$this->url_callback = $url_callback;
 
 		if (count( $orders )) {
-			$this->order = O_Registry::get( "app/" . $order_registry );
+			$this->order = O( $order_registry );
 			$this->orders_list = $orders;
 			foreach ($this->orders_list as $k => &$v) {
 				if (!is_array( $v ))
