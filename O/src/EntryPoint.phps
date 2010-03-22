@@ -14,8 +14,7 @@ require 'ClassManager.phps';
  *
  * This depends on several configuration files:
  * ./Apps/Orena.fw.conf -- framework registry configuration (to be used instead of default one, located in ./O/src/)
- * ./Apps/Conditions.conf -- application selection
- * ./Apps/{APP_NAME}/Conf/Conditions.conf -- application conditions
+ * ./Apps/{APP_NAME}/Conf/Conditions.php -- application conditions
  * ./Apps/{APP_NAME}/Conf/Registry.conf -- registry in app rootkey
  * ./Apps/{APP_NAME}/Conf/Urls.conf -- url parser
  *
@@ -138,15 +137,6 @@ class O_EntryPoint {
 	 */
 	static public function selectApp()
 	{
-		// Find application in central applications conditions
-		if (is_file( self::$APPS_DIR."/Conditions.conf" )) {
-			$configs = O_Registry::parseFile( self::$APPS_DIR."/Conditions.conf" );
-			foreach ($configs as $app => $cond) {
-				if (self::processConditions( $cond, $app )) {
-					return true;
-				}
-			}
-		}
 		// Look into applications directories
 		$d = opendir( self::$APPS_DIR."" );
 		while ($f = readdir( $d )) {
@@ -164,103 +154,8 @@ class O_EntryPoint {
 					return true;
 				}
 			}
-
-			if (!is_dir( self::$APPS_DIR."/" . $f ) || !is_file( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" ))
-				continue;
-			$cond = O_Registry::parseFile( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" );
-			if (self::processConditions( $cond, $f )) {
-				return true;
-			}
 		}
 		throw new O_Ex_Critical( "Neither app-selecting config nor app config found." );
-	}
-
-	/**
-	 * Processes application conditions array as mode=>conf
-	 *
-	 * @param array $cond
-	 * @param string $app_name
-	 * @return bool
-	 * @throws O_Ex_Config
-	 */
-	static protected function processConditions( Array $cond, $app_name )
-	{
-		$app_prefix = isset( $cond[ "prefix" ] ) ? $cond[ "prefix" ] : null;
-		$app_ext = isset( $cond[ "ext" ] ) ? $cond[ "ext" ] : null;
-		if (!$app_ext)
-			$app_ext = O_ClassManager::DEFAULT_EXTENSION;
-
-		if (!$app_prefix || !$app_name)
-			throw new O_Ex_Config( "Application without name or class prefix cannot be processed." );
-
-		foreach ($cond[ "conditions" ] as $mode => $c) {
-			if (self::processCondRules( $c )) {
-				O_ClassManager::registerPrefix( $app_prefix, self::$APPS_DIR."/" . $app_name, $app_ext );
-				O_Registry::set( "app/class_prefix", $app_prefix );
-				O_Registry::set( "app/name", $app_name );
-				O_Registry::set( "app/mode", $mode );
-
-				if (isset( $c[ "registry" ] ) && is_array( $c[ "registry" ] )) {
-					foreach ($c[ "registry" ] as $rootkey => $values) {
-						if (is_array( $values )) {
-							O_Registry::mixIn( $values, $rootkey );
-						} else {
-							O_Registry::set( $rootkey, $values );
-						}
-					}
-				}
-
-				O_Registry::set( "env/process_url", substr( O_Registry::get( "env/request_url" ), strlen( O_Registry::get( "env/base_url" ) ) ) );
-
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Processes app-selecting condition rules
-	 *
-	 * @param array $cond
-	 * #return bool
-	 */
-	static private function processCondRules( Array $cond )
-	{
-		if ($cond[ "pattern" ] == "any")
-			return true;
-
-		foreach ($cond[ "pattern" ] as $name => $part) {
-			switch ($name) {
-				// Checks if url starts with "base" attribute or matches "pattern"
-				case "url" :
-					$d = 0;
-					if (isset( $part[ "base" ] ) && $part[ "base" ]) {
-						if (strpos( O_Registry::get( "env/request_url" ), $part[ "base" ] ) === 0) {
-							O_Registry::set( "env/base_url", $part[ "base" ] );
-							$d = 1;
-						} else
-							return false;
-					}
-					if (isset( $part[ "pattern" ] ) && $part[ "pattern" ]) {
-						$pattern = $part[ "pattern" ];
-						if (preg_match( "#^$pattern$#i", O_Registry::get( "env/request_url" ) ))
-							continue;
-					}
-					if ($d)
-						continue;
-					return false;
-				break;
-				// Checks if hostname matches pattern
-				case "host" :
-					if ($part && preg_match( "#^$part$#i", O_Registry::get( "env/http_host" ) ))
-						continue;
-					return false;
-				break;
-				default :
-					throw new O_Ex_Config( "Wrong node in app-selection condition: " . $name );
-			}
-		}
-		return true;
 	}
 
 	/**

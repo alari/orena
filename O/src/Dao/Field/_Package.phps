@@ -136,7 +136,7 @@ abstract class O_Dao_Field_Bases {
 		if ($targetBase[ 0 ] == "{" && $targetBase[ strlen( $targetBase ) - 1 ] == "}") {
 			return O_Registry::get( "app/" . substr( $targetBase, 1, -1 ) );
 		} elseif ($targetBase[ 0 ] == "_") {
-			return O_Registry::get( "app/class_prefix" ) . "_Mdl" . $targetBase;
+			return O_Registry::get( "_prefix" ) . "_Mdl" . $targetBase;
 		} else {
 			return $targetBase;
 		}
