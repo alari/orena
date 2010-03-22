@@ -62,8 +62,8 @@ class Test_Cases_Registry extends PHPUnit_Framework_TestCase {
 	 */
 	public function testInheritance()
 	{
-		O_Registry::set("_test_inh", "+1");
-		$this->assertEquals("+1", O_Registry::get("`test_inh"));
+		O_Registry::set("`test_inh", "+1");
+		$this->assertEquals("+1", O_Registry::get("_test_inh"));
 	}
 
 }

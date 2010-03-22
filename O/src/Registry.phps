@@ -126,7 +126,6 @@ class O_Registry {
 	 * @return Array if $rootkey is not specified
 	 */
 	static public function parseFile($src, $rootkey = null) {
-		echo "(".$rootkey.")";
 		if(!$rootkey) return O_Conf_Parser::parseConfFile($src);
 		$varType = self::getVarType($rootkey);
 		return O_Conf_Parser::parseConfFile($src, self::$$varType);
