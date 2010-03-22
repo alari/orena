@@ -34,8 +34,10 @@ class O_Utils {
 		 */
 		static public function getFromArray( $nestedKey, Array $array )
 		{
-			if (!strpos( $nestedKey, "/" ))
+			if (!$nestedKey)
 				return $array;
+			if (!strpos( $nestedKey, "/" ))
+				return array_key_exists($nestedKey, $array) ? $array[$nestedKey] : null;
 			$keys = explode( "/", $nestedKey );
 			$value = $array;
 			foreach ($keys as $k) {
@@ -58,31 +60,40 @@ class O_Utils {
 		 */
 		static public function setIntoArray( $nestedKey, Array &$array, $value, $add = false )
 		{
-			if (!strpos( $nestedKey, "/" ))
+			if(!$nestedKey) {
 				$array = $value;
+				return;
+			}
+
+			if (!strpos( $nestedKey, "/" )) {
+				$array[$nestedKey] = $value;
+				return;
+			}
+
 			$keys = explode( "/", $nestedKey );
+			$set = &$array;
 			foreach ($keys as $i => $k) {
-				if (isset( $array[ $k ] )) {
-					$array = &$array[ $k ];
+				if (isset( $set[ $k ] )) {
+					$set = &$set[ $k ];
 				} elseif ($i < count( $keys ) - 1) {
-					$array[ $k ] = Array ();
-					$array = &$array[ $k ];
+					$set[ $k ] = Array ();
+					$set = &$set[ $k ];
 				} else {
 					if ($add) {
-						if (!isset( $array[ $k ] ) || !is_array( $array[ $k ] ))
-							$array[ $k ] = Array ();
-						$array[ $k ][] = $value;
+						if (!isset( $set[ $k ] ) || !is_array( $set[ $k ] ))
+							$set[ $k ] = Array ();
+						$set[ $k ][] = $value;
 						return;
 					} else {
-						$array[ $k ] = $value;
+						$set[ $k ] = $value;
 						return;
 					}
 				}
 			}
 			if ($add)
-				$array[] = $value;
+				$set[] = $value;
 			else
-				$array = $value;
+				$set = $value;
 		}
 
 		/**

@@ -118,9 +118,6 @@ class O_EntryPoint {
 		// Request method
 		O_Registry::set( "env/request_method", $_SERVER[ 'REQUEST_METHOD' ] );
 
-		// Setting registry inheritance
-		O_Registry::setInheritance( "fw", "app" );
-
 		// Adding request params to env/request registry
 		O_Registry::set( "env/params", array_merge( $_POST, $_GET ) );
 
