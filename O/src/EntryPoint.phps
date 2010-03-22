@@ -295,7 +295,7 @@ class O_EntryPoint {
 	static public function makeResponse()
 	{
 		// Create O_Command and process it
-		$cmd_name = O_Registry::get( "app/command_name" );
+		$cmd_name = O( "*command" );
 		if (!$cmd_name) {
 			$url = O_Registry::get( "env/process_url" );
 			// Remove extension
@@ -316,7 +316,7 @@ class O_EntryPoint {
 			}
 		}
 
-		$plugin_name = O_Registry::get( "app/plugin_name" );
+		$plugin_name = O_Registry::get( "*plugin" );
 		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
 
 		if (!O_Registry::get( "app/command_full" )) {
