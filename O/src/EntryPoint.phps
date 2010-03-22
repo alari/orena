@@ -169,10 +169,17 @@ class O_EntryPoint {
 	 */
 	static private function processAppConfig()
 	{
-		$app_name = O_Registry::get( "app/name" );
+		$app_name = O( "_name" );
 
 		if (is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf" )) {
 			O_Registry::parseFile( self::$APPS_DIR."/" . $app_name . "/Conf/Registry.conf", "app" );
+		}
+
+		if(is_file(self::$APPS_DIR."/" . $app_name . "/Conf/Urls.php")) {
+			include self::$APPS_DIR."/" . $app_name . "/Conf/Urls.php";
+			$dispatcher = O("*url_dispatcher");
+			$dispatcher();
+			return true;
 		}
 
 		if (!is_file( self::$APPS_DIR."/" . $app_name . "/Conf/Urls.conf" ))
