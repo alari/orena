@@ -78,8 +78,8 @@ class O_EntryPoint {
 
 	static public function runTests() {
 		require "PHPUnit/Framework.php";
-		$suite = O_Registry::get( "app/class_prefix" ) . "_Tests_Suite";
-		if(!class_exists($suite, true)) $suite = O_Registry::get( "app/class_prefix" ) . "_Suite";
+		$suite = O( "_prefix" ) . "_Tests_Suite";
+		if(!class_exists($suite, true)) $suite = O( "*prefix" ) . "_Suite";
 		if(!class_exists($suite, true)) return "Cannot find test suite.";
 		Header("Content-type: text/plain; charset=utf-8");
 		// TODO: drop all tables
