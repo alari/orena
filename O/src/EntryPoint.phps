@@ -418,15 +418,15 @@ class O_EntryPoint {
 		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
 
 		if (!O_Registry::get( "app/command_full" )) {
-			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+			$cmd_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+			$tpl_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
 		} else {
 			$cmd_class = $cmd_name;
 		}
 		if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
 			$cmd_name = "Default";
-			$cmd_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-			$tpl_class = O_Registry::get( "app/class_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
+			$cmd_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
+			$tpl_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
 		}
 
 		if (class_exists( $cmd_class, true )) {
