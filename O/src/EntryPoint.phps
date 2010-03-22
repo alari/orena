@@ -57,9 +57,9 @@ class O_EntryPoint {
 			// TODO: get locale from registry
 			setlocale( LC_ALL, "ru_RU.UTF8" );
 
-			if (O_Registry::get( "app/mode" ) == "development") {
+			if (O( "*mode" ) == "development") {
 				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
-			} elseif (O_Registry::get("app/mode") == "testing") {
+			} elseif (O("*mode") == "testing") {
 				return self::runTests();
 			}
 
