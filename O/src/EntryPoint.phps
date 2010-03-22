@@ -260,6 +260,7 @@ class O_EntryPoint {
  	 * @param string $name
  	 */
  	static private function tryCmdTpl($name) {
+ 		$plugin = O("*plugin");
  		$plugin = $plugin && $plugin != "-" ? "_".$plugin : "";
  		if(self::tryRunCmdTpl(O("_prefix").$plugin."_Cmd_".$name)) return true;
  		if(self::tryRunCmdTpl(O("_prefix").$plugin."_Tpl_".$name)) return true;
