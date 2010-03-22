@@ -152,6 +152,19 @@ class O_EntryPoint {
 		while ($f = readdir( $d )) {
 			if ($f == "." || $f == "..")
 				continue;
+
+			if(is_file(self::$APPS_DIR."/" . $f . "/Conf/Conditions.php")) {
+				include self::$APPS_DIR."/" . $f . "/Conf/Conditions.php";
+				$cond = O("*conditions");
+				$cond();
+				if(O("*mode")) {
+					O("_name", $f);
+					O( "~process_url", substr( O( "~request_url" ), strlen( O( "~base_url" ) ) ) );
+					O_ClassManager::registerPrefix(O("_prefix"), self::$APPS_DIR."/" . $f, O("_ext"));
+					return true;
+				}
+			}
+
 			if (!is_dir( self::$APPS_DIR."/" . $f ) || !is_file( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" ))
 				continue;
 			$cond = O_Registry::parseFile( self::$APPS_DIR."/" . $f . "/Conf/Conditions.conf" );
