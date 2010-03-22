@@ -1,5 +1,6 @@
 <?php
 // We need to require it manually
+require 'Utils.phps';
 require 'Profiler.phps';
 require 'ClassManager.phps';
 /**
