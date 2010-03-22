@@ -53,8 +53,8 @@ class O_EntryPoint {
 			// Parsing application registry
 			self::processAppConfig();
 
-			// TODO: get locale from registry
-			setlocale( LC_ALL, "ru_RU.UTF8" );
+			// Sets main locale
+			setlocale( LC_ALL, O("_locale"));
 
 			if (O( "*mode" ) == "development") {
 				set_error_handler( Array (__CLASS__, "errorException"), E_ALL );
@@ -66,7 +66,7 @@ class O_EntryPoint {
 			return self::makeResponse();
 		}
 		catch (Exception $e) {
-			$errTpl = O_Registry::get( "app/err_tpl" );
+			$errTpl = O( "_err_tpl" );
 			$tpl = new $errTpl( $e );
 			if ($tpl instanceof O_Html_Template) {
 				$tpl->display();
@@ -110,18 +110,20 @@ class O_EntryPoint {
 		$url = $_SERVER[ 'REQUEST_URI' ];
 		if (strpos( $url, "?" ))
 			$url = substr( $url, 0, strpos( $url, "?" ) );
-		O_Registry::set( "env/request_url", $url );
+		O( "~request_url", $url );
 
 		// Saving HTTP_HOST value
-		O_Registry::set( "env/http_host", $_SERVER[ 'HTTP_HOST' ] );
+		O( "~http_host", $_SERVER[ 'HTTP_HOST' ] );
+		O( "~host", $_SERVER[ 'HTTP_HOST' ] );
 		// Request method
-		O_Registry::set( "env/request_method", $_SERVER[ 'REQUEST_METHOD' ] );
+		O( "~request_method", $_SERVER[ 'REQUEST_METHOD' ] );
+		O( "~method", $_SERVER["REQUEST_METHOD"] );
 
 		// Adding request params to env/request registry
-		O_Registry::set( "env/params", array_merge( $_POST, $_GET ) );
+		O( "~params", array_merge( $_POST, $_GET ) );
 
 		// Base URL
-		O_Registry::set( "env/base_url", "/" );
+		O( "~base_url", "/" );
 	}
 
 	/**
@@ -202,66 +204,65 @@ class O_EntryPoint {
 	}
 
 	/**
-	 * According with current application settings, processes command or template and echoes response
-	 *
-	 * @return bool True on success, false on 404 error (will be also echoed)
+	 * Makes and echoes response or throws PageNotFound error
 	 */
-	static public function makeResponse()
-	{
-		// Create O_Command and process it
-		$cmd_name = O( "*command" );
-		if (!$cmd_name) {
-			$url = O_Registry::get( "env/process_url" );
-			// Remove extension
-			if (O_Registry::get( "app/pages_extension" )) {
-				$ext = O_Registry::get( "app/pages_extension" );
-				if (strlen( $url ) > strlen( $ext ) && substr( $url, -strlen( $ext ) ) == $ext) {
-					$url = substr( $url, 0, -strlen( $ext ) );
-				}
+	static public function makeResponse() {
+		$cmd_class = O("*command_class");
+		if($cmd_class && self::tryRunCmdTpl($cmd_class)) return;
+
+		if(self::tryCmdTpl( self::getCmdName() )) return;
+		if(self::tryCmdTpl( O("_default_command") )) return;
+
+		throw new O_Ex_PageNotFound("Page Not Found", 404);
+ 	}
+
+ 	/**
+ 	 * Returns command name according to configs and/or url
+ 	 */
+ 	static private function getCmdName() {
+ 		$cmd = O("*command");
+		if(!$cmd) {
+			$url = O("~process_url");
+			$ext = O("_pages_extension");
+			if( $ext && substr($url, -strlen($ext)) == $ext) {
+				$url = substr( $url, 0, -strlen($ext) );
 			}
-			// Remove slashes
-			$url = trim( $url, "/" );
-			if (!$url) {
-				$cmd_name = "Default";
+			$url = trim($url, "/");
+			if(!$url) {
+				$cmd = O("_default_command");
 			} else {
-				$cmd_name = str_replace( " ", "", ucwords( str_replace( "-", " ", $url ) ) );
-				$cmd_name = str_replace( array (".", "/"), array (" ", " "), $cmd_name );
-				$cmd_name = str_replace( " ", "_", ucwords( $cmd_name ) );
+				$cmd = str_replace(" ", "", ucwords(strtr($url, "-", " ")));
+				$cmd = strtr($cmd, "./ ", "___");
 			}
 		}
+		return $cmd;
+ 	}
 
-		$plugin_name = O_Registry::get( "*plugin" );
-		$plugin_name = $plugin_name && $plugin_name != "-" ? "_" . $plugin_name : "";
+ 	/**
+ 	 * Tries to run command or template by its full classname
+ 	 * @param string $class
+ 	 */
+ 	static private function tryRunCmdTpl($class) {
+ 		if(!class_exists($class, true)) return false;
+ 		$o = new $class;
+ 		if($o instanceof O_Command) {
+ 			$o->run();
+ 			return true;
+ 		} elseif($o instanceof O_Html_Template) {
+ 			$o->display();
+ 			return true;
+ 		}
+ 		return false;
+ 	}
 
-		if (!O_Registry::get( "app/command_full" )) {
-			$cmd_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-			$tpl_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
-		} else {
-			$cmd_class = $cmd_name;
-		}
-		if (!class_exists( $cmd_class, true ) && !class_exists( $tpl_class, true ) && $cmd_name != "Default") {
-			$cmd_name = "Default";
-			$cmd_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Cmd_" . $cmd_name;
-			$tpl_class = O_Registry::get( "_prefix" ) . $plugin_name . "_Tpl_" . $cmd_name;
-		}
-
-		if (class_exists( $cmd_class, true )) {
-			$cmd = new $cmd_class( );
-			if ($cmd instanceof O_Command) {
-				/* @var $cmd O_Command */
-				$cmd->run();
-				return true;
-			}
-		}
-
-		// Else create O_Html_Template
-		if (class_exists( $tpl_class, true )) {
-			$tpl = new $tpl_class( );
-			if ($tpl instanceof O_Html_Template) {
-				$tpl->display();
-				return true;
-			}
-		}
-		throw new O_Ex_PageNotFound( "Page Not Found", 404 );
-	}
+ 	/**
+ 	 * Builds command and template classes, tries to run them
+ 	 * @param string $name
+ 	 */
+ 	static private function tryCmdTpl($name) {
+ 		$plugin = $plugin && $plugin != "-" ? "_".$plugin : "";
+ 		if(self::tryRunCmdTpl(O("_prefix").$plugin."_Cmd_".$name)) return true;
+ 		if(self::tryRunCmdTpl(O("_prefix").$plugin."_Tpl_".$name)) return true;
+ 		return false;
+ 	}
 }
