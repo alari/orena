@@ -204,7 +204,7 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 	 * @param string $page_registry
 	 * @return O_Dao_Paginator
 	 */
-	public function getPaginator( $url_callback, $perpage = null, $page_registry = "paginator/page", array $orders = array(), $order_registry = "paginator/order" )
+	public function getPaginator( $url_callback, $perpage = null, $page_registry = "*paginator/page", array $orders = array(), $order_registry = "*paginator/order" )
 	{
 		return new O_Dao_Paginator( $this, $url_callback, $perpage, $page_registry, $orders,
 				$order_registry );
