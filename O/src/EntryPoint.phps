@@ -236,7 +236,7 @@ class O_EntryPoint {
 				$to_what = trim( $to_what );
 				if ($what == "mode" && O_Registry::get( "app/mode" ) != $to_what)
 					break;
-				if ($what == "plugin" && O_Registry::get( "app/plugin_name" ) != $to_what)
+				if ($what == "plugin" && O( "*plugin" ) != $to_what)
 					break;
 				foreach ($params as $k => $v) {
 					self::processUrlsConfPart( $k, $v );
@@ -262,12 +262,12 @@ class O_EntryPoint {
 			// Sets "app/command_name" registry key, continues processing
 			case "command" :
 				// TODO: add command type and so on processing
-				if (!O_Registry::get( "app/command_name" ))
-					O_Registry::set( "app/command_name", $params );
+				if (!O( "*command" ))
+					O( "command*", $params );
 			break;
 			// Set plugin into "app/plugin_name" registry
 			case "plugin" :
-				O_Registry::set( "app/plugin_name", $params );
+				O( "*plugin", $params );
 			break;
 			default :
 				throw new O_Ex_Config( "Unknown key in urls configuration file." );
