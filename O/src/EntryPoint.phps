@@ -37,7 +37,7 @@ class O_EntryPoint {
 	static public function processRequest()
 	{
 		try {
-			O_Registry::set( "start-time", microtime( true ) );
+			O( "*start-time", microtime( true ) );
 
 			self::$APPS_DIR = O_DOC_ROOT."/Apps";
 
