@@ -12,6 +12,8 @@ Om.EditableLine = new Class({
 		onBlur: function(value, el, this)
 		onKeypress: function(event, el, this)
 		onChange: function(value, el, this)
+		bindTo: input element with value
+		field: create hidden element with this name and bind to it
 		*/
 	},
 	initialize: function(el, options){
@@ -19,8 +21,11 @@ Om.EditableLine = new Class({
 		this.setOptions(options);
 		this.el.addClass(this.options.classDefault);
 		
-		if(!this.options.nullValue) {
+		if(!$defined(this.options.nullValue)) {
 			this.options.nullValue = this.el.get("text");
+		}
+		if($defined(this.options.field)) {
+			this.createHiddenField();
 		}
 		this.checkNull();
 		
@@ -30,6 +35,18 @@ Om.EditableLine = new Class({
 		this.el.addEvent("keyup", this.evtChange);
 	},
 	
+	getValue: function(){
+		var value = this.el.get("text");
+		if(value == this.options.nullValue) return '';
+		return value;
+	},
+	createHiddenField: function(){
+		this.options.bindTo = new Element("input", {
+			type: "hidden",
+			name: this.options.field,
+			value: this.getValue()
+		});
+	},
 	checkNull: function(){
 		if(this.el.get("text") == this.options.nullValue) {
 			this.el.addClass(this.options.classNull);
@@ -39,9 +56,7 @@ Om.EditableLine = new Class({
 	},
 	
 	evtClick: function(){
-		if(this.checkNull()) {
-			this.el.set("text", "");
-		}
+		this.el.set("text", this.getValue());
 		this.el.removeClass(this.options.classNull);
 		this.el.addClass(this.options.classActive);
 		this.el.setProperty("contentEditable", true);
@@ -51,14 +66,14 @@ Om.EditableLine = new Class({
 	evtBlur: function(){
 		this.el.removeClass(this.options.classActive);
 		this.el.setProperty("contentEditable", false);
-		if(!this.el.get("text")) {
+		if(!this.getValue()) {
 			this.el.set("text", this.options.nullValue);
 		} else {
 			this.el.set("html", this.el.get("text"));
 		}
 		this.checkNull();
 		this.evtChange();
-		this.fireEvent("blur", [this.el.get("text"), this.el, this]);
+		this.fireEvent("blur", [this.getValue(), this.el, this]);
 	},
 	evtKeypress: function(e) {
 		if(e.key == "enter") {
@@ -68,6 +83,9 @@ Om.EditableLine = new Class({
 		this.fireEvent("keypress", [e, this.el, this]);
 	},
 	evtChange: function(){
-		this.fireEvent("change", [this.el.get("text"), this.el, this]);
+		if(this.options.bindTo) {
+			$(this.options.bindTo).set("value", this.getValue());
+		}
+		this.fireEvent("change", [this.getValue(), this.el, this]);
 	}
 });

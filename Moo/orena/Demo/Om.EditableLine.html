@@ -13,11 +13,13 @@
 <body>
 <div id="e">Test editable</div>
 
+<input type="text" id="binded" size="255"/>
+
 <textarea id="e-cnt" cols="80" rows="20"></textarea>
 
 <script type="text/javascript">
 	var line1 = new Om.EditableLine("e", {
-		onChange: function(value){$('e-cnt').set("text", value);}
+		bindTo: "binded"
 	});
 </script>
 
