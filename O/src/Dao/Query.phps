@@ -247,6 +247,30 @@ class O_Dao_Query extends O_Db_Query implements ArrayAccess, Iterator {
 		return array_key_exists($objectOrId, $this->objects);
 	}
 
+	/**
+	 * Apply one or several callbacks on the query
+	 *
+	 * @return O_Dao_Query
+	 */
+	public function __invoke() {
+		$args = func_get_args();
+		foreach($args as $a) {
+			// Substitute from registry. If it is a callback name,
+			// it will be returned unmodified
+			if(is_string($a)) {
+				$a = O($a);
+			}
+			// Handle array of callbacks
+			if(is_array($a)) {
+				foreach($a as $_a) {
+					is_array($_a) ? call_user_func_array($this, $_a) : call_user_func($this, $_a);
+				}
+			} elseif(is_callable($a)) {
+				$a($this);
+			}
+		}
+		return $this;
+	}
 
 	/**
 	 * For Iterator
