@@ -1,0 +1,25 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Om.EditableLine Demo</title>
+<script type="text/javascript" src="/Moo/build.php?require=Om.EditableLine&reset=yes&compression=none"></script>
+<style type="text/css">
+.om-editableline{cursor:text}
+.om-editableline-null{color:gray}
+.om-editableline-active{border:1px dashed gray}
+</style>
+</head>
+<body>
+<div id="e">Test editable</div>
+
+<textarea id="e-cnt" cols="80" rows="20"></textarea>
+
+<script type="text/javascript">
+	var line1 = new Om.EditableLine("e", {
+		onChange: function(value){$('e-cnt').set("text", value);}
+	});
+</script>
+
+</body>
+</html>

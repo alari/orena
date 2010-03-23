@@ -7,6 +7,10 @@
 		"Om.FormSender": {
 			"deps": ["Function","Request.JSON","Element"],
 			"desc": "Sender for auto-generated ajax forms."
+		},
+		"Om.EditableLine": {
+			"deps": ["Om","Class","Class.Extras","Class.Binds","Element","Function"],
+			"desc": "Makes a line in HTML element editable."
 		}
 	},
 	"3rdParty": {
