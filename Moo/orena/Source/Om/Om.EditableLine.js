@@ -2,6 +2,7 @@ Om.EditableLine = new Class({
 	Implements: [Events, Options, Class.Binds],
 	Binds: ['evtClick','evtBlur','evtKeypress','evtChange'],
 	el: null,
+	isFocused: false,
 	options: {
 		classNull: 'om-editableline-null',
 		classActive: 'om-editableline-active',
@@ -46,6 +47,7 @@ Om.EditableLine = new Class({
 			name: this.options.field,
 			value: this.getValue()
 		});
+		this.options.bindTo.inject(this.el, "after");
 	},
 	checkNull: function(){
 		if(this.el.get("text") == this.options.nullValue) {
@@ -56,12 +58,14 @@ Om.EditableLine = new Class({
 	},
 	
 	evtClick: function(){
+		if(this.isFocused) return;
 		this.el.set("text", this.getValue());
 		this.el.removeClass(this.options.classNull);
 		this.el.addClass(this.options.classActive);
 		this.el.setProperty("contentEditable", true);
 		this.el.focus();
 		this.fireEvent("focus", [this.el, this]);
+		this.isFocused = true;
 	},
 	evtBlur: function(){
 		this.el.removeClass(this.options.classActive);
@@ -74,6 +78,7 @@ Om.EditableLine = new Class({
 		this.checkNull();
 		this.evtChange();
 		this.fireEvent("blur", [this.getValue(), this.el, this]);
+		this.isFocused = false;
 	},
 	evtKeypress: function(e) {
 		if(e.key == "enter") {
