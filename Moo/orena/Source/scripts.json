@@ -9,13 +9,17 @@
 			"desc": "Sender for auto-generated ajax forms."
 		},
 		"Om.EditableLine": {
-			"deps": ["Om","Class","Class.Extras","Class.Binds","Element","Function"],
-			"desc": "Makes a line in HTML element editable."
+			"deps": ["Om","Class","Class.Extras","Class.Binds","Element"],
+			"desc": "Makes a line-in HTML element editable."
+		},
+		"Om.Tag": {
+			"deps": ["Om","Class","Class.Extras","Class.Binds","Element"],
+			"desc": "Tags"
 		}
 	},
 	"3rdParty": {
-		"Rainbow": {
-			"deps": ["Core","Class","Class.Extras","Array","String","Function","Number","Element","Element.Event","Selectors","Element.Dimensions","DomReady","Drag","Color","Assets"],
+		"MooRainbow": {
+			"deps": ["Core","Class","Class.Extras","Array","String","Function","Number","Element","Element.Event","Element.Style","Selectors","Element.Dimensions","DomReady","Drag","Color","Assets","Om"],
 			"desc": "Color picker"
 		}
 	}

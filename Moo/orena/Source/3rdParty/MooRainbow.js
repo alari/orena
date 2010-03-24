@@ -25,9 +25,13 @@ var MooRainbow = new Class({
 	
 	initialize: function(el, options) {
 		this.element = $(el); if (!this.element) return;
+		
+		if(!options.imgPath) options.imgPath = Om.root + this.options.imgPath;
+		
 		this.setOptions(options);
 		
-		Asset.css(this.imgPath+"mooRainbow.css");
+		Asset.css(this.options.imgPath+"mooRainbow.css");
+		//Asset.css(this.options.imgPath+"tmp.css");
 		
 		this.sliderPos = 0;
 		this.pickerPos = {x: 0, y: 0};
@@ -510,7 +514,7 @@ var MooRainbow = new Class({
 			'class': prefix + 'okButton'
 		}).inject(box);
 		
-		var transp = new Element('a', {'style': {'position': 'absolute'}, 'href': '#', 'class': prefix + 'transp'}).inject(box);
+		var transp = new Element('a', {'styles': {'position': 'absolute'}, 'href': '#', 'class': prefix + 'transp'}).inject(box);
 		
 		this.rePosition();
 

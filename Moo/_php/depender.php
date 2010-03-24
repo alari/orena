@@ -361,8 +361,15 @@ Class Depender {
 		}
 
 		if (in_array('Depender.Client', $includes) || $this->getVar('client')) $out .= $this->dependerJs($includes);
+		if (in_array('Om', $includes)) $out .= $this->omJs();
 
 		print $out;
+	}
+
+	public function omJs(){
+		$root = "http://".$_SERVER["HTTP_HOST"];
+		if(strpos($_SERVER["REQUEST_URI"], "/Moo/")) $root .= substr($_SERVER["REQUEST_URI"], 0, strpos("Moo/"));
+		return "Om.root = '$root';";
 	}
 }
 date_default_timezone_set('UTC');

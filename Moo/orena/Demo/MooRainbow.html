@@ -1,0 +1,103 @@
+<!DOCTYPE html 
+		PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>MooRainbow Demo</title>
+<script type="text/javascript" src="/Moo/build.php?require=MooRainbow&reset=yes&compression=none"></script>
+
+<script type="text/javascript">
+	window.addEvent('load', function() {
+		var ex1 = new MooRainbow('myRainbow', {
+			'startColor': [58, 142, 246]
+		});
+
+		var ex2 = new MooRainbow('myRainbow2', {
+			'id': 'mooRainbow2',
+			'wheel': true,
+			'startColor': [58, 142, 246],
+			'onChange': function(color) {
+				$('myInput2').value = color.hex;
+			}
+		});
+
+		var demo1 = new MooRainbow('demo1', {id: 'myDemo1'});
+
+		var demo2 = new MooRainbow('demo2', {	
+			id: 'myDemo2',
+			wheel: true,
+			onChange: function(color) {
+				$('outer').setStyle('background-color', color.hex);
+				$('demoInput2').value = color.hex;
+			},
+			onComplete: function(color) {
+				$('outer').setStyle('background-color', '#121212');
+				$('demoInput2').value = color.hex;
+			}
+		});
+		/*have no assets for this demo
+		var demo3 = new MooRainbow('demo3', {
+			id: 'myDemo3',
+			imgPath: 'images/demo3/'
+		});*/
+	});
+</script>
+
+</head>
+<body>
+
+<div id="outer">
+
+<a href="http://moorainbow.woolly-sheep.net/#demos">http://moorainbow.woolly-sheep.net/#demos</a>
+
+    <div id="demo">
+        <a id="demos"></a>
+        <h2>Demos</h2>
+        <strong><span class="title">Demo 1:</span> Full mooRainbow </strong>
+        <div class="code">
+          <pre>
+new MooRainbow('demo1', {id: 'myDemo1'});
+</pre>
+        </div>
+        <p>
+          <label> <img src="../Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo1" />
+          <input id="demoInput1" name="demoInput1" type="hidden" size="1" />
+          </label>
+          Click on the rainbow
+        </p>
+        <div class="sep">
+        </div>
+        <p>
+          <strong><span class="title">Demo 2:</span> Full mooRainbow + wheel and keys events + onChange + onComplete </strong>
+        </p>
+        <div class="code">
+          <pre>
+new MooRainbow('demo2', {
+	id: 'myDemo2',
+	wheel: true,
+	onChange: function(color) {
+		$('outer').setStyle('background-color', color.hex);
+		$('demoInput2').value = color.hex;
+	},
+	onComplete: function(color) {
+		$('outer').setStyle('background-color', '#121212');
+		$('demoInput2').value = color.hex;
+	}
+});</pre>
+        </div>
+        <p>
+          <label> <img src="../Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo2" />
+          <input id="demoInput2" name="demoInput2" type="text" size="13" />
+          </label>
+        </p>
+        <p>
+          Click on the rainbow and try your wheel on RGB/HSB Inputs and Slider.  (You can also use UP/DOWN keys on Inputs). Change color and find out one you like, then click on Select button.
+        </p>
+       
+      </div>
+
+</div>
+
+</body>
+</html>

@@ -1,4 +1,5 @@
 var Om = {
+	root: null,
 	use: function(){
 		var callback = $A(arguments).getLast();
 		var deps = $A(arguments).erase(callback);
