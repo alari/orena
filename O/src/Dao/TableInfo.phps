@@ -302,10 +302,10 @@ class O_Dao_TableInfo {
 		foreach($meta as $annotation) {
 			if($annotation["name"] == "Table") {
 				$params = $annotation["params"];
-				if(isset($params[0])) $this->table = array_unshift($params);
+				if(isset($params[0])) $this->table = array_shift($params);
 				$this->params = array_merge($this->params, $params);
 			} elseif($annotation["name"] == "Tail") {
-				$this->tail = array_unshift($annotation["params"]);
+				$this->tail = array_shift($annotation["params"]);
 			}
 		}
 
