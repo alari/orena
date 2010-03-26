@@ -1,9 +1,4 @@
 <?php
-
-require_once 'O\src\Meta\Decorators.phps';
-
-require_once 'O\inc\PHPUnit\Framework\TestCase.php';
-
 /**
  * O_Meta_Decorators test case.
  */
