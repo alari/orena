@@ -2,7 +2,7 @@
 /**
  * O_Meta_Decorators test case.
  */
-class DecoratorsTest extends PHPUnit_Framework_TestCase {
+class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 
 	/**
 	 * @var O_Meta_Decorators
