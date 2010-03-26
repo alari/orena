@@ -36,7 +36,7 @@ class O_Meta_Decorators{
 		if(count($this->arguments)) {
 			$argn = array_keys($this->arguments);
 			foreach($args as $v) {
-				$n = array_unshift($argn);
+				$n = array_shift($argn);
 				if(!$n) throw new O_Ex_WrongArgument("Too many arguments.");
 				$this->args[ $n ] = $v;
 			}
