@@ -238,8 +238,8 @@ class O_Meta {
 	 * @param string $key
 	 * @return mixed
 	 */
-	static private function retrieve($key) {return 0;
-		return !function_exists("apc_fetch") ?: apc_fetch($key);
+	static private function retrieve($key) {
+		return !function_exists("apc_fetch") || mt_rand(0, 100) > 92 ?: apc_fetch($key);
 	}
 
 	/**
