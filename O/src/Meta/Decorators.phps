@@ -115,7 +115,7 @@ class O_Meta_Decorators{
 	private function callHandler($handler) {
 		$this->currentHandler = $handler;
 		$h = $this->currentHandler["handler"];
-		$h($this);
+		call_user_func($h, $this);
 	}
 
 	public function getHandlerParams() {
