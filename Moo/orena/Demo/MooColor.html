@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>MooColor Demo</title>
+    <link href="/Moo/orena/Assets/MooColor/styles.css" media="screen" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/Moo/build.php?require=Om.MooColor&reset=yes&compression=none"></script>
+
+    <script type="text/javascript">
+        window.addEvent('domready', function() {
+            var picker = new Om.MooColor('pick', {
+                    imgPath: '/Moo/orena/Assets/MooColor/', //window.demo_path +
+                    startColor: [58, 142, 246],
+                    wheel: false,
+                    onChange: function(color) {
+                            $('pick').setStyle('background-color', color.hex);
+                            $('pick-result').value = color.hex;
+                    },
+                    onComplete: function(color) {
+                        $('pick').setStyle('background-color', color.hex);
+                        $('pick-result').value = color.hex;
+                    }
+            });
+        });
+    </script>
+
+</head>
+<body>
+
+<div class="col2" id="content">
+    <div class="content">
+        <div id="contentArea">
+        </div>
+        <span id="pick" class="pick">&nbsp;&nbsp;&nbsp;&nbsp; </span>
+        <input type="text" id="pick-result" />
+    </div>
+</div>
+</body>
+</html>

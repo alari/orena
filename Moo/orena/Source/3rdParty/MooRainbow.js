@@ -278,7 +278,7 @@ var MooRainbow = new Class({
 			this.fireEvent('onChange', [this.sets, this]);
 		}.bind(this));
 	},
-	
+	/*
 	wheelEvents: function() {
 		var arrColors = $A(this.arrRGB).extend(this.arrHSB);
 
@@ -295,7 +295,7 @@ var MooRainbow = new Class({
 				'keydown': this.eventKeys.bindWithEvent(this, [this.arrHSB[0], 'slider'])
 			});
 		}, this);
-	},
+	},*/
 	
 	eventKeys: function(e, el, id) {
 		var wheel, type;
@@ -440,7 +440,7 @@ var MooRainbow = new Class({
 			'class': prefix + 'overlay'
 		}).inject(div);
 		
-		if (window.ie6) {
+		if ( "trident" == Browser.Engine.name ) {
 			div.setStyle('overflow', '');
 			var src = ov.src;
 			ov.src = this.options.imgPath + 'blank.gif';
