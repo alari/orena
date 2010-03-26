@@ -118,7 +118,7 @@ class O_Meta {
 		}
 		// Parameters for a property
 		if($refl instanceof ReflectionProperty) {
-			$meta["value"] = array("isOptional"=>false, "default"=>$refl->getValue());
+			$meta["value"] = array("isOptional"=>false, "default"=>$refl->getDefaultValue());
 			return self::store($key, $meta);
 		}
 	}
