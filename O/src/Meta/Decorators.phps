@@ -172,7 +172,7 @@ class O_Meta_Decorators{
 			}
 			// Class: construct
 			$refl = new ReflectionClass($this->class);
-			return $refl->newInstanceArgs($this->args);
+			return $refl->newInstance($this->args);
 		}
 		// Plain function
 		if(!$this->class) {
