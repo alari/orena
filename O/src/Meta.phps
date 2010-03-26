@@ -134,7 +134,7 @@ class O_Meta {
 		$args = func_get_args();
 		$callback = array_shift($args);
 		list($class, $method, $object, ) = self::getRequested($callback);
-echo "($class,$method,".(!$object?:"+").")";
+
 		$call = new O_Meta_Decorators($class, $method, $object);
 
 		$call->setArgsInfo(self::getArguments($callback));
