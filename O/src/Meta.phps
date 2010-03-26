@@ -189,7 +189,7 @@ class O_Meta {
 	 * @param string|closure $method
 	 * @return array(class, method, cache_key)
 	 */
-	static private function getRequested($class, $method) {
+	static private function getRequested($class, $method=null) {
 		$object = null;
 		if(is_array($class)) {
 			list($class, $method) = $class;
