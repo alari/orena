@@ -183,7 +183,7 @@ class O_Meta_Decorators{
 			$property = substr($this->method, 1);
 			if($this->object) return $this->object->$property = $this->args["value"];
 			$class = $this->class;
-			return $class::$property = $this->args["value"];
+			return $class::$$property = $this->args["value"];
 		}
 		// Object method
 		if($this->object) {
