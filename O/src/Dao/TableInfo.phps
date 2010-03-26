@@ -147,7 +147,7 @@ class O_Dao_TableInfo {
 	private function processField($n, $params) {
 		$name = array_unshift($params);
 		$type = null;
-		if(array_key_exists(0, $params)) {
+		if(isset($params[0])) {
 			$type = $params[0];
 		}
 		$this->fields [$name] = array ($type, $params, $n );
@@ -302,7 +302,7 @@ class O_Dao_TableInfo {
 		foreach($meta as $annotation) {
 			if($annotation["name"] == "Table") {
 				$params = $annotation["params"];
-				if(array_key_exists(0, $params)) $this->table = array_unshift($params);
+				if(isset($params[0])) $this->table = array_unshift($params);
 				$this->params = array_merge($this->params, $params);
 			} elseif($annotation["name"] == "Tail") {
 				$this->tail = array_unshift($annotation["params"]);
