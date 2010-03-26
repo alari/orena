@@ -49,7 +49,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 		$k = "Test_Models_Decorators::__construct";
 		$this->assertArrayHasKey($k, $o->called);
 		$this->assertEquals(432, $o->called[$k][0]);
-		$this->assertEquals(432, $o->called[$k][1]);
+		$this->assertEquals(123, $o->called[$k][1]);
 	}
 
 	public function testInvoke() {
@@ -58,7 +58,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 		$k = "Test_Models_Decorators::__invoke";
 		$this->assertArrayHasKey($k, $o->called);
 		$this->assertEquals(432, $o->called[$k][0]);
-		$this->assertEquals(432, $o->called[$k][1]);
+		$this->assertEquals(123, $o->called[$k][1]);
 	}
 
 	public function testMethod() {
@@ -67,7 +67,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 		$k = "Test_Models_Decorators::method";
 		$this->assertArrayHasKey($k, $o->called);
 		$this->assertEquals(432, $o->called[$k][0]);
-		$this->assertEquals(432, $o->called[$k][1]);
+		$this->assertEquals(123, $o->called[$k][1]);
 	}
 
 	public function testStMethod() {
