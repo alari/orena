@@ -1,6 +1,6 @@
 <?php
 /**
- * @Table(core_model, signal=1, show:envelop=simple, show-loop:envelop="envelop loop"
+ * @Table(core_model, signal=1, show:envelop=simple, show-loop:envelop="envelop loop")
  * @Field(textfield, text, edit=wysiwyg, title="Текстовое поле", signal="test", show-def="wysiwyg", check="htmlPurifier", edit-ajax="area", required="Введи текст!")
  * @Field(intfield=int, signal=1, show=simple, loop=simple, edit-ajax=1, required="Число!")
  * @Field(subs, owns="many {test/sub_class}", inverse=core)
