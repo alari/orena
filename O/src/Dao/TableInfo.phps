@@ -133,7 +133,7 @@ class O_Dao_TableInfo {
 	}
 
 	private function configField($params) {
-		$name = array_unshift($params);
+		$name = array_shift($params);
 		if ((isset ( $this->fields [$name] ))) {
 			if (is_array ( $this->fields [$name] )) {
 				$this->fields [$name][1] = array_merge ( $this->fields [$name] [1], $subkeys );
@@ -145,7 +145,7 @@ class O_Dao_TableInfo {
 	}
 
 	private function processField($n, $params) {
-		$name = array_unshift($params);
+		$name = array_shift($params);
 		$type = null;
 		if(isset($params[0])) {
 			$type = $params[0];
@@ -154,7 +154,7 @@ class O_Dao_TableInfo {
 	}
 
 	private function processIndex($n, $params) {
-		$fields = array_unshift($params);
+		$fields = array_shift($params);
 		$this->indexes [$fields] = $params;
 	}
 
