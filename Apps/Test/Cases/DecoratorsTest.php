@@ -54,7 +54,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 
 	public function testInvoke() {
 		$o = new Test_Models_Decorators;
-		$o = O_Meta::call($o, "foo", "bar");
+		O_Meta::call($o, "foo", "bar");
 		$k = "Test_Models_Decorators::__invoke";
 		$this->assertArrayHasKey($k, $o->called);
 		$this->assertEquals(432, $o->called[$k][0]);
@@ -63,7 +63,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 
 	public function testMethod() {
 		$o = new Test_Models_Decorators;
-		$o = O_Meta::call(Array($o, "method"), "foo", "bar");
+		O_Meta::call(Array($o, "method"), "foo", "bar");
 		$k = "Test_Models_Decorators::method";
 		$this->assertArrayHasKey($k, $o->called);
 		$this->assertEquals(432, $o->called[$k][0]);
