@@ -369,7 +369,7 @@ abstract class O_Dao_ActiveRecord implements ArrayAccess {
 	 */
 	static public function getInjectedMethods( $class )
 	{
-		return isset( self::$injected_methods[ $class ] ) ? self::$injected_methods[ $class ] : Array ();
+		return array_key_exists( $class, self::$injected_methods ) ? self::$injected_methods[ $class ] : Array ();
 	}
 
 	/**
