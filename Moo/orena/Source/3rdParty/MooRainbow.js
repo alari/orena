@@ -417,7 +417,7 @@ var MooRainbow = new Class({
 		}).inject(this.layout);
 			
 		var div = new Element('div', {
-			'styles': {'position': 'absolute', 'overflow': 'hidden'},
+			'styles': {'position': 'absolute', 'overflow': 'hidden', 'width': 256, 'height': 256},
 			'class': prefix + 'overlayBox'
 		}).inject(box);
 		
@@ -429,7 +429,7 @@ var MooRainbow = new Class({
 		ar.height = ar.getStyle('height').toInt();
 		
 		var ov = new Element('img', {
-			'styles': {'background-color': '#fff', 'position': 'relative', 'zIndex': 2},
+			'styles': {'background-color': '#faf00f', 'position': 'relative', 'zIndex': 2},
 			'src': this.options.imgPath + 'moor_woverlay.png',
 			'class': prefix + 'overlay'
 		}).inject(div);

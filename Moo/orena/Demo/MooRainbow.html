@@ -1,6 +1,4 @@
-<!DOCTYPE html 
-		PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-		"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -8,32 +6,62 @@
 <script type="text/javascript" src="/Moo/build.php?require=MooRainbow&reset=yes&compression=none"></script>
 
 <script type="text/javascript">
-	window.addEvent('load', function() {
+    window.addEvent('domready', function() {
+	//this mooRainbow Version has been customized to work with mootools 1.2
+
+	var demo1 = new MooRainbow('demo1', {
+                imgPath: '/Moo/orena/Assets/Rainbow/', //window.demo_path +
+		startColor: [58, 142, 246],
+		wheel: false,
+		onChange: function(color) {
+			$('content').setStyle('background-color', color.hex);
+			$('demoInput1').value = color.hex;
+		},
+		onComplete: function(color) {
+			$('content').setStyle('background-color', '#fff');
+			$('demoInput1').value = color.hex;
+		}
+	});
+        new MooRainbow('demo2', {
+                id: 'myDemo2',
+                wheel: true,
+                onChange: function(color) {
+                        $('outer').setStyle('background-color', color.hex);
+                        $('demoInput2').value = color.hex;
+                },
+                onComplete: function(color) {
+                        $('outer').setStyle('background-color', '#121212');
+                        $('demoInput2').value = color.hex;
+                }
+        });
+});
+
+/*	window.addEvent('load', function() {
 		var ex1 = new MooRainbow('myRainbow', {
 			'startColor': [58, 142, 246]
 		});
 
-		var ex2 = new MooRainbow('myRainbow2', {
-			'id': 'mooRainbow2',
+		var ex2 = new MooRainbow('myRainbow3', {
+			'id': 'mooRainbow3',
 			'wheel': true,
 			'startColor': [58, 142, 246],
 			'onChange': function(color) {
-				$('myInput2').value = color.hex;
+				$('myInput3').value = color.hex;
 			}
 		});
 
-		var demo1 = new MooRainbow('demo1', {id: 'myDemo1'});
+		var demo1 = new MooRainbow('demo2', {id: 'myDemo2'});
 
-		var demo2 = new MooRainbow('demo2', {	
-			id: 'myDemo2',
+		var demo2 = new MooRainbow('demo3', {
+			id: 'myDemo3',
 			wheel: true,
 			onChange: function(color) {
 				$('outer').setStyle('background-color', color.hex);
-				$('demoInput2').value = color.hex;
+				$('demoInput3').value = color.hex;
 			},
 			onComplete: function(color) {
 				$('outer').setStyle('background-color', '#121212');
-				$('demoInput2').value = color.hex;
+				$('demoInput3').value = color.hex;
 			}
 		});
 		/*have no assets for this demo
@@ -41,14 +69,58 @@
 			id: 'myDemo3',
 			imgPath: 'images/demo3/'
 		});*/
-	});
+//	});
 </script>
 
 </head>
 <body>
 
+<div class="col2" id="content">
+    <div class="content">
+        <div id="contentArea">
+<!-- ### HIDE ABOVE ### -->
+<h1>mooRainbow <span class="version">v1.2b1</span></h1>
+
+<h2>Introduction</h2>
+
+<strong>mooRainbow</strong> is a powerful Javascript color picker that allows you to visually
+choose and use colors as a real and useful application.<br /> <br />
+<div class="help">
+Note: every object must have an unique id.
+</div>
+
+Just click me:
+<img id="demo1" src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" />
+<input id="demoInput1" name="demo1input" type="text" size="13" />
+<br />
+Click on the rainbow and try your wheel on RGB/HSB Inputs and Slider. <br />
+
+(You can also use UP/DOWN keys on Inputs)
+<br /> <br />
+
+How about RGB colors:
+<img id="demo2" src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" />
+(R/G/B)
+<input id="demoInput2a" name="demo2ainput" type="text" size="2" />
+<input id="demoInput2b" name="demo2binput" type="text" size="2" />
+<input id="demoInput2c" name="demo2cinput" type="text" size="2" />
+<br /> <br />
+
+You would like to have a different style?
+<img id="demo3" src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" />
+(needs an additional <a href="/Moo/orena/Assets/Rainbow/demo3.css">style file</a>)
+        </div>
+    </div>
+</div> <!-- /col2 [cols_px_210_750]-->
+
+
+ <!--
 <div id="outer">
 
+Just click me:
+<img id="demo1" src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" />
+<input id="demoInput1" name="demo1input" type="text" size="13" />
+<br />
 <a href="http://moorainbow.woolly-sheep.net/#demos">http://moorainbow.woolly-sheep.net/#demos</a>
 
     <div id="demo">
@@ -57,12 +129,12 @@
         <strong><span class="title">Demo 1:</span> Full mooRainbow </strong>
         <div class="code">
           <pre>
-new MooRainbow('demo1', {id: 'myDemo1'});
+new MooRainbow('demo2', {id: 'myDemo2'});
 </pre>
         </div>
         <p>
-          <label> <img src="../Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo1" />
-          <input id="demoInput1" name="demoInput1" type="hidden" size="1" />
+          <label> <img src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo2" />
+          <input id="demoInput2" name="demoInput2" type="hidden" size="1" />
           </label>
           Click on the rainbow
         </p>
@@ -73,22 +145,22 @@ new MooRainbow('demo1', {id: 'myDemo1'});
         </p>
         <div class="code">
           <pre>
-new MooRainbow('demo2', {
-	id: 'myDemo2',
+new MooRainbow('demo3', {
+	id: 'myDemo3',
 	wheel: true,
 	onChange: function(color) {
 		$('outer').setStyle('background-color', color.hex);
-		$('demoInput2').value = color.hex;
+		$('demoInput3').value = color.hex;
 	},
 	onComplete: function(color) {
 		$('outer').setStyle('background-color', '#121212');
-		$('demoInput2').value = color.hex;
+		$('demoInput3').value = color.hex;
 	}
 });</pre>
         </div>
         <p>
-          <label> <img src="../Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo2" />
-          <input id="demoInput2" name="demoInput2" type="text" size="13" />
+          <label> <img src="/Moo/orena/Assets/Rainbow/rainbow.png" alt="[r]" width="16" height="16" class="rain" id="demo3" />
+          <input id="demoInput3" name="demoInput3" type="text" size="13" />
           </label>
         </p>
         <p>
@@ -96,8 +168,7 @@ new MooRainbow('demo2', {
         </p>
        
       </div>
-
-</div>
+-->
 
 </body>
 </html>
