@@ -162,6 +162,10 @@ class O_Meta {
 			if(!$class) {
 				return new ReflectionFunction($method);
 			}
+			// Class method
+			if($class && $method) {
+				return new ReflectionMethod($class, $method);
+			}
 			// Object
 			if($object) {
 				return new ReflectionObject($object);
@@ -174,8 +178,6 @@ class O_Meta {
 			if($method[0] == '$') {
 				return new ReflectionProperty($class, substr($method, 1));
 			}
-			// Class method
-			return new ReflectionMethod($class, $method);
 		} catch(ReflectionException $e) {
 			return null;
 		}
