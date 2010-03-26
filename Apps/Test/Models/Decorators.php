@@ -14,7 +14,7 @@ class Test_Models_Decorators {
 	/**
 	 * @Test(foo=432, bar=123)
 	 */
-	public function __construct($foo, $bar) {
+	public function __construct($foo=null, $bar=null) {
 		$this->called[__METHOD__] = Array($foo, $bar);
 	}
 
