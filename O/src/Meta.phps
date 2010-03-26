@@ -238,7 +238,7 @@ class O_Meta {
 	 * @param string $key
 	 * @return mixed
 	 */
-	static private function retrieve($key) {
+	static private function retrieve($key) {return 0;
 		return !function_exists("apc_fetch") ?: apc_fetch($key);
 	}
 
