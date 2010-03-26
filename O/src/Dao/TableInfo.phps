@@ -74,11 +74,11 @@ class O_Dao_TableInfo {
 	private $registry = Array();
 
 	private function processParent(){
-		$parent = get_parent_class($this->class);
-		if(!$parent) return;
-		if($parent == "O_Dao_ActiveRecord") return;
+		$parent_class = get_parent_class($this->class);
+		if(!$parent_class) return;
+		if($parent_class == "O_Dao_ActiveRecord") return;
 
-		$parent = self::get( $parent );
+		$parent = self::get( $parent_class );
 
 		// Fields
 		foreach ( $parent->fields as $name => $info ) {
@@ -97,7 +97,7 @@ class O_Dao_TableInfo {
 		$this->tail = $parent->tail;
 
 		// Injections
-		foreach ( O_Dao_ActiveRecord::getInjectedMethods ( $parent ) as $name => $callback ) {
+		foreach ( O_Dao_ActiveRecord::getInjectedMethods ( $parent_class ) as $name => $callback ) {
 			O_Dao_ActiveRecord::injectMethod ( $this->class, $name, $callback );
 		}
 	}
