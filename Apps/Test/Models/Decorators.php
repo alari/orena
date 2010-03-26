@@ -36,6 +36,6 @@ class Test_Models_Decorators {
 	 * @Test(foo=123, bar=345)
 	 */
 	static public function stMethod($foo, $bar) {
-		$this->called[__METHOD__] = Array($foo, $bar);
+		return Array(__METHOD__, $foo, $bar);
 	}
 }
