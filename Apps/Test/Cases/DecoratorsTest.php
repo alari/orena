@@ -40,7 +40,7 @@ class Test_Cases_DecoratorsTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testStProp() {
-		O_Meta::call(array(Test_Models_Decorators, '$stProp'), "something");
+		O_Meta::call(array("Test_Models_Decorators", '$stProp'), "something");
 		$this->assertEquals(456, Test_Models_Decorators::$stProp);
 	}
 
