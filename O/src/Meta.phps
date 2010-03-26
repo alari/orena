@@ -241,7 +241,7 @@ class O_Meta {
 	 * @return mixed
 	 */
 	static private function retrieve($key) {
-		return !function_exists("apc_fetch") || mt_rand(0, 100) > 92 ?: apc_fetch($key);
+		return !function_exists("apc_fetch") || 1 ?: apc_fetch($key);
 	}
 
 	/**
