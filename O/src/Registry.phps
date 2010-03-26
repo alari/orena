@@ -152,3 +152,6 @@ function O_cl($name, $class, $value=null, $add=false) {
 	$name = "_class/".(is_object($class)?get_class($class):$class)."/".$name;
 	return O_Registry::setOrAdd($name, $value, $add);
 }
+function O_add($name, $value) {
+	return O_Registry::add($name, $value);
+}

@@ -1,5 +1,7 @@
 <?php
 class O_Meta_Decorators{
+	const REGISTRY = "_decorators";
+
 	protected $arguments = Array();
 	protected $args = Array();
 	protected $return;
@@ -7,8 +9,8 @@ class O_Meta_Decorators{
 	protected $class;
 	protected $method;
 	protected $object;
-	protected $type = O_Meta::TYPE_FUNC;
 	protected $handlers = Array();
+	protected $isCalled = false;
 
 	private $currentHandler = Array();
 
@@ -91,6 +93,9 @@ class O_Meta_Decorators{
 	 * @return mixed
 	 */
 	public function __invoke() {
+		if($this->isCalled) {
+			return $this->return;
+		}
 		if(!count($this->handlers)) {
 			return $this->call();
 		}
@@ -98,6 +103,7 @@ class O_Meta_Decorators{
 		array_map(array($this, "callHandler"), $this->handlers);
 		// Save result
 		$this->return = $this->call();
+		$this->isCalled = 1;
 		// Cannot modify properties after setting
 		if($this->method[0] == '$') return $this->return;
 		// Modify result
@@ -130,6 +136,10 @@ class O_Meta_Decorators{
 
 	public function getMethod() {
 		return $this->method;
+	}
+
+	public function isCalled() {
+		return $this->isCalled;
 	}
 
 	/**

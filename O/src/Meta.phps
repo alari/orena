@@ -63,11 +63,16 @@ class O_Meta {
 	 * @param string $class
 	 * @param string $method
 	 */
-	static public function getHandlers($class, $method=null) {
+	static public function getHandlers($class, $method, $registryOrArray="_annotation") {
 		$raw = self::getMergedRaw($class, $method);
 		$handlers = Array();
 		foreach($raw as $k=>$v) {
-			$h = O("_annotation/".$v["name"]);
+			if(is_array($registryOrArray)){
+				if(!array_key_exists($v["name"], $registryOrArray)) continue;
+				$h = $registryOrArray[$v["name"]];
+			} else {
+				$h = O($registryOrArray."/".$v["name"]);
+			}
 			if(!$h) continue;
 			$handlers[] = Array("handler"=>$h, "params"=>$v["params"], "class"=>$v["class"]);
 		}
@@ -134,7 +139,7 @@ class O_Meta {
 
 		$call->setArgsInfo(self::getArguments($callback));
 		$call->setUserArgs($args);
-		$call->setHandlers(self::getHandlers($class, $method));
+		$call->setHandlers(self::getHandlers($class, $method, O_Meta_Decorators::REGISTRY));
 		return $call();
 	}
 
@@ -216,7 +221,7 @@ class O_Meta {
 
 		foreach($names as $k=>$v) {
 			// Parse arguments for annotation
-			preg_match_all('#(([-_\$a-z0-9]+)\s*=\s*)?(("([^"]+)")|[^ ,]+)\s*(,|$)#im', $params[$k], $m);
+			preg_match_all('#(([-_\$\+/:a-z0-9]+)\s*=\s*)?(("([^"]*)")|[^ ,]+)\s*(,|$)#im', $params[$k], $m);
 			$p = Array();
 			foreach(array_keys($m[0]) as $pk) {
 				$p[$m[2][$pk] ? $m[2][$pk] : $pk] = $m[5][$pk] ? $m[5][$pk] : $m[3][$pk];;

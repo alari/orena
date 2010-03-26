@@ -73,42 +73,94 @@ class O_Dao_TableInfo {
 
 	private $registry = Array();
 
-	/**
-	 * Uses recursion to get table config
-	 *
-	 * @param string $class
-	 */
-	private function __construct($class) {
-		$this->class = $class;
+	private function processParent(){
+		$parent = get_parent_class($this->class);
+		if(!$parent) return;
+		if($parent == "O_Dao_ActiveRecord") return;
 
-		if(!is_subclass_of($class, "O_Dao_ActiveRecord")) return;
+		$parent = self::get( $parent );
 
-		$reflection = new ReflectionClass ( $class );
-		if (! $reflection->isSubclassOf ( "O_Dao_ActiveRecord" ))
-			return;
-
-		// Copy all data from parent object
-		if ($reflection->getParentClass ()) {
-			$parent = self::get ( $reflection->getParentClass ()->getName () );
-
-			$this->table = $parent->table;
-			foreach ( $parent->fields as $name => $info ) {
-				if ($info instanceof O_Dao_FieldInfo) {
-					$this->fields [$name] = clone $info;
-					$this->fields [$name]->setClass ( $this->class );
-				} else {
-					$this->fields [$name] = $info;
-				}
+		// Fields
+		foreach ( $parent->fields as $name => $info ) {
+			if ($info instanceof O_Dao_FieldInfo) {
+				$this->fields [$name] = clone $info;
+				$this->fields [$name]->setClass ( $this->class );
+			} else {
+				$this->fields [$name] = $info;
 			}
-			$this->params = $parent->params;
-			$this->indexes = $parent->indexes;
-			$this->tail = $parent->tail;
 		}
 
-		// Inherited injections
-		foreach ( O_Dao_ActiveRecord::getInjectedMethods ( $reflection->getParentClass ()->getName () ) as $name => $callback ) {
-			O_Dao_ActiveRecord::injectMethod ( $class, $name, $callback );
+		// Simple
+		$this->table = $parent->table;
+		$this->params = $parent->params;
+		$this->indexes = $parent->indexes;
+		$this->tail = $parent->tail;
+
+		// Injections
+		foreach ( O_Dao_ActiveRecord::getInjectedMethods ( $parent ) as $name => $callback ) {
+			O_Dao_ActiveRecord::injectMethod ( $this->class, $name, $callback );
 		}
+	}
+
+	private function replaceFields($params) {
+		// Just replace field positions in array
+		list($field1, $field2) = $params;
+		$field1 = trim ( $field1 );
+		$field2 = trim ( $field2 );
+		if (! isset ( $this->fields [$field1] ) || ! isset ( $this->fields [$field2] ))
+			throw new O_Ex_Config ( "field:replace for unexistent field." );
+		$tmp_fields = $this->fields;
+		$this->fields = array ();
+		foreach ( $tmp_fields as $name => $info ) {
+			if ($name == $field1)
+				$this->fields [$field2] = $tmp_fields [$field2];
+			elseif ($name == $field2)
+				$this->fields [$field1] = $tmp_fields [$field1];
+			else
+				$this->fields [$name] = $info;
+		}
+	}
+
+	private function processRegistry($params) {
+		foreach($params as $k=>$v) {
+			if($k[strlen($k)-1] == "+") {
+				$k = substr($k, 0, -1);
+				O_add($k, $v);
+			} else {
+				O($k, $v);
+			}
+		}
+	}
+
+	private function configField($params) {
+		$name = array_unshift($params);
+		if ((isset ( $this->fields [$name] ))) {
+			if (is_array ( $this->fields [$name] )) {
+				$this->fields [$name][1] = array_merge ( $this->fields [$name] [1], $subkeys );
+			} else {
+				$this->getFieldInfo ( $name )->addParams ( $params );
+			}
+		} else
+			throw new O_Ex_Config ( "Field:Config for unexistent field." );;
+	}
+
+	private function processField($n, $params) {
+		$name = array_unshift($params);
+		$type = null;
+		if(array_key_exists(0, $params)) {
+			$type = $params[0];
+		}
+		$this->fields [$name] = array ($type, $params, $n );
+	}
+
+	private function processIndex($n, $params) {
+		$fields = array_unshift($params);
+		$this->indexes [$fields] = $params;
+	}
+
+	private function processOld() {
+		$class = $this->class;
+		$reflection = new ReflectionClass ( $class );
 
 		$docCommentLines = Array ();
 
@@ -230,7 +282,52 @@ class O_Dao_TableInfo {
 						break;
 				}
 			}
+		};
+	}
+
+	/**
+	 * Uses recursion to get table config
+	 *
+	 * @param string $class
+	 */
+	private function __construct($class) {
+		$this->class = $class;
+
+		if(!is_subclass_of($class, "O_Dao_ActiveRecord")) return;
+
+		$this->processParent();
+
+		$meta = O_Meta::getRaw($this->class);
+		// Table
+		foreach($meta as $annotation) {
+			if($annotation["name"] == "Table") {
+				$params = $annotation["params"];
+				if(array_key_exists(0, $params)) $this->table = array_unshift($params);
+				$this->params = array_merge($this->params, $params);
+			} elseif($annotation["name"] == "Tail") {
+				$this->tail = array_unshift($annotation["params"]);
+			}
 		}
+
+		// Plugins
+		$plugins = O_cl("plugins", $class);
+		if(is_array($plugins)) {
+			foreach($plugins as $plugin) {
+				$meta = array_merge(O_Meta::getRaw($plugin), $meta);
+			}
+		}
+
+		foreach($meta as $a) {
+			$n = $a["name"];
+			$p = $a["params"];
+			if($n == "Field") $this->processField($n, $p);
+			elseif($n == "Registry") $this->processRegistry($p);
+			elseif($n == "Field:Replace") $this->replaceFields($p);
+			elseif($n == "Field:Config") $this->configField($p);
+			elseif($n == "Index") $this->processIndex($n, $p);
+		}
+
+		$this->processOld();
 	}
 
 	/**
