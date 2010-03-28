@@ -8,12 +8,16 @@
  *
  */
 
+/*
+ * look at http://www.switchonthecode.com/tutorials/javascript-interactive-color-picker
+ */
+
 Om.MooColor = new Class({
         options: {
 		id: 'mooColor',
 		prefix: 'mooc-',
 		imgPath: '/Moo/orena/Assets/MooColor/',
-		startColor: [100, 30, 65],
+		startColor: [ , 30, 65],
 		wheel: false,
 		onComplete: $empty,
 		onChange: $empty
@@ -58,7 +62,7 @@ Om.MooColor = new Class({
 	},
 
 	show: function() {
-		//this.rePosition();
+		this.rePosition();
 		this.layout.setStyle('display', 'block');
 		this.visible = true;
 	},
@@ -67,46 +71,37 @@ Om.MooColor = new Class({
 		this.layout.setStyles({'display': 'none'});
 		this.visible = false;
 	},
-        closeAll: function(){
+    closeAll: function(){
 
-        },
+    },
 
-        doLayout: function () {
-            var id = this.options.id, prefix = this.options.prefix;
+    doLayout: function () {
+            var id = this.options.id;
+		    var prefix = this.options.prefix;
             var idPrefix = id + ' .' + prefix;
-            alert ('rere'+ id);
-            console.debug(id);
             
-            this.layout = new Element('div', {
-                    'styles': {'display': 'block', 'position': 'absolute', 'background-color': 'aquamarine'},
+            this.layout = new Element('div', { // Picker container
+                    'styles': {'display': 'block', 'position': 'absolute'},
                     'id': id
             }).inject(document.body);
             var box = new Element('div', {
-                    'styles':  {'position': 'relative'},
+                    'styles':  {'position': 'relative', 'height': 300, 'width':400},
                     'class': prefix + 'box'
             }).inject(this.layout);
 
-            var div = new Element('div', {
-                    'styles': {'position': 'absolute', 'overflow': 'hidden', 'width': 256, 'height': 256},
+            var div = new Element('div', { // Image
+                    'styles': {'position': 'absolute', 'overflow': 'hidden', 'width': 256, 'height':256},
                     'class': prefix + 'overlayBox'
             }).inject(box);
-
-            var ar = new Element('div', {
-                    'styles': {'position': 'absolute', 'zIndex': 1},
-                    'class': prefix + 'arrows'
-            }).inject(box);
-            ar.width = ar.getStyle('width').toInt();
-            ar.height = ar.getStyle('height').toInt();
-
-            var ov = new Element('img', {
-                    'styles': {'background-color': '#faf00f', 'position': 'relative', 'zIndex': 2},
-                    'src': this.options.imgPath + 'moor_woverlay.png',
+           var ov = new Element('img', {
+                    'styles': {'background-color': '#ffffff', 'position': 'relative', 'zIndex': 2},
+                    'src': this.options.imgPath + 'mooc_woverlay.png',
                     'class': prefix + 'overlay'
             }).inject(div);
 
             var ov2 = new Element('img', {
                     'styles': {'position': 'absolute', 'top': 0, 'left': 0, 'zIndex': 2},
-                    'src': this.options.imgPath + 'moor_boverlay.png',
+                    'src': this.options.imgPath + 'mooc_boverlay.png',
                     'class': prefix + 'overlay'
             }).inject(div);
 
@@ -122,24 +117,35 @@ Om.MooColor = new Class({
             ov.width = ov2.width = div.getStyle('width').toInt();
             ov.height = ov2.height = div.getStyle('height').toInt();
 
-            var cr = new Element('div', {
+            var cr = new Element('div', { //cursor
                     'styles': {'overflow': 'hidden', 'position': 'absolute', 'zIndex': 2},
                     'class': prefix + 'cursor'
             }).inject(div);
             cr.width = cr.getStyle('width').toInt();
             cr.height = cr.getStyle('height').toInt();
-
+			var slbox = new Element('div', {
+				'styles': { 'position': 'relative', 'top': 0, 'left': 265, 'margin': '0 10 0 10' }
+			}).inject(box);
             var sl = new Element('img', {
                     'styles': {'position': 'absolute', 'z-index': 2},
-                    'src': this.options.imgPath + 'moor_slider.png',
+                    'src': this.options.imgPath + 'mooc_slider.png',
                     'class': prefix + 'slider'
-            }).inject(box);
+            }).inject(slbox);
+
+			var ar = new Element('div', {
+					'styles': {'position': 'absolute', 'zIndex': 1, 'background-color': 'gray', 'width': 36, 'height': 12},
+					'class': prefix + 'arrows'
+					}).inject(slbox);
+			//ar.width = ar.getStyle('width').toInt();
+			//ar.height = ar.getStyle('height').toInt();
+
+ 
             this.layout.slider = document.getElement('#' + idPrefix + 'slider');
             sl.width = sl.getStyle('width').toInt();
             sl.height = sl.getStyle('height').toInt();
 
             new Element('div', {
-                    'styles': {'position': 'absolute'},
+                    'styles': {'position': 'absolute', 'border': 'dotted 1px green'},
                     'class': prefix + 'colorBox'
             }).inject(box);
 
@@ -153,8 +159,14 @@ Om.MooColor = new Class({
                     'class': prefix + 'currentColor'
             }).inject(box);
 
-        }
-
+	},
+    rePosition: function() {
+         var coords = this.element.getCoordinates();
+         this.layout.setStyles({
+             'left': coords.left,
+             'top': coords.top + coords.height + 1
+        });
+    }
 });
 
 Om.MooColor.implement(new Options);

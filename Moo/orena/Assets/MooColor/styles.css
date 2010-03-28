@@ -10,27 +10,20 @@ span.pick {
 }
 /*{ font-size: 11px; color: #000; }*/
 
-.moor-box {
-	width: 125px; 
-	height: 110px; 
+.mooc-box {
 	border: 1px solid #636163; 
-	background-color: #f9f9f9;
+	background-color: #fff;
 }
-.moor-overlayBox {
-	width: 80px; /* Width and Height of the overlay must be setted here: default 256x256 */
-	height: 80px; 
+.mooc-overlayBox {
 	margin-top: 3px; 
 	margin-left: 3px;
 	border: 1px solid #000;
 }
-.moor-slider {
+.mooc-slider {
 	border: 1px solid #000;
 	margin-top: 3px; 
-	margin-left: 86px;
-	width: 10px; /* if you want a bigger or smaller slider... */
-	height: 80px;
 }
-.moor-colorBox {
+.mooc-colorBox {
 	/*display: none;*/
 	visibility: hidden;
 	border: 1px solid #000; 
@@ -40,7 +33,7 @@ span.pick {
 	margin-left: 315px;
 }
 
-.moor-currentColor { /* Bottom Box Color, the backup one */
+.mooc-currentColor { /* Bottom Box Color, the backup one */
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 55px; 
@@ -48,7 +41,7 @@ span.pick {
 	width: 59px; 
 	height: 34px;
 }
-.moor-okButton {
+.mooc-okButton {
 	font-family: Tahoma;
 	font-weight: bold;
 	font-size: 8px;
@@ -64,80 +57,74 @@ label {
 	font-family: mono;
 }
 /* Following are just <label> */
-.moor-rLabel {
+.mooc-rLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 100px;
 	margin-left: 315px;
 }
-.moor-gLabel {
+.mooc-gLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 125px;
 	margin-left: 315px;
 }
-.moor-bLabel {
+.mooc-bLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 150px;
 	margin-left: 315px;
 }
-.moor-HueLabel {
+.mooc-HueLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 190px;
 	margin-left: 315px;
 }
-span.moor-ballino { /* Style hue � (degree) !! */
+span.mooc-ballino { /* Style hue � (degree) !! */
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 190px;
 	margin-left: 370px;
 }
-.moor-SatuLabel {
+.mooc-SatuLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 215px;
 	margin-left: 315px;
 }
-.moor-BrighLabel {
+.mooc-BrighLabel {
 	/*display: none;*/
 	visibility: hidden;
 	margin-top: 240px;
 	margin-left: 315px;
 }
-.moor-hexLabel {
+.mooc-hexLabel {
 	font-size: 0px;
 	margin-top: 90px;
 	margin-left: 70px;
 }
 
 /* <input> */
-.moor-rInput, .moor-gInput, .moor-bInput, .moor-HueInput, .moor-SatuInput, .moor-BrighInput { 
+.mooc-rInput, .moor-gInput, .moor-bInput, .moor-HueInput, .moor-SatuInput, .moor-BrighInput { 
 	/*display: none;*/
 	visibility: hidden;
 	width: 30px;
 }
-.moor-hexInput {
+.mooc-hexInput {
 	font-size: 9px;
 	width: 45px;
 }
-.moor-cursor {
-	background-image: url(moor_cursor.gif); 
+.mooc-cursor {
+	background-image: url(mooc_cursor.gif); 
 	width: 12px;
 	height: 12px;
 }
-.moor-arrows {
-	/*display: none;*/
-	visibility: hidden;
-	/*background-image: url(moor_arrows.gif);*/
-	top: 9px; 
-	left: 270px;
-	width: 41px;
-	height: 9px;
+.mooc-arrows {
+	background-image: url(mooc_arrows.gif);
 }
 
-.moor-chooseColor {
+.mooc-chooseColor {
 	margin-left: 100px;
 	margin-top: 3px;
 	width: 20px;
