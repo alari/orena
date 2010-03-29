@@ -232,7 +232,7 @@ class O_EntryPoint {
 				$cmd = O("_default_command");
 			} else {
 				$cmd = str_replace(" ", "", ucwords(strtr($url, "-", " ")));
-				$cmd = str_replace(" ", "_", ucwords(strtr($url, "./", "  ")));
+				$cmd = str_replace(" ", "_", ucwords(strtr($cmd, "./", "  ")));
 			}
 		}
 		return $cmd;
